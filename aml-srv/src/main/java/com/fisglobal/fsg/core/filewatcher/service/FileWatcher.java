@@ -83,6 +83,10 @@ public class FileWatcher {
 							if (fileName!=null && fileName.toString().endsWith(FROM_FILE_FRMT)) {
 								Logger.info("File format {} Block",FROM_FILE_FRMT);
 								Path fullPath = path.resolve(fileName);
+								
+								// Waiting for file write completion
+								waitForFileCompletion(fullPath);
+								
 								String csvNewFilename = converter.convertFLTToCsv(fullPath, DESTINATION_CSV_FOLDER,DESTINATION_PROCESSED_FOLDER);
 								try {
 									if(StringUtils.isNotBlank(csvNewFilename)) {
@@ -127,4 +131,14 @@ public class FileWatcher {
 		thread.setDaemon(true);
 		thread.start();
 	}
+	
+	private static void waitForFileCompletion(Path file) throws InterruptedException {
+        long previousSize = -1;
+        while (true) {
+            long currentSize = file.toFile().length();
+            if (currentSize == previousSize) break;
+            previousSize = currentSize;
+            Thread.sleep(1000); // Wait and check again
+        }
+    }
 }

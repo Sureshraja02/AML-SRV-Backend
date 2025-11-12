@@ -67,8 +67,8 @@ public class CSVDirectImportService {
 			
 			Logger.info("Final Duck DB FOLDER Path : {}",finalDUckdbfldr);
 			//finalDbConnURL = jdbcURLDtl+finalDUckdbfldr + currentDateNmFldr + "_" + csvFileName.replace(".csv", ".db");
-			finalDbConnURL = jdbcURLDtl+finalDUckdbfldr + currentDateNmFldr + "_aml.db";
-			Logger.info("Final Duck DB COnnection URL : {}",finalDbConnURL);
+			finalDbConnURL = jdbcURLDtl + finalDUckdbfldr + currentDateNmFldr + "_aml.db";
+			Logger.info("Final Duck DB COnnection URL : {}", finalDbConnURL);
 			
 			Path duckDBFinalDir = Paths.get(finalDUckdbfldr);
 			if (!Files.exists(duckDBFinalDir)) {

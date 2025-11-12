@@ -9,6 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+/**
+ * 
+ * @author : E5554365 (Prabakaran.R)
+ * @Project : aml-srv
+ * @year : 2025
+ */
 @Component
 public class CommonUtils {
 
