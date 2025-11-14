@@ -16,4 +16,6 @@ public class AMLConstants {
 	
 	public static final String KAFKA_PUB_TOPIC = "TRASN-PUB";
 	public static final String KAFAK_RETURN_PUB_TOPIC ="TRANS-RTN-PUB";
+	
+	public static final String YES = "YES";
 }

@@ -32,7 +32,7 @@ public class PublishData2Kafka {
 	 * sendtoKafka
 	 * void
 	 */
-	private void sendtoKafka(String keyid, FinSecIndicatorVO dataDetails, String resultopic) {
+	public void sendtoKafka(String keyid, FinSecIndicatorVO dataDetails, String resultopic) {
 		ProducerRecord<String, String> record = null;
 		try {
 			/**
@@ -40,8 +40,10 @@ public class PublishData2Kafka {
 			 * partition to which the record should be sent key The key that will be
 			 * included in the record value The record contents
 			 */
+			LOGGER.info(":::::::::::::::::::::::::::::::FINSECINDICATOR : [{}]",new Gson().toJson(dataDetails));
 			record = new ProducerRecord<String, String>(resultopic, null, keyid, new Gson().toJson(dataDetails));
 			kafkaTemplate.send(record);
+			LOGGER.info("AML DATA File processing completed. FINSEC Object pushed into KAFKA.....\n\n");
 		} catch (Exception e) {
 			LOGGER.error("Exception found in FileService@sendtoKafka : {}", e);
 		} finally {

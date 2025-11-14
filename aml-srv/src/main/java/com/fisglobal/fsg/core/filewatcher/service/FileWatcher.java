@@ -10,6 +10,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.fisglobal.fsg.core.cust.profiling.service.CustomerProfiling;
 import com.fisglobal.fsg.core.duckdb.service.CSVDirectImportService;
+import com.fisglobal.fsg.core.kafka.PublishData2Kafka;
+import com.fisglobal.fsg.core.kafka.repo.FinSecIndicatorVO;
 import com.fisglobal.fsg.core.utils.AMLConstants;
 import com.fisglobal.fsg.core.utils.CommonUtils;
 
@@ -50,40 +54,64 @@ public class FileWatcher {
 	
 	@Value("${to.file.format}")
 	private String TO_FILE_FRMT;
+	
+	
+	@Value("${daily.cbs.file.count}")
+	private Integer CBSAmlFileC0unt;
+	
+	@Value("${file.fetch.interval:6000}")
+	private Integer fileFetchInterval;
+	
+	@Value("${file.completion.check.interval:1000}")
+	private Integer fileCompletionCheckval;
 
 	@Autowired
 	FLTtoCSVConverter converter;
 
 	@Autowired
 	CSVDirectImportService cvsDirectImportService;
-
 	
+	@Autowired
+	AMLDataTblDetailsFetch amlDataTblDetailsFetch;
+	
+	@Autowired
+	CustomerProfiling customerProfiling;
+	
+	@Autowired
+	PublishData2Kafka publishData2Kafka;
+
+	Long startDateMain = new Date().getTime();
+	/**
+	 * 
+	 * 
+	 * watchDirectory
+	 * void
+	 */
 	@PostConstruct
 	public void watchDirectory() {
 		Thread thread = new Thread(() -> {
+			boolean completedFileCountSts=false;
 			try {
 				WatchService watchService = FileSystems.getDefault().newWatchService();
 				Path path = Paths.get(DIRECTORY_TO_WATCH);
-				path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
-						//, StandardWatchEventKinds.ENTRY_MODIFY);// StandardWatchEventKinds.ENT
+				path.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);//, StandardWatchEventKinds.ENTRY_MODIFY);// StandardWatchEventKinds.ENT
 				Logger.info("=============Processing started==================");
 				Logger.info("Watching directory: {}", DIRECTORY_TO_WATCH);
 				while (true) {
 					WatchKey key = watchService.take();
 					List<WatchEvent<?>> watcheventss = key.pollEvents();
 					Integer fileCount = watcheventss.size();
-					Logger.info("fileCount : {}", fileCount);
+					//Logger.info("fileCount : {}", fileCount);
 					for (WatchEvent<?> event : watcheventss) {
 						WatchEvent.Kind<?> kind = event.kind();
 						Path fileName = (Path) event.context();
 						Logger.info("kind : {}", kind);
 						if (!StandardWatchEventKinds.ENTRY_DELETE.equals(kind)
 								&& !StandardWatchEventKinds.ENTRY_MODIFY.equals(kind)) {
-							Logger.info("FROM_FILE_FRMT : {}", FROM_FILE_FRMT);
+							Logger.info("FROM_FILE_FRMT : [{}]", FROM_FILE_FRMT);
 							if (fileName!=null && fileName.toString().endsWith(FROM_FILE_FRMT)) {
 								Logger.info("File format {} Block",FROM_FILE_FRMT);
 								Path fullPath = path.resolve(fileName);
-								
 								// Waiting for file write completion
 								waitForFileCompletion(fullPath);
 								
@@ -92,12 +120,12 @@ public class FileWatcher {
 									if(StringUtils.isNotBlank(csvNewFilename)) {
 									Path csvFilePath = Paths.get(DESTINATION_CSV_FOLDER, csvNewFilename);
 										if (csvFilePath != null && Files.exists(csvFilePath)) {
-										Logger.info("Final CSV Path and Name after Convert : {}", csvFilePath.toString());
-										Long startDate = new Date().getTime();
-										Logger.info("FileWatcher CSV Import Start Time : [{}]", startDate);
-										cvsDirectImportService.importCsv(csvFilePath.toString());
-										Long endTime = new Date().getTime();
-										Logger.info("FileWatcher CSV Import - Total time : {}", commonUtils.findIsHourMinSec((endTime - startDate)));
+											Logger.info("Final CSV Path and Name after Convert : {}", csvFilePath.toString());
+											Long startDate = new Date().getTime();
+											Logger.info("FileWatcher CSV Import Start Time : [{}]", startDate);
+											cvsDirectImportService.importCsv(csvFilePath.toString());
+											Long endTime = new Date().getTime();
+											Logger.info("FileWatcher CSV Import - Total time : {}", commonUtils.findIsHourMinSec((endTime - startDate)));
 										}
 									}
 								} catch (SQLException e) {
@@ -108,37 +136,124 @@ public class FileWatcher {
 								Logger.info("File format {} block entred.",AMLConstants.CSV_FORMAT);
 								// Move file
 								Path fullPath = path.resolve(fileName);
+								// Waiting for file write completion
+								waitForFileCompletion(fullPath);
+								
 								String toCsvFileName = fileName.getFileName().toString();
 								Path csvFilePath = Paths.get(DESTINATION_CSV_FOLDER, toCsvFileName);
 								commonUtils.toMove(fullPath, csvFilePath);
 								Logger.info("File moved successfully");
-								Logger.info("File format {} block End.",AMLConstants.CSV_FORMAT);
+								
+								try {
+									if(StringUtils.isNotBlank(toCsvFileName)) {
+									Path csvNewFilePath = Paths.get(DESTINATION_CSV_FOLDER, toCsvFileName);
+										if (csvNewFilePath != null && Files.exists(csvNewFilePath)) {
+											Logger.info("[CSV] Final CSV Path and Name after Convert : {}", csvNewFilePath.toString());
+											Long startDate = new Date().getTime();
+											Logger.info("[CSV] FileWatcher CSV Import Start Time : [{}]", startDate);
+											cvsDirectImportService.importCsv(csvNewFilePath.toString());
+											Long endTime = new Date().getTime();
+											Logger.info("[CSV] FileWatcher CSV Import - Total time : {}", commonUtils.findIsHourMinSec((endTime - startDate)));
+										}
+									}
+								} catch (SQLException e) {
+									Logger.error("Exception found in watchDirectory : {}", e);
+								}
+								Logger.info("File format {} block End.", AMLConstants.CSV_FORMAT);
 							}
-							Thread.sleep(6000);
+							
+							
+							completedFileCountSts = packageWatcherToChkFileCntReached();
+							Logger.info("completedFileCountSts - [{}]",completedFileCountSts);
+							if (completedFileCountSts) {
+								FinSecIndicatorVO finSecIndicatorVOoBj = new FinSecIndicatorVO();
+								finSecIndicatorVOoBj = amlDataTblDetailsFetch
+										.toSetFinSecIndicatorObjectForDuckDBSts(finSecIndicatorVOoBj);
+								finSecIndicatorVOoBj = amlDataTblDetailsFetch
+										.toGetRowCountEachAMLTblSetINFincSecIndicator(finSecIndicatorVOoBj);
+								finSecIndicatorVOoBj = customerProfiling
+										.addCustomerProfilingStsFinSecIndictor(finSecIndicatorVOoBj);
+								publishData2Kafka.sendtoKafka(finSecIndicatorVOoBj.getUuid(), finSecIndicatorVOoBj,
+										AMLConstants.KAFKA_PUB_TOPIC);
+								
+								Long endTime = new Date().getTime();
+								Logger.info("Total file processed time : {}", commonUtils.findIsHourMinSec((endTime - startDateMain)));
+								
+							}
+							// File fetch interval on each.
+							Thread.sleep(fileFetchInterval);
 						}
 					}
 					boolean valid = key.reset();
-					if (!valid) {
-						break;
-					}
+					if (!valid) { break; }
 				}
 			} catch (IOException | InterruptedException e) {
 				Logger.error("Exception found in FileWatcher@watchDirectory : {}",e);
 			}  finally {
-				Logger.info("Thread count : "+Thread.activeCount());
+				Logger.info("Thread count : [{}]", Thread.activeCount());
 			}
 		});
 		thread.setDaemon(true);
 		thread.start();
 	}
 	
-	private static void waitForFileCompletion(Path file) throws InterruptedException {
+	/**
+	 * 
+	 * @param file
+	 * @throws InterruptedException
+	 * waitForFileCompletion
+	 * void
+	 */
+	private void waitForFileCompletion(Path file) throws InterruptedException {
         long previousSize = -1;
         while (true) {
             long currentSize = file.toFile().length();
             if (currentSize == previousSize) break;
             previousSize = currentSize;
-            Thread.sleep(1000); // Wait and check again
+            try {
+            	//File Coppied Completion Check
+				Thread.sleep(fileCompletionCheckval);
+			} catch (InterruptedException e) { } // Wait and check again
         }
     }
+	
+	/**
+	 * 
+	 * @return
+	 * packageWatcherToChkFileCntReached
+	 * boolean
+	 */
+	private boolean packageWatcherToChkFileCntReached() {
+		Logger.info("::::::::::::packageWatcherToChkFileCntReached methos called.:::::");
+		String currentDateNmFldr = null;
+		Path toPath = null;
+		boolean cbsFileImportStatus = false;
+		long count = 0;
+		try {
+			currentDateNmFldr = new SimpleDateFormat("yyyyMMdd").format(new Date());
+			toPath = Paths.get(DESTINATION_CSV_FOLDER + "/" + currentDateNmFldr + "/");
+			Logger.info("Get File Count - CSV Folder Path : [{}]",toPath);
+			// while(true) {
+			if(toPath!=null) {
+				 count = Files.list(toPath).filter(Files::isRegularFile).count();
+					if (count == 1) {
+						startDateMain = new Date().getTime();
+					}
+				 Logger.info("Config / Required COunt is : [{}], File Count : [{}]",CBSAmlFileC0unt, count);
+				if (count == CBSAmlFileC0unt) {
+					cbsFileImportStatus = true;
+					// break;
+				}
+			} // Thread.sleep(6000);}
+		} catch (Exception e) {
+			Logger.error("Exception found in FileWatcher@fileWatcherTogetCount : {}", e);
+		} finally {
+
+		}
+		Logger.info("::::::::::::packageWatcherToChkFileCntReached method end.:::::\n");
+		return cbsFileImportStatus;
+	}
+	
+	
+	
 }

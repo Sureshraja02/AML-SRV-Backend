@@ -16,6 +16,8 @@ public class FinSecIndicatorVO implements Serializable {
 	private String csv2DuckDbImprtIsReady; // DuckDB Import
 	private String customerProfileIsReady; // Customer Profiling status
 
+	
+	
 	private String productTblIsReady; // Product Table
 	private String asaTblIsReady; // Account Status Table
 	private String crmTblIsReady;// Currency Mgmt Table
@@ -38,20 +40,34 @@ public class FinSecIndicatorVO implements Serializable {
 	private String transactionTblIsReady; // TRN - Transaction
 	private String lockerTblsIsReady; // LCK Table
 
+	private Long productTblRecordCnt; // Product Table
+	private Long asaTblRecordCnt; // Account Status Table
+	private Long crmTblRecordCnt;// Currency Mgmt Table
+	private Long insturmentTblRecordCnt;// Instrument Table
+	private Long nomineeTblRecordCnt;// Nominee Table
+	private Long countryTblRecordCnt;// Country Table
+	private Long transTypeTblRecordCnt;// Transaction Type Table
+	private Long minAccBalanceTblRecordCnt;// Minaccountbalance Table
+	private Long accountTblRecordCnt; // Account Table
+	private Long accCustTblRecordCnt;// AccCust table
+	private Long branchTblRecordCnt; // Branch Table
+	private Long eodTblRecordCnt; // EOD Table
+	private Long chequeDtlTblRecordCnt; // Cheque Details Table
+	private Long nctTransTblRecordCnt;// NGO or NGO transaction table
+	private Long cstTblRecordCnt; // CST or Customer Details
+	private Long ncbTblRecordCnt;// NCB Customer transaction table
+	private Long mcdTblRecordCnt;// Guardin Details Table
+	private Long joinHolderTblRecordCnt; // Join Holder Table
+	private Long tradeAccTransTblRecordCnt;// TBM - Trade Account Transaction Table
+	private Long transactionTblRecordCnt; // TRN - Transaction
+	private Long lockerTblsRecordCnt; // LCK Table
+
 	public String getUuid() {
 		return uuid;
 	}
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
-	}
-
-	public String getCsv2DuckDbImprtIsReady() {
-		return csv2DuckDbImprtIsReady;
-	}
-
-	public void setCsv2DuckDbImprtIsReady(String csv2DuckDbImprtIsReady) {
-		this.csv2DuckDbImprtIsReady = csv2DuckDbImprtIsReady;
 	}
 
 	public String getCustomerProfileIsReady() {
@@ -228,6 +244,182 @@ public class FinSecIndicatorVO implements Serializable {
 
 	public void setLockerTblsIsReady(String lockerTblsIsReady) {
 		this.lockerTblsIsReady = lockerTblsIsReady;
+	}
+
+	public String getCsv2DuckDbImprtIsReady() {
+		return csv2DuckDbImprtIsReady;
+	}
+
+	public void setCsv2DuckDbImprtIsReady(String csv2DuckDbImprtIsReady) {
+		this.csv2DuckDbImprtIsReady = csv2DuckDbImprtIsReady;
+	}
+
+	public Long getProductTblRecordCnt() {
+		return productTblRecordCnt;
+	}
+
+	public void setProductTblRecordCnt(Long productTblRecordCnt) {
+		this.productTblRecordCnt = productTblRecordCnt;
+	}
+
+	public Long getAsaTblRecordCnt() {
+		return asaTblRecordCnt;
+	}
+
+	public void setAsaTblRecordCnt(Long asaTblRecordCnt) {
+		this.asaTblRecordCnt = asaTblRecordCnt;
+	}
+
+	public Long getCrmTblRecordCnt() {
+		return crmTblRecordCnt;
+	}
+
+	public void setCrmTblRecordCnt(Long crmTblRecordCnt) {
+		this.crmTblRecordCnt = crmTblRecordCnt;
+	}
+
+	public Long getInsturmentTblRecordCnt() {
+		return insturmentTblRecordCnt;
+	}
+
+	public void setInsturmentTblRecordCnt(Long insturmentTblRecordCnt) {
+		this.insturmentTblRecordCnt = insturmentTblRecordCnt;
+	}
+
+	public Long getNomineeTblRecordCnt() {
+		return nomineeTblRecordCnt;
+	}
+
+	public void setNomineeTblRecordCnt(Long nomineeTblRecordCnt) {
+		this.nomineeTblRecordCnt = nomineeTblRecordCnt;
+	}
+
+	public Long getCountryTblRecordCnt() {
+		return countryTblRecordCnt;
+	}
+
+	public void setCountryTblRecordCnt(Long countryTblRecordCnt) {
+		this.countryTblRecordCnt = countryTblRecordCnt;
+	}
+
+	public Long getTransTypeTblRecordCnt() {
+		return transTypeTblRecordCnt;
+	}
+
+	public void setTransTypeTblRecordCnt(Long transTypeTblRecordCnt) {
+		this.transTypeTblRecordCnt = transTypeTblRecordCnt;
+	}
+
+	public Long getMinAccBalanceTblRecordCnt() {
+		return minAccBalanceTblRecordCnt;
+	}
+
+	public void setMinAccBalanceTblRecordCnt(Long minAccBalanceTblRecordCnt) {
+		this.minAccBalanceTblRecordCnt = minAccBalanceTblRecordCnt;
+	}
+
+	public Long getAccountTblRecordCnt() {
+		return accountTblRecordCnt;
+	}
+
+	public void setAccountTblRecordCnt(Long accountTblRecordCnt) {
+		this.accountTblRecordCnt = accountTblRecordCnt;
+	}
+
+	public Long getAccCustTblRecordCnt() {
+		return accCustTblRecordCnt;
+	}
+
+	public void setAccCustTblRecordCnt(Long accCustTblRecordCnt) {
+		this.accCustTblRecordCnt = accCustTblRecordCnt;
+	}
+
+	public Long getBranchTblRecordCnt() {
+		return branchTblRecordCnt;
+	}
+
+	public void setBranchTblRecordCnt(Long branchTblRecordCnt) {
+		this.branchTblRecordCnt = branchTblRecordCnt;
+	}
+
+	public Long getEodTblRecordCnt() {
+		return eodTblRecordCnt;
+	}
+
+	public void setEodTblRecordCnt(Long eodTblRecordCnt) {
+		this.eodTblRecordCnt = eodTblRecordCnt;
+	}
+
+	public Long getChequeDtlTblRecordCnt() {
+		return chequeDtlTblRecordCnt;
+	}
+
+	public void setChequeDtlTblRecordCnt(Long chequeDtlTblRecordCnt) {
+		this.chequeDtlTblRecordCnt = chequeDtlTblRecordCnt;
+	}
+
+	public Long getNctTransTblRecordCnt() {
+		return nctTransTblRecordCnt;
+	}
+
+	public void setNctTransTblRecordCnt(Long nctTransTblRecordCnt) {
+		this.nctTransTblRecordCnt = nctTransTblRecordCnt;
+	}
+
+	public Long getCstTblRecordCnt() {
+		return cstTblRecordCnt;
+	}
+
+	public void setCstTblRecordCnt(Long cstTblRecordCnt) {
+		this.cstTblRecordCnt = cstTblRecordCnt;
+	}
+
+	public Long getNcbTblRecordCnt() {
+		return ncbTblRecordCnt;
+	}
+
+	public void setNcbTblRecordCnt(Long ncbTblRecordCnt) {
+		this.ncbTblRecordCnt = ncbTblRecordCnt;
+	}
+
+	public Long getMcdTblRecordCnt() {
+		return mcdTblRecordCnt;
+	}
+
+	public void setMcdTblRecordCnt(Long mcdTblRecordCnt) {
+		this.mcdTblRecordCnt = mcdTblRecordCnt;
+	}
+
+	public Long getJoinHolderTblRecordCnt() {
+		return joinHolderTblRecordCnt;
+	}
+
+	public void setJoinHolderTblRecordCnt(Long joinHolderTblRecordCnt) {
+		this.joinHolderTblRecordCnt = joinHolderTblRecordCnt;
+	}
+
+	public Long getTradeAccTransTblRecordCnt() {
+		return tradeAccTransTblRecordCnt;
+	}
+
+	public void setTradeAccTransTblRecordCnt(Long tradeAccTransTblRecordCnt) {
+		this.tradeAccTransTblRecordCnt = tradeAccTransTblRecordCnt;
+	}
+
+	public Long getTransactionTblRecordCnt() {
+		return transactionTblRecordCnt;
+	}
+
+	public void setTransactionTblRecordCnt(Long transactionTblRecordCnt) {
+		this.transactionTblRecordCnt = transactionTblRecordCnt;
+	}
+
+	public Long getLockerTblsRecordCnt() {
+		return lockerTblsRecordCnt;
+	}
+
+	public void setLockerTblsRecordCnt(Long lockerTblsRecordCnt) {
+		this.lockerTblsRecordCnt = lockerTblsRecordCnt;
 	}
 
 }

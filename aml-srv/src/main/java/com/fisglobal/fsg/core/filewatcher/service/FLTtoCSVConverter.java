@@ -33,7 +33,6 @@ public class FLTtoCSVConverter {
 		String csvFileName = null;
 		try {
 			// Path csvPath = Paths.get(tlfPath.toString().replace(".flt", ".csv"));
-			
 			// Path csvPath = Paths.get(tlfPath.getParent().toString(), csvFileName);
 			Path destinationDir = Paths.get(newCsvPath);
 			if (!Files.exists(destinationDir)) {
@@ -45,7 +44,6 @@ public class FLTtoCSVConverter {
 				Files.createDirectories(processeddestinationDir);
 				Logger.info("Created destination folder:{} ", processeddestinationDir);
 			}
-			
 			
 			if(tlfPath!=null && Files.exists(tlfPath) && Files.isRegularFile(tlfPath)) {
 				csvFileName = tlfPath.getFileName().toString().replace(".flt", ".csv");

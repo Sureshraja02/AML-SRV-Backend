@@ -44,7 +44,7 @@ public class CSVDirectImportService {
 		Logger.info(":::::::::::::::::::Import Csv Started:::::::::::::::::");
 		Long startDate = new Date().getTime();
 		Logger.info("CSV Import Start Time : [{}]", startDate);
-		String currentDateNmFldr =new SimpleDateFormat("yyyyMMdd").format(new Date());
+		String currentDateNmFldr = new SimpleDateFormat("yyyyMMdd").format(new Date());
 		// String jdbcUrl = "jdbc:duckdb:";
 		// Adjust path as needed //String csvPath = "src/main/resources/data.csv";
 		//String csvPath = path + csvFileName;
@@ -63,11 +63,15 @@ public class CSVDirectImportService {
 			Logger.info("CSV file Name is : [{}]",csvFileName);
 			
 			tableName = csvFileName.replace(".csv", "");
+			tableName = tableName.replaceAll(" ", "_");
 			Logger.info("Table Name is : [{}]",tableName);
+			
+			tableName = commonUtils.toSpltFileNameNDGetTableName(csvFileName);
+			Logger.info("Final - Table Name is : [{}]", tableName);
 			
 			Logger.info("Final Duck DB FOLDER Path : {}",finalDUckdbfldr);
 			//finalDbConnURL = jdbcURLDtl+finalDUckdbfldr + currentDateNmFldr + "_" + csvFileName.replace(".csv", ".db");
-			finalDbConnURL = jdbcURLDtl + finalDUckdbfldr + currentDateNmFldr + "_aml.db";
+			finalDbConnURL = jdbcURLDtl + finalDUckdbfldr + "FINSEC_" + currentDateNmFldr + ".db";
 			Logger.info("Final Duck DB COnnection URL : {}", finalDbConnURL);
 			
 			Path duckDBFinalDir = Paths.get(finalDUckdbfldr);
@@ -94,13 +98,31 @@ public class CSVDirectImportService {
 					stmt.execute(createQuery);
 	            }
 	        	
+	            
+	            if(rs!=null) {
+					rs.close(); rs = null;
+				}
+				if (stmt != null) {
+					stmt.close(); stmt = null;
+				}
+				if (conn != null) {
+					conn.close(); conn = null;
+				}
+	            
 				// stmt.execute("CREATE TABLE IF NOT EXISTS " + tableName + " (id INTEGER, name VARCHAR, email VARCHAR)");
 				// stmt.execute("COPY " + tableName + " FROM '" + csvPath + "' (DELIMITER ',',  HEADER)");
-				Logger.info("CSV imported successfully.");
+				Logger.info("::::::::::::CSV imported successfully.\n\n");
 				
 				// To move into current data folder
-				Path toPath = Paths.get(DESTINATION_CSV_FOLDER + currentDateNmFldr+"/", csvFileName);
-				Logger.info("Completed from file path : {}", toPath);
+				//Path toPath = Paths.get(DESTINATION_CSV_FOLDER +"/"+ currentDateNmFldr+"/", csvFileName);
+				Path toPath = Paths.get(DESTINATION_CSV_FOLDER +"/"+ currentDateNmFldr+"/");
+				Logger.info("Before Create destination folder: {}", toPath);
+				if (!Files.exists(toPath)) {
+					Files.createDirectories(toPath);
+					Logger.info("After Created destination folder: {}", toPath);
+				}
+				toPath = Paths.get(DESTINATION_CSV_FOLDER +"/"+ currentDateNmFldr+"/",csvFileName);
+				Logger.info("Completed from file path : {}", csvFilePathObj);
 				Logger.info("Completed to file path : {}", toPath);
 				commonUtils.toMove(csvFilePathObj, toPath);
 				
@@ -110,15 +132,10 @@ public class CSVDirectImportService {
 		} catch (Exception e) {
 			Logger.error("Exception found in CsvImportServiceDirectfile@importCsv : {}", e);
 		} finally {
-			if(rs!=null) {
-				rs.close(); rs = null;
-			}
-			if (stmt != null) {
-				stmt.close(); stmt = null;
-			}
-			if (conn != null) {
-				conn.close(); conn = null;
-			}
+			/*
+			 * if(rs!=null) { rs.close(); rs = null; } if (stmt != null) { stmt.close();
+			 * stmt = null; } if (conn != null) { conn.close(); conn = null; }
+			 */
 			Long endTime = new Date().getTime();
 			Logger.info("Total time : {}", commonUtils.findIsHourMinSec((endTime - startDate)));
 			Logger.info(":::::::::::::::::::Import Csv End:::::::::::::::::\n");
