@@ -17,12 +17,6 @@ public class CustomerProfiling {
 
 	private static final Logger Logger = LoggerFactory.getLogger(CustomerProfiling.class);
 	
-    private final AMLConstants AMLConstants;
-
-    CustomerProfiling(AMLConstants AMLConstants) {
-        this.AMLConstants = AMLConstants;
-    }
-	
 	public FinSecIndicatorVO addCustomerProfilingStsFinSecIndictor(FinSecIndicatorVO finSecIndicatorVOObjParam){
 		
 		// Need to do customer profiling
