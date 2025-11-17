@@ -2,11 +2,11 @@ package com.fisglobal.fsg.core.duckdb.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.fisglobal.fsg.core.duckdb.entity.RuleAuditEntity;
+import com.fisglobal.fsg.core.duckdb.entity.RuleAuditReqEntity;
 
 import jakarta.data.repository.Repository;
 
 @Repository
-public interface RuleAuditRepositry<T> extends JpaRepository<RuleAuditEntity, String>  {
+public interface RuleAuditRepositry<T> extends JpaRepository<RuleAuditReqEntity, String>  {
 
 }

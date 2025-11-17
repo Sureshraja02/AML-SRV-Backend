@@ -118,7 +118,7 @@ public class CustomerDetailsEntity {
     private String motherName;
 
     @Column(name = "DATEOFBIRTH")
-    private Timestamp dateOfBirth;
+    private String dateOfBirth;
 
     @Column(name = "PLACEOFBIRTH")
     private String placeOfBirth;
@@ -637,11 +637,11 @@ public class CustomerDetailsEntity {
 		this.motherName = motherName;
 	}
 
-	public Timestamp getDateOfBirth() {
+	public String getDateOfBirth() {
 		return dateOfBirth;
 	}
 
-	public void setDateOfBirth(Timestamp dateOfBirth) {
+	public void setDateOfBirth(String dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 

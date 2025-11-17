@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.fisglobal.fsg.core.alldb.service.CSVDirectImportPostgresqlService;
 import com.fisglobal.fsg.core.cust.profiling.service.CustomerProfiling;
 import com.fisglobal.fsg.core.duckdb.service.CSVDirectImportService;
 import com.fisglobal.fsg.core.kafka.PublishData2Kafka;
@@ -79,6 +80,9 @@ public class FileWatcher {
 	
 	@Autowired
 	PublishData2Kafka publishData2Kafka;
+	
+	@Autowired
+	CSVDirectImportPostgresqlService csvDirectImportPostgresqlService;
 
 	Long startDateMain = new Date().getTime();
 	/**
@@ -123,12 +127,15 @@ public class FileWatcher {
 											Logger.info("Final CSV Path and Name after Convert : {}", csvFilePath.toString());
 											Long startDate = new Date().getTime();
 											Logger.info("FileWatcher CSV Import Start Time : [{}]", startDate);
-											cvsDirectImportService.importCsv(csvFilePath.toString());
+											
+											csvDirectImportPostgresqlService.toImportCsv(csvFilePath.getFileName().toString(), csvFilePath.toString());
+											
+											//cvsDirectImportService.importCsv(csvFilePath.toString());
 											Long endTime = new Date().getTime();
 											Logger.info("FileWatcher CSV Import - Total time : {}", commonUtils.findIsHourMinSec((endTime - startDate)));
 										}
 									}
-								} catch (SQLException e) {
+								} catch (Exception e) {
 									Logger.error("Exception found in watchDirectory : {}", e);
 								}
 								
@@ -151,12 +158,13 @@ public class FileWatcher {
 											Logger.info("[CSV] Final CSV Path and Name after Convert : {}", csvNewFilePath.toString());
 											Long startDate = new Date().getTime();
 											Logger.info("[CSV] FileWatcher CSV Import Start Time : [{}]", startDate);
-											cvsDirectImportService.importCsv(csvNewFilePath.toString());
+											csvDirectImportPostgresqlService.toImportCsv(csvFilePath.getFileName().toString(), csvFilePath.toString());
+											//cvsDirectImportService.importCsv(csvNewFilePath.toString());
 											Long endTime = new Date().getTime();
 											Logger.info("[CSV] FileWatcher CSV Import - Total time : {}", commonUtils.findIsHourMinSec((endTime - startDate)));
 										}
 									}
-								} catch (SQLException e) {
+								} catch (Exception e) {
 									Logger.error("Exception found in watchDirectory : {}", e);
 								}
 								Logger.info("File format {} block End.", AMLConstants.CSV_FORMAT);
@@ -239,7 +247,7 @@ public class FileWatcher {
 					if (count == 1) {
 						startDateMain = new Date().getTime();
 					}
-				 Logger.info("Config / Required COunt is : [{}], File Count : [{}]",CBSAmlFileC0unt, count);
+				 Logger.info("Config / Required Count is : [{}], File Count : [{}]",CBSAmlFileC0unt, count);
 				if (count == CBSAmlFileC0unt) {
 					cbsFileImportStatus = true;
 					// break;

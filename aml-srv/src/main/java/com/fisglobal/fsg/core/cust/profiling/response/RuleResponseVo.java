@@ -1,6 +1,7 @@
 package com.fisglobal.fsg.core.cust.profiling.response;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,8 +20,14 @@ public class RuleResponseVo implements Serializable {
 	@JsonProperty("ruleId")
 	private String ruleId;
 	
-	@JsonProperty("cumulativeValue")
-	private String cumulativeValue;
+	@JsonProperty("accountHolderType")
+	private String accountHolderType;
+	
+	@JsonProperty("accountStatus")
+	private String accountStatus;
+	
+	@JsonProperty("value")
+	private BigDecimal value;
 
 	@JsonProperty("reqId")
 	public String getReqId() {
@@ -42,14 +49,34 @@ public class RuleResponseVo implements Serializable {
 		this.ruleId = ruleId;
 	}
 
-	@JsonProperty("cumulativeValue")
-	public String getCumulativeValue() {
-		return cumulativeValue;
+	@JsonProperty("accountHolderType")
+	public String getAccountHolderType() {
+		return accountHolderType;
 	}
 
-	@JsonProperty("cumulativeValue")
-	public void setCumulativeValue(String cumulativeValue) {
-		this.cumulativeValue = cumulativeValue;
+	@JsonProperty("accountHolderType")
+	public void setAccountHolderType(String accountHolderType) {
+		this.accountHolderType = accountHolderType;
+	}
+
+	@JsonProperty("accountStatus")
+	public String getAccountStatus() {
+		return accountStatus;
+	}
+
+	@JsonProperty("accountStatus")
+	public void setAccountStatus(String accountStatus) {
+		this.accountStatus = accountStatus;
+	}
+
+	@JsonProperty("value")
+	public BigDecimal getValue() {
+		return value;
+	}
+
+	@JsonProperty("value")
+	public void setValue(BigDecimal value) {
+		this.value = value;
 	}
 
 }

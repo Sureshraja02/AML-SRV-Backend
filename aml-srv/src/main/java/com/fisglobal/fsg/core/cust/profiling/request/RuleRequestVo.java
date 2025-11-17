@@ -1,9 +1,11 @@
 package com.fisglobal.fsg.core.cust.profiling.request;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RuleRequestVo implements Serializable {
@@ -25,35 +27,23 @@ public class RuleRequestVo implements Serializable {
 	@JsonProperty("accountNo")
 	private String accountNo;
 	
-	@JsonProperty("days")
-	private String days;
-	
-	@JsonProperty("hours")
-	private String hours;
-	
-	@JsonProperty("ruleId")
-	private String fact;
-	
 	@JsonProperty("transactionMode")
 	private String transactionMode;
 	
 	@JsonProperty("txnType")
 	private String txnType;
 	
-	@JsonProperty("accountStatus")
-	private String accountStatus;
+	@JsonProperty("txn_time")
+	private String txn_time;
 	
-	@JsonProperty("accountHolderType")
-	private String accountHolderType;
-	
-	@JsonProperty("reqTime")
-	private String reqTime;
+	@JsonProperty("Factset")
+	private List<Factset> factSet;
 
 	@JsonProperty("reqId")
 	public String getReqId() {
 		return reqId;
 	}
-
+	
 	@JsonProperty("reqId")
 	public void setReqId(String reqId) {
 		this.reqId = reqId;
@@ -89,36 +79,6 @@ public class RuleRequestVo implements Serializable {
 		this.accountNo = accountNo;
 	}
 
-	@JsonProperty("days")
-	public String getDays() {
-		return days;
-	}
-
-	@JsonProperty("days")
-	public void setDays(String days) {
-		this.days = days;
-	}
-
-	@JsonProperty("hours")
-	public String getHours() {
-		return hours;
-	}
-
-	@JsonProperty("hours")
-	public void setHours(String hours) {
-		this.hours = hours;
-	}
-
-	@JsonProperty("fact")
-	public String getFact() {
-		return fact;
-	}
-
-	@JsonProperty("fact")
-	public void setFact(String fact) {
-		this.fact = fact;
-	}
-
 	@JsonProperty("transactionMode")
 	public String getTransactionMode() {
 		return transactionMode;
@@ -139,33 +99,24 @@ public class RuleRequestVo implements Serializable {
 		this.txnType = txnType;
 	}
 
-	@JsonProperty("accountStatus")
-	public String getAccountStatus() {
-		return accountStatus;
+	@JsonProperty("txn_time")
+	public String getTxn_time() {
+		return txn_time;
 	}
 
-	@JsonProperty("accountStatus")
-	public void setAccountStatus(String accountStatus) {
-		this.accountStatus = accountStatus;
+	@JsonProperty("txn_time")
+	public void setTxn_time(String txn_time) {
+		this.txn_time = txn_time;
 	}
 
-	@JsonProperty("accountHolderType")
-	public String getAccountHolderType() {
-		return accountHolderType;
+	@JsonProperty("factSet")
+	public List<Factset> getFactSet() {
+		return factSet;
 	}
 
-	@JsonProperty("accountHolderType")
-	public void setAccountHolderType(String accountHolderType) {
-		this.accountHolderType = accountHolderType;
-	}
-	
-	@JsonProperty("reqTime")
-	public String getReqTime() {
-		return reqTime;
+	@JsonProperty("factSet")
+	public void setFactSet(List<Factset> factSet) {
+		this.factSet = factSet;
 	}
 
-	@JsonProperty("reqTime")
-	public void setReqTime(String reqTime) {
-		this.reqTime = reqTime;
-	}
 }

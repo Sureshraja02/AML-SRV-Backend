@@ -1,5 +1,7 @@
 package com.fisglobal.fsg.core.alldb.service;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,6 +12,9 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
+import org.postgresql.copy.CopyManager;
+import org.postgresql.core.BaseConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +35,15 @@ public class CSVDirectImportPostgresqlService {
 	@Value("${csv.destination.folder}")
 	private String DESTINATION_CSV_FOLDER;
 	
+	@Value("${csv.insert.copy.via:JDBCCommon}")
+	private String insertVia;
+	
+	@Value("${spring.datasource.url}")
+	private String dbUrl;
+	
+	@Value("${spring.datasource.url}")
+	private String useName;
+	
 	public Connection getDBConn() {
 		
 		DriverManagerDataSource dataSource = null;
@@ -40,14 +54,15 @@ public class CSVDirectImportPostgresqlService {
 			String password = "amluser";
 			dataSource = new DriverManagerDataSource();
 			dataSource.setDriverClassName("org.postgresql.Driver");
+			dataSource.setSchema("amlschema");
 			dataSource.setUsername(user);
 			dataSource.setPassword(password);
-			dataSource.setUrl(url);
+			dataSource.setUrl(dbUrl);
 			connectionObj = dataSource.getConnection();
 		} catch (Exception e) {
 			connectionObj = null;
 		}
-
+		Logger.info("-------------------DB COnnection : {}", connectionObj);
 		return connectionObj;
 	}
 	
@@ -57,19 +72,20 @@ public class CSVDirectImportPostgresqlService {
 		}
 	}
 
-	public void toImportCsv(String tableName, String csvFilePath) {
-		
+	public void toImportCsv(String tableName, String csvFilePath) throws SQLException {
+		Path csvFilePathObj = null;
 		Connection conn = null;
 		Statement stmt = null;
 		ResultSet rs = null;
 		String csvFileName = null;
+		String currentDateNmFldr = new SimpleDateFormat("yyyyMMdd").format(new Date());
 		try {
 			Long startDate = new Date().getTime();
 			Logger.info("[POSTGRESQL] CSV Import Start Time : [{}]", startDate);
-			String currentDateNmFldr = new SimpleDateFormat("yyyyMMdd").format(new Date());
+			
 			
 			Logger.info("[POSTGRESQL] CSV File Path csvFilePath : {}",csvFilePath);
-			Path csvFilePathObj = Paths.get(csvFilePath);
+			csvFilePathObj = Paths.get(csvFilePath);
 			
 			csvFileName = csvFilePathObj.getFileName().toString();
 			Logger.info("[POSTGRESQL] CSV file Name is : [{}]",csvFileName);
@@ -85,24 +101,48 @@ public class CSVDirectImportPostgresqlService {
 			
 			stmt = conn.createStatement();
         	// Check if table exists
-            String checkSql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '" + tableName + "'";
+           /* String checkSql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_name = '" + tableName + "'";
             rs = stmt.executeQuery(checkSql);
             rs.next();
 			boolean tableExists = rs.getInt(1) > 0;
 			Logger.info("[POSTGRESQL] Table isexists : {}", tableExists);
-            if(tableExists) {
+			*/
+           /* if(tableExists) {
             	String insertSql = "INSERT INTO " + tableName + " SELECT * FROM read_csv_auto('" + csvFilePathObj.toString() + "')";
                 stmt.execute(insertSql);
             } else {
             	String createQuery = "CREATE TABLE IF NOT EXISTS " + tableName + " AS SELECT * FROM read_csv_auto('" + csvFilePathObj.toString() + "')";
 				stmt.execute(createQuery);
-            }
-			
-			if(rs!=null) {
+            }if(rs!=null) {
 				rs.close(); rs = null;
-			}
-			if (stmt != null) {
-				stmt.close(); stmt = null;
+			}*/
+            			
+			if (StringUtils.isNotBlank(insertVia) && insertVia.equalsIgnoreCase("JDBCCommon")) {
+				Logger.info("[POSTGRESQL]  JDBC Common Block Called......");
+				String sql = "COPY " + tableName + " FROM '" + csvFilePathObj.toString() + "' DELIMITER ',' CSV HEADER";
+				stmt.execute(sql);
+				if (stmt != null) {
+					stmt.close(); stmt = null;
+				}
+			} else if (StringUtils.isNotBlank(insertVia) && insertVia.equalsIgnoreCase("PGCopyManager")) {
+				Logger.info("[POSTGRESQL]  PGCopyManager Block Called......");
+				CopyManager copyManager = null;
+				FileReader fileReader = null;
+				try {
+					copyManager = new CopyManager((BaseConnection) conn);
+					fileReader = new FileReader(csvFilePathObj.toString());
+					copyManager.copyIn("COPY " + tableName + " FROM STDIN WITH CSV HEADER", fileReader);
+				} catch (Exception e) {
+					Logger.error("Exception found in [POSTGRESQL]  PGCopyManager Block : {}", e);
+				} finally {
+					if (fileReader != null) {
+						fileReader.close();
+						fileReader = null;
+					}
+					if (copyManager != null) {
+						copyManager = null;
+					}
+				}
 			}
 			closeConn(conn);
 			
@@ -122,6 +162,27 @@ public class CSVDirectImportPostgresqlService {
 			commonUtils.toMove(csvFilePathObj, toPath);
 		
 		} catch(Exception e) {
+			closeConn(conn);
+			if (stmt != null) {
+				stmt.close(); stmt = null;
+			}
+			String faliPathFlder = "FAIL-PATH";
+			Path toPath = Paths.get(DESTINATION_CSV_FOLDER + "/" + faliPathFlder + "/" + currentDateNmFldr + "/");
+			Logger.info("Before Create destination folder: {}", toPath);
+			if (!Files.exists(toPath)) {
+				try {
+					Files.createDirectories(toPath);
+				} catch (IOException e1) {
+				}
+				Logger.info("After Created destination folder: {}", toPath);
+			}
+			toPath = Paths.get(DESTINATION_CSV_FOLDER + "/" + faliPathFlder + "/" + currentDateNmFldr + "/",
+					csvFileName);
+			Logger.info("[POSTGRESQL] Completed from file path : {}", csvFilePathObj);
+			Logger.info("[POSTGRESQL] Completed to file path : {}", toPath);
+			commonUtils.toMove(csvFilePathObj, toPath);
+			
+			
 			Logger.error("Exception found in CSVDirectImportPostgresqlService@toImportCsv : {}", e);
 		} finally {
 			
