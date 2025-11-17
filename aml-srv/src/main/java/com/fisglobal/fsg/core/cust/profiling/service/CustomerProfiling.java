@@ -22,7 +22,7 @@ public class CustomerProfiling {
 		// Need to do customer profiling
 		
 		
-		finSecIndicatorVOObjParam.setCustomerProfileIsReady(AMLConstants.YES);
+		//finSecIndicatorVOObjParam.setCustomerProfileIsReady(AMLConstants.YES);
 		return finSecIndicatorVOObjParam;
 	}
 

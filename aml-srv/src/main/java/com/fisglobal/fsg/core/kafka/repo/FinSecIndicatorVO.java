@@ -14,7 +14,7 @@ public class FinSecIndicatorVO implements Serializable {
 
 	private String uuid;
 	private String csv2DuckDbImprtIsReady; // DuckDB Import
-	private String customerProfileIsReady; // Customer Profiling status
+	//private String customerProfileIsReady; // Customer Profiling status
 
 	
 	
@@ -68,14 +68,6 @@ public class FinSecIndicatorVO implements Serializable {
 
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
-	}
-
-	public String getCustomerProfileIsReady() {
-		return customerProfileIsReady;
-	}
-
-	public void setCustomerProfileIsReady(String customerProfileIsReady) {
-		this.customerProfileIsReady = customerProfileIsReady;
 	}
 
 	public String getProductTblIsReady() {
