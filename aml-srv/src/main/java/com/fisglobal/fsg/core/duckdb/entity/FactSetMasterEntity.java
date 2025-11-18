@@ -16,21 +16,26 @@ public class FactSetMasterEntity implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@Column(name = "FACT_ID", nullable = true)
 	private String factId;
-	
+
 	@Column(name = "FACT_NAME", nullable = true)
 	private String factName;
-	
+
+	@Column(name = "FACT_DATATYPE", nullable = true)
+	private String factDataType;
+
+	@Column(name = "FACT_TYPE", nullable = true)
+	private String factType;
+
 	@Column(name = "FACT_DESC", nullable = true)
 	private String factDesc;
-	
-	
+
 	@Column(name = "CREATED_DATE", nullable = true)
 	private Timestamp createdDate;
-	
+
 	@Column(name = "UPDATE_DATE", nullable = true)
 	private Timestamp updatedDate;
 
@@ -72,6 +77,22 @@ public class FactSetMasterEntity implements Serializable {
 
 	public void setUpdatedDate(Timestamp updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public String getFactDataType() {
+		return factDataType;
+	}
+
+	public void setFactDataType(String factDataType) {
+		this.factDataType = factDataType;
+	}
+
+	public String getFactType() {
+		return factType;
+	}
+
+	public void setFactType(String factType) {
+		this.factType = factType;
 	}
 
 }
