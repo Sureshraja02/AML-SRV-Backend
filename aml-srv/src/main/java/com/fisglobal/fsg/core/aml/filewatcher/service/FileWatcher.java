@@ -23,11 +23,11 @@ import org.springframework.stereotype.Component;
 
 import com.fisglobal.fsg.core.aml.cust.profiling.service.CustomerProfiling;
 import com.fisglobal.fsg.core.aml.db.service.CSVDirectImportPostgresqlService;
+import com.fisglobal.fsg.core.aml.duckdb.service.CSVDirectImportService;
 import com.fisglobal.fsg.core.aml.kafka.PublishData2Kafka;
 import com.fisglobal.fsg.core.aml.kafka.repo.FinSecIndicatorVO;
 import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 import com.fisglobal.fsg.core.aml.utils.CommonUtils;
-import com.fisglobal.fsg.core.duckdb.service.CSVDirectImportService;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -242,12 +242,12 @@ public class FileWatcher {
 			toPath = Paths.get(DESTINATION_CSV_FOLDER + "/" + currentDateNmFldr + "/");
 			Logger.info("Get File Count - CSV Folder Path : [{}]",toPath);
 			// while(true) {
-			if(toPath!=null) {
-				 count = Files.list(toPath).filter(Files::isRegularFile).count();
-					if (count == 1) {
-						startDateMain = new Date().getTime();
-					}
-				 Logger.info("Config / Required Count is : [{}], File Count : [{}]",CBSAmlFileC0unt, count);
+			if (toPath != null) {
+				count = Files.list(toPath).filter(Files::isRegularFile).count();
+				if (count == 1) {
+					startDateMain = new Date().getTime();
+				}
+				Logger.info("Config / Required Count is : [{}], File Count : [{}]", CBSAmlFileC0unt, count);
 				if (count == CBSAmlFileC0unt) {
 					cbsFileImportStatus = true;
 					// break;

@@ -41,22 +41,31 @@ public class CSVDirectImportPostgresqlService {
 	@Value("${spring.datasource.url}")
 	private String dbUrl;
 	
-	@Value("${spring.datasource.url}")
+	@Value("${spring.datasource.username}")
 	private String useName;
+	
+	@Value("${spring.datasource.password}")
+	private String secureTerm;
+	
+	@Value("${spring.jpa.properties.hibernate.default_schema}")
+	private String schemaName;
+	
+	@Value("${spring.datasource.driver-class-name}")
+	private String driverName;
 	
 	public Connection getDBConn() {
 		
 		DriverManagerDataSource dataSource = null;
 		Connection connectionObj = null;
 		try {
-			String url = "jdbc:postgresql://localhost:5432/AMLDB";
-			String user = "amluser";
-			String password = "amluser";
+//			String url = "jdbc:postgresql://localhost:5432/AMLDB";
+//			String user = "amluser";
+//			String password = "amluser";
 			dataSource = new DriverManagerDataSource();
-			dataSource.setDriverClassName("org.postgresql.Driver");
-			dataSource.setSchema("amlschema");
-			dataSource.setUsername(user);
-			dataSource.setPassword(password);
+			dataSource.setDriverClassName(driverName);
+			dataSource.setSchema(schemaName);
+			dataSource.setUsername(useName);
+			dataSource.setPassword(secureTerm);
 			dataSource.setUrl(dbUrl);
 			connectionObj = dataSource.getConnection();
 		} catch (Exception e) {

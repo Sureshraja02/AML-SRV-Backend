@@ -1,6 +1,6 @@
 package com.fisglobal.fsg.core.aml.cust.profiling.service;
 
-import com.fisglobal.fsg.core.rule.process.request.RuleRequestVo;
+import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 
 public interface RuleFactInt {
 

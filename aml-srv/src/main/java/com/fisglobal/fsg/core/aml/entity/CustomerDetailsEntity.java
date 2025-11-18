@@ -1,19 +1,16 @@
 package com.fisglobal.fsg.core.aml.entity;
 
-import java.sql.Timestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 @Entity
 @Table(name = "FS_CUST")
 public class CustomerDetailsEntity {
 
 	@Id
     @Column(name = "CUSTOMERID")
-    private Long customerId;
+    private String customerId;
 
     @Column(name = "CUSTOMERNAME")
     private String customerName;
@@ -43,7 +40,7 @@ public class CustomerDetailsEntity {
     private String creditRating;
 
     @Column(name = "CREATEDDATETIME")
-    private Timestamp createdDateTime;
+    private String createdDateTime;
 
     @Column(name = "INTRODUCERCUSTOMERID")
     private Long introducerCustomerId;
@@ -262,13 +259,13 @@ public class CustomerDetailsEntity {
     private String country;
 
     @Column(name = "PINCODE")
-    private Long pincode;
+    private String pincode;
 
     @Column(name = "PHONENO")
-    private Double phoneNo;
+    private String phoneNo;
 
     @Column(name = "MOBILENO")
-    private Double mobileNo;
+    private String mobileNo;
 
     @Column(name = "FAXNO")
     private String faxNo;
@@ -310,7 +307,7 @@ public class CustomerDetailsEntity {
     private String remarks;
 
     @Column(name = "UPDATETIMESTAMP")
-    private Timestamp updateTimestamp;
+    private String updateTimestamp;
 
     @Column(name = "SECURITYID")
     private String securityId;
@@ -352,16 +349,16 @@ public class CustomerDetailsEntity {
     private String sourceType;
 
     @Column(name = "LASTUPDATEDDATE")
-    private Timestamp lastUpdatedDate;
+    private String lastUpdatedDate;
 
     @Column(name = "PASSPORTEXPIRYDATE")
     private String passportExpiryDate;
 
-	public Long getCustomerId() {
+	public String getCustomerId() {
 		return customerId;
 	}
 
-	public void setCustomerId(Long customerId) {
+	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
 
@@ -437,11 +434,11 @@ public class CustomerDetailsEntity {
 		this.creditRating = creditRating;
 	}
 
-	public Timestamp getCreatedDateTime() {
+	public String getCreatedDateTime() {
 		return createdDateTime;
 	}
 
-	public void setCreatedDateTime(Timestamp createdDateTime) {
+	public void setCreatedDateTime(String createdDateTime) {
 		this.createdDateTime = createdDateTime;
 	}
 
@@ -1021,27 +1018,27 @@ public class CustomerDetailsEntity {
 		this.country = country;
 	}
 
-	public Long getPincode() {
+	public String getPincode() {
 		return pincode;
 	}
 
-	public void setPincode(Long pincode) {
+	public void setPincode(String pincode) {
 		this.pincode = pincode;
 	}
 
-	public Double getPhoneNo() {
+	public String getPhoneNo() {
 		return phoneNo;
 	}
 
-	public void setPhoneNo(Double phoneNo) {
+	public void setPhoneNo(String phoneNo) {
 		this.phoneNo = phoneNo;
 	}
 
-	public Double getMobileNo() {
+	public String getMobileNo() {
 		return mobileNo;
 	}
 
-	public void setMobileNo(Double mobileNo) {
+	public void setMobileNo(String mobileNo) {
 		this.mobileNo = mobileNo;
 	}
 
@@ -1149,11 +1146,11 @@ public class CustomerDetailsEntity {
 		this.remarks = remarks;
 	}
 
-	public Timestamp getUpdateTimestamp() {
+	public String getUpdateString() {
 		return updateTimestamp;
 	}
 
-	public void setUpdateTimestamp(Timestamp updateTimestamp) {
+	public void setUpdateTimestamp(String updateTimestamp) {
 		this.updateTimestamp = updateTimestamp;
 	}
 
@@ -1261,11 +1258,11 @@ public class CustomerDetailsEntity {
 		this.sourceType = sourceType;
 	}
 
-	public Timestamp getLastUpdatedDate() {
+	public String getLastUpdatedDate() {
 		return lastUpdatedDate;
 	}
 
-	public void setLastUpdatedDate(Timestamp lastUpdatedDate) {
+	public void setLastUpdatedDate(String lastUpdatedDate) {
 		this.lastUpdatedDate = lastUpdatedDate;
 	}
 
@@ -1276,6 +1273,5 @@ public class CustomerDetailsEntity {
 	public void setPassportExpiryDate(String passportExpiryDate) {
 		this.passportExpiryDate = passportExpiryDate;
 	}
-    
-    
+       
 }
