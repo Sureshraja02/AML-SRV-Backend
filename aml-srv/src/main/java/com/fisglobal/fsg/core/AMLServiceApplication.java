@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import com.fisglobal.fsg.core.cust.profiling.service.CustomerProfiling;
+import com.fisglobal.fsg.core.aml.cust.profiling.service.CustomerProfiling;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 
 /**
