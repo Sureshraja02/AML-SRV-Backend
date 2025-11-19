@@ -1,5 +1,6 @@
 package com.fisglobal.fsg.core.aml.repo;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +45,9 @@ public class TransactionDetailsRepositryImpl {
 	 * @param fieldName
 	 * @return getSumValue Integer
 	 */
-	public Integer getSumValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getSumValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method called...........", reqId);
-		Integer retnVal = 0;
+		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
 		List<Predicate> predicates = null;
 		CriteriaQuery<Object[]> cq = null;
@@ -69,16 +70,31 @@ public class TransactionDetailsRepositryImpl {
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			if (days != null) {
-				Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string
-				);
-
-				// Calculate date range in Java
+				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);
+				
+			/*	Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("TO_DATE", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));
+				*/
 				LocalDate currentDateTdy = LocalDate.now();
 				LocalDate stDate = currentDateTdy.minusDays(days);
 				// Convert LocalDate to String in same format as DB
-				// String todayStr = today.toString(); // yyyy-MM-dd//String startDateStr =
-				// startDate.toString();
-				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(stDate), java.sql.Date.valueOf(currentDateTdy));
+				 String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, stDate);
+				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(stDate));
+				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(currentDateTdy));
+				LOGGER.info("REQID : [{}] - columnName is : [{}]  [{}]", reqId, todayStr,startDateStr);
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));
+
+				// Calculate date range in Java
+				
+				
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr), java.sql.Date.valueOf(todayStr));
 				predicates.add(betweenDates);
 			}
 			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
@@ -87,14 +103,16 @@ public class TransactionDetailsRepositryImpl {
 				cq.multiselect(cb.count(rootBk), cb.sum(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					retnVal = (Integer) result[1];
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
+					retnVal = new BigDecimal(0);
 					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
 				}
 			}
 		} catch (Exception e) {
-			retnVal = 0;
+			retnVal = new BigDecimal(0);
 			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getSumValue :{}", reqId, e);
 		} finally {
 			cb = null;
