@@ -68,14 +68,14 @@ public class RulesAggregateService implements RuleExecutorIntr {
 			Integer hours = factSetObj.getHours();
 			Integer months = factSetObj.getMonths();
 			txnTime = requVoObjParam.getTxn_time();
-			Integer finalValue = null;
+			BigDecimal finalValue = null;
 			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
 				String tableName = fieldName.split("\\.")[0];
 				String columnName = fieldName.split("\\.")[1];
 				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
 					finalValue = transactionDetailsRepositryImpl.getSumValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
 					computedFactsVOObj.setFact(factName);
-					computedFactsVOObj.setValue(new BigDecimal(finalValue));
+					computedFactsVOObj.setValue(finalValue);
 				}
 			}
 
@@ -178,13 +178,13 @@ public class RulesAggregateService implements RuleExecutorIntr {
 			factName = factSetObj.getFact();
 			Integer days = factSetObj.getDays();
 
-			Integer finalValue = null;
+			BigDecimal finalValue = null;
 			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
 				String tableName = fieldName.split("\\.")[0];
 				String columnName = fieldName.split("\\.")[1];
 				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
 					finalValue = transactionDetailsRepositryImpl2.ruleOfLargerDeposite(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName, columnName);
-					computedFactsVOObj.setValue(new BigDecimal(finalValue));
+					computedFactsVOObj.setValue((finalValue));
 					computedFactsVOObj.setFact(factName);
 				}
 			}
@@ -210,15 +210,13 @@ public class RulesAggregateService implements RuleExecutorIntr {
 			factName = factSetObj.getFact();
 			Integer days = factSetObj.getDays();
 
-			Integer finalValue = null;
+			BigDecimal finalValue = null;
 			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
 				String tableName = fieldName.split("\\.")[0];
 				String columnName = fieldName.split("\\.")[1];
 				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
 					finalValue = transactionDetailsRepositryImpl2.ruleOfLargerDeposite(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName, columnName);
-					if (finalValue > 0) {
-
-					}
+					
 				}
 			}
 
