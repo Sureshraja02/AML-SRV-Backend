@@ -44,7 +44,7 @@ public class TransactionDetailsRepositryImpl {
 	 * @param fieldName
 	 * @return getSumValue Integer
 	 */
-	public Integer getSumValue(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName) {
+	public Integer getSumValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method called...........", reqId);
 		Integer retnVal = 0;
 		CriteriaBuilder cb = null;

@@ -27,9 +27,6 @@ public class RuleResposeDetailsVO implements Serializable{
 	@JsonProperty("accountStatus")
 	private String accountStatus;
 	
-	@JsonProperty("value")
-	private BigDecimal value;
-	
 	@JsonProperty("computedFacts")
 	private List<ComputedFactsVO> computedFacts;
 
@@ -73,25 +70,14 @@ public class RuleResposeDetailsVO implements Serializable{
 		this.accountStatus = accountStatus;
 	}
 
-	@JsonProperty("value")
-	public BigDecimal getValue() {
-		return value;
-	}
-
-	@JsonProperty("value")
-	public void setValue(BigDecimal value) {
-		this.value = value;
-	}
-
+	@JsonProperty("computedFacts")
 	public List<ComputedFactsVO> getComputedFacts() {
 		return computedFacts;
 	}
 
+	@JsonProperty("computedFacts")
 	public void setComputedFacts(List<ComputedFactsVO> computedFacts) {
 		this.computedFacts = computedFacts;
 	}
-	
-	
-	
 	
 }

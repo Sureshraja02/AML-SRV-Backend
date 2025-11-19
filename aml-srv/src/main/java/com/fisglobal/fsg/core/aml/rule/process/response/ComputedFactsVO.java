@@ -1,6 +1,7 @@
 package com.fisglobal.fsg.core.aml.rule.process.response;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,7 +24,7 @@ public class ComputedFactsVO implements Serializable {
 	private String fact;
 
 	@JsonProperty("value")
-	private String value;
+	private BigDecimal value;
 
 	@JsonProperty("fact")
 	public String getFact() {
@@ -36,12 +37,12 @@ public class ComputedFactsVO implements Serializable {
 	}
 
 	@JsonProperty("value")
-	public String getValue() {
+	public BigDecimal getValue() {
 		return value;
 	}
 
 	@JsonProperty("value")
-	public void setValue(String value) {
+	public void setValue(BigDecimal value) {
 		this.value = value;
 	}
 

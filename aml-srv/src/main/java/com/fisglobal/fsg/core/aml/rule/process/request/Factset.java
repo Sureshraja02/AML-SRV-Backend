@@ -5,11 +5,9 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Factset implements Serializable{
+public class Factset implements Serializable {
 
-	
 	/**
 	 * 
 	 */
@@ -17,13 +15,16 @@ public class Factset implements Serializable{
 
 	@JsonProperty("days")
 	private Integer days;
-	
+
 	@JsonProperty("months")
 	private Integer months;
-	
+
+	@JsonProperty("hours")
+	private Integer hours;
+
 	@JsonProperty("fact")
 	private String fact;
-	
+
 	@JsonProperty("field")
 	private String field;
 
@@ -66,7 +67,14 @@ public class Factset implements Serializable{
 	public void setField(String field) {
 		this.field = field;
 	}
-	
-	
-	
+
+	@JsonProperty("hours")
+	public Integer getHours() {
+		return hours;
+	}
+
+	@JsonProperty("hours")
+	public void setHours(Integer hours) {
+		this.hours = hours;
+	}
 }

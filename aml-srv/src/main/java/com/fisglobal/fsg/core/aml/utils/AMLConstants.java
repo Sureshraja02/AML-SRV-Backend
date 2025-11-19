@@ -36,4 +36,6 @@ public class AMLConstants {
 	public static final String PAN_STATUS = "PAN_STATUS";
 	public static final String ACCOUNT_STATUS = "ACCOUNT_STATUS";
 	public static final String BENEFICIARY_RELATION = "BENEFICIARY_RELATION";
+	public static final String AVG_DEBIT_CREDIT = "AVG_DEBIT_CREDIT";
+	public static final String SUM_DEBIT_CREDIT = "SUM_DEBIT_CREDIT";
 }

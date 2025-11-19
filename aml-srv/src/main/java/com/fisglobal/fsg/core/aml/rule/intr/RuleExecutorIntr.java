@@ -33,6 +33,11 @@ public interface RuleExecutorIntr {
 	
 	public ComputedFactsVO ruleOfImmediateWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
+	public ComputedFactsVO ruleOfAvgCreditDebit(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfSumCreditAmount(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	
 	//filed:Tablename.column
 	
 }

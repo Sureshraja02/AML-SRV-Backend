@@ -1,6 +1,5 @@
 package com.fisglobal.fsg.core.aml.rule.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fisglobal.fsg.core.aml.entity.AccountStatusEntity;
 import com.fisglobal.fsg.core.aml.entity.CustomerDetailsEntity;
+import com.fisglobal.fsg.core.aml.repo.AccountStatusRepositryImpl;
 import com.fisglobal.fsg.core.aml.repo.CustomerDetailsRepoImpl;
 import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
@@ -19,6 +20,12 @@ import com.fisglobal.fsg.core.aml.rule.process.response.RuleResponseVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.RuleResposeDetailsVO;
 import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
+/**
+ * 
+ * @author : E5554365 (Prabakaran.R)
+ * @Project : aml-srv
+ * @year : 2025
+ */
 @Component
 public class RulesIdentifierService {
 
@@ -32,6 +39,9 @@ public class RulesIdentifierService {
 
 	@Autowired
 	CustomerDetailsRepoImpl customerDetailsRepoImpl;
+	
+	@Autowired
+	AccountStatusRepositryImpl accountStatusRepositryImpl;
 
 	public RuleResponseVo toComputeAMLData(RuleRequestVo ruleRequestVoObParam) {
 		LOGGER.info("RulesIdentifierService toComputeAMLData method called......");
@@ -57,7 +67,6 @@ public class RulesIdentifierService {
 
 						case AMLConstants.SUM:
 							computedFactsVO = rulesExecutorService.ruleOfSUMProcess(ruleRequestVoObParam, fact);
-							
 							break;
 						case AMLConstants.COUNT:
 							computedFactsVO = rulesExecutorService.ruleOfCountProcess(ruleRequestVoObParam, fact);
@@ -102,6 +111,12 @@ public class RulesIdentifierService {
 						case AMLConstants.BENEFICIARY_RELATION:
 							computedFactsVO = rulesRsikComplianceService.ruleOfBeneficiaryRelation(ruleRequestVoObParam, fact);
 							break;
+						case AMLConstants.AVG_DEBIT_CREDIT:
+							computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact);	
+							break;
+						case AMLConstants.SUM_DEBIT_CREDIT:
+							computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact);
+							break;	
 
 						default:
 							LOGGER.info("NO MATCH FOUND");
@@ -113,16 +128,19 @@ public class RulesIdentifierService {
 				}
 				if(StringUtils.isNotBlank(ruleRequestVoObParam.getCustomerId())) {
 					CustomerDetailsEntity customerEnityObj = customerDetailsRepoImpl.getCustomerDetailsByCustId(ruleRequestVoObParam.getCustomerId());
-					ruleResposeDetailsVO.setAccountHolderType(customerEnityObj.getCustomerType());
+					if (customerEnityObj != null) {
+						ruleResposeDetailsVO.setAccountHolderType(customerEnityObj.getCustomerType());
+					}
 				}
 				if(StringUtils.isNotBlank(ruleRequestVoObParam.getAccountNo())) {
+					AccountStatusEntity accountStatusEntityObj = accountStatusRepositryImpl.getAccountStatusByAccNO(ruleRequestVoObParam.getAccountNo(), ruleRequestVoObParam.getReqId());
+					if(accountStatusEntityObj!=null) {
+						ruleResposeDetailsVO.setAccountStatus(accountStatusEntityObj.getStatus());
+					}
 					
-					ruleResposeDetailsVO.setAccountStatus("");
 				}
-				
 				ruleResposeDetailsVO.setComputedFacts(computedFacts);
 				ruleResposeDetailsVO.setReqId(ruleRequestVoObParam.getReqId());
-				ruleResposeDetailsVO.setValue(new BigDecimal(0));
 				
 				ruleRespDtlObj.add(ruleResposeDetailsVO);
 				ruleResponseVoObj.setRuleResponse(ruleRespDtlObj);
@@ -131,6 +149,7 @@ public class RulesIdentifierService {
 		} catch (Exception e) {
 			LOGGER.error("Exception found in RulesIdentifierService");
 		} finally {
+			
 		}
 		return ruleResponseVoObj;
 	}
