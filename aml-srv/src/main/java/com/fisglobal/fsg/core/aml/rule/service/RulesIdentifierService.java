@@ -1,5 +1,6 @@
 package com.fisglobal.fsg.core.aml.rule.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fisglobal.fsg.core.aml.entity.CustomerDetailsEntity;
+import com.fisglobal.fsg.core.aml.repo.CustomerDetailsRepoImpl;
 import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
+import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 import com.fisglobal.fsg.core.aml.rule.process.response.RuleResponseVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.RuleResposeDetailsVO;
 import com.fisglobal.fsg.core.aml.utils.AMLConstants;
@@ -26,81 +30,103 @@ public class RulesIdentifierService {
 	@Autowired
 	RulesRiskComplianceService rulesRsikComplianceService;
 
+	@Autowired
+	CustomerDetailsRepoImpl customerDetailsRepoImpl;
+
 	public RuleResponseVo toComputeAMLData(RuleRequestVo ruleRequestVoObParam) {
 		LOGGER.info("RulesIdentifierService toComputeAMLData method called......");
 
 		RuleResponseVo ruleResponseVoObj = null;
 		List<RuleResposeDetailsVO> ruleRespDtlObj = null;
 		RuleResposeDetailsVO ruleResposeDetailsVO = null;
+		List<ComputedFactsVO> computedFacts = null;
+		ComputedFactsVO computedFactsVO = null;
 		try {
 			LOGGER.info("RulesIdentifierService toComputeAMLData - ruleRequestVoObParam [{}]......", ruleRequestVoObParam);
 			if (ruleRequestVoObParam != null) {
 				ruleResponseVoObj = new RuleResponseVo();
-				ruleRespDtlObj = new ArrayList<RuleResposeDetailsVO>();
-				for (Factset fact : ruleRequestVoObParam.getFactSet()) {
-					// ruleResposeDetailsVO = new RuleResposeDetailsVO();
-					// BigDecimal finalValue = null;
-					if (StringUtils.isNotBlank(fact.getFact())) {
 
+				ruleRespDtlObj = new ArrayList<RuleResposeDetailsVO>();
+				computedFacts = new ArrayList<ComputedFactsVO>();
+				ruleResposeDetailsVO = new RuleResposeDetailsVO();
+				for (Factset fact : ruleRequestVoObParam.getFactSet()) {
+					computedFactsVO = new ComputedFactsVO();
+					if (StringUtils.isNotBlank(fact.getFact())) {
+						computedFactsVO.setFact(fact.getFact());
 						switch (fact.getFact()) {
 
 						case AMLConstants.SUM:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfSUMProcess(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesExecutorService.ruleOfSUMProcess(ruleRequestVoObParam, fact);
+							
 							break;
 						case AMLConstants.COUNT:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfCountProcess(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesExecutorService.ruleOfCountProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.AVG:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfAVGProcess(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesExecutorService.ruleOfAVGProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.MAX:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfMaxProcess(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesExecutorService.ruleOfMaxProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.TOTAL:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfSUMProcess(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesExecutorService.ruleOfSUMProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.PREVIOUS_FOREX_TURNOVER:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfPreviousForexTurnoverProcess(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesExecutorService.ruleOfPreviousForexTurnoverProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.FD_CONVERSION:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfFDConversion(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesExecutorService.ruleOfFDConversion(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.LARGE_DEPOSIT:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfLargerDeposite(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesExecutorService.ruleOfLargerDeposite(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.IMMEDIATE_WITHDRAWAL:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact);
 							break;
 
 						case AMLConstants.COUNTRY_RISK:
-							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfCountryRisk(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesRsikComplianceService.ruleOfCountryRisk(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.CUSTOMER_MATCH:
-							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfCustomerMatch(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesRsikComplianceService.ruleOfCustomerMatch(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.FCRA_COMPLIANCE:
-							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfFCRACompliance(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesRsikComplianceService.ruleOfFCRACompliance(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.PAN_STATUS:
-							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfPanStatus(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesRsikComplianceService.ruleOfPanStatus(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.ACCOUNT_STATUS:
-							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfAccountStatus(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesRsikComplianceService.ruleOfAccountStatus(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.BENEFICIARY_RELATION:
-							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfBeneficiaryRelation(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesRsikComplianceService.ruleOfBeneficiaryRelation(ruleRequestVoObParam, fact);
 							break;
 
 						default:
 							LOGGER.info("NO MATCH FOUND");
 						}
-						ruleRespDtlObj.add(ruleResposeDetailsVO);
+						computedFacts.add(computedFactsVO);
 					} else {
 						LOGGER.info("RuleRequestVo object is NULL recevie");
 					}
 				}
+				if(StringUtils.isNotBlank(ruleRequestVoObParam.getCustomerId())) {
+					CustomerDetailsEntity customerEnityObj = customerDetailsRepoImpl.getCustomerDetailsByCustId(ruleRequestVoObParam.getCustomerId());
+					ruleResposeDetailsVO.setAccountHolderType(customerEnityObj.getCustomerType());
+				}
+				if(StringUtils.isNotBlank(ruleRequestVoObParam.getAccountNo())) {
+					
+					ruleResposeDetailsVO.setAccountStatus("");
+				}
+				
+				ruleResposeDetailsVO.setComputedFacts(computedFacts);
+				ruleResposeDetailsVO.setReqId(ruleRequestVoObParam.getReqId());
+				ruleResposeDetailsVO.setValue(new BigDecimal(0));
+				
+				ruleRespDtlObj.add(ruleResposeDetailsVO);
+				ruleResponseVoObj.setRuleResponse(ruleRespDtlObj);
 			}
-			ruleResponseVoObj.setRuleResponse(ruleRespDtlObj);
 
 		} catch (Exception e) {
 			LOGGER.error("Exception found in RulesIdentifierService");

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
-import com.fisglobal.fsg.core.aml.rule.process.response.RuleResposeDetailsVO;
+import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 
 /**
  * 
@@ -15,23 +15,23 @@ import com.fisglobal.fsg.core.aml.rule.process.response.RuleResposeDetailsVO;
 @Component
 public interface RuleExecutorIntr {
 	
-	public RuleResposeDetailsVO ruleOfCountProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfCountProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
 
-	public RuleResposeDetailsVO ruleOfSUMProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfSUMProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-	public RuleResposeDetailsVO ruleOfMaxProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfMaxProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-	public RuleResposeDetailsVO ruleOfAVGProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfAVGProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-	public RuleResposeDetailsVO ruleOfCommAggregateProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfCommAggregateProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-	public RuleResposeDetailsVO ruleOfPreviousForexTurnoverProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfPreviousForexTurnoverProcess(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-	public RuleResposeDetailsVO ruleOfFDConversion(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfFDConversion(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-	public RuleResposeDetailsVO ruleOfLargerDeposite(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfLargerDeposite(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-	public RuleResposeDetailsVO ruleOfImmediateWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfImmediateWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
 	//filed:Tablename.column
 	
