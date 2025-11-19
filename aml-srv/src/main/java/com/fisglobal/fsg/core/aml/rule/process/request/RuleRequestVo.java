@@ -118,5 +118,6 @@ public class RuleRequestVo implements Serializable {
 	public void setFactSet(List<Factset> factSet) {
 		this.factSet = factSet;
 	}
+	
 
 }

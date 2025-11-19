@@ -1,6 +1,5 @@
 package com.fisglobal.fsg.core.aml.rule.service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class RulesIdentifierService {
 	private Logger LOGGER = LoggerFactory.getLogger(RulesIdentifierService.class);
 
 	@Autowired
-	RulesExecutorService rulesExecutorService;
+	RulesAggregateService rulesExecutorService;
 
 	@Autowired
 	RulesRiskComplianceService rulesRsikComplianceService;
@@ -34,8 +33,7 @@ public class RulesIdentifierService {
 		List<RuleResposeDetailsVO> ruleRespDtlObj = null;
 		RuleResposeDetailsVO ruleResposeDetailsVO = null;
 		try {
-			LOGGER.info("RulesIdentifierService toComputeAMLData - ruleRequestVoObParam [{}]......",
-					ruleRequestVoObParam);
+			LOGGER.info("RulesIdentifierService toComputeAMLData - ruleRequestVoObParam [{}]......", ruleRequestVoObParam);
 			if (ruleRequestVoObParam != null) {
 				ruleResponseVoObj = new RuleResponseVo();
 				ruleRespDtlObj = new ArrayList<RuleResposeDetailsVO>();
@@ -47,53 +45,50 @@ public class RulesIdentifierService {
 						switch (fact.getFact()) {
 
 						case AMLConstants.SUM:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfSUMProcess(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesExecutorService.ruleOfSUMProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.COUNT:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfCountProcess(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesExecutorService.ruleOfCountProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.AVG:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfAVGProcess(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesExecutorService.ruleOfAVGProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.MAX:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfMaxProcess(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesExecutorService.ruleOfMaxProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.TOTAL:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfSUMProcess(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesExecutorService.ruleOfSUMProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.PREVIOUS_FOREX_TURNOVER:
-							ruleResposeDetailsVO = rulesExecutorService
-									.ruleOfPreviousForexTurnoverProcess(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesExecutorService.ruleOfPreviousForexTurnoverProcess(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.FD_CONVERSION:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfFDConversion(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesExecutorService.ruleOfFDConversion(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.LARGE_DEPOSIT:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfLargerDeposite(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesExecutorService.ruleOfLargerDeposite(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.IMMEDIATE_WITHDRAWAL:
-							ruleResposeDetailsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact);
 							break;
 
 						case AMLConstants.COUNTRY_RISK:
-							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfCountryRisk(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfCountryRisk(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.CUSTOMER_MATCH:
-							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfCustomerMatch(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfCustomerMatch(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.FCRA_COMPLIANCE:
-							ruleResposeDetailsVO = rulesRsikComplianceService
-									.ruleOfFCRACompliance(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfFCRACompliance(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.PAN_STATUS:
-							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfPanStatus(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfPanStatus(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.ACCOUNT_STATUS:
-							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfAccountStatus(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfAccountStatus(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.BENEFICIARY_RELATION:
-							ruleResposeDetailsVO = rulesRsikComplianceService
-									.ruleOfBeneficiaryRelation(ruleRequestVoObParam);
+							ruleResposeDetailsVO = rulesRsikComplianceService.ruleOfBeneficiaryRelation(ruleRequestVoObParam, fact);
 							break;
 
 						default:

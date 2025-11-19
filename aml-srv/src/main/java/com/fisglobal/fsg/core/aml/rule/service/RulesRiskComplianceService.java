@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.fisglobal.fsg.core.aml.rule.intr.RulesRiskComplianceIntr;
+import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.RuleResposeDetailsVO;
 
@@ -16,7 +17,7 @@ public class RulesRiskComplianceService implements RulesRiskComplianceIntr {
 	private Logger LOGGER = LoggerFactory.getLogger(RulesRiskComplianceService.class);
 
 	@Override
-	public RuleResposeDetailsVO ruleOfCountryRisk(RuleRequestVo requVoObjParam) {
+	public RuleResposeDetailsVO ruleOfCountryRisk(RuleRequestVo requVoObjParam, Factset factSetObj) {
 		RuleResposeDetailsVO ruleResposeDetailsVO = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesRiskComplianceService@ruleOfImmediateWithdraw (IMMEDIATE_WITHDRAWAL) Called::::::::::", requVoObjParam.getReqId());
 		try {
@@ -35,7 +36,7 @@ public class RulesRiskComplianceService implements RulesRiskComplianceIntr {
 	}
 
 	@Override
-	public RuleResposeDetailsVO ruleOfCustomerMatch(RuleRequestVo requVoObjParam) {
+	public RuleResposeDetailsVO ruleOfCustomerMatch(RuleRequestVo requVoObjParam, Factset factSetObj) {
 		RuleResposeDetailsVO ruleResposeDetailsVO = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesRiskComplianceService@ruleOfCustomerMatch (CUSTOMER_MATCH) Called::::::::::", requVoObjParam.getReqId());
 		try {
@@ -54,7 +55,7 @@ public class RulesRiskComplianceService implements RulesRiskComplianceIntr {
 	}
 
 	@Override
-	public RuleResposeDetailsVO ruleOfFCRACompliance(RuleRequestVo requVoObjParam) {
+	public RuleResposeDetailsVO ruleOfFCRACompliance(RuleRequestVo requVoObjParam, Factset factSetObj) {
 		RuleResposeDetailsVO ruleResposeDetailsVO = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesRiskComplianceService@ruleOfFCRACompliance (FCRA_COMPLIANCE) Called::::::::::", requVoObjParam.getReqId());
 		try {
@@ -73,7 +74,7 @@ public class RulesRiskComplianceService implements RulesRiskComplianceIntr {
 	}
 
 	@Override
-	public RuleResposeDetailsVO ruleOfPanStatus(RuleRequestVo requVoObjParam) {
+	public RuleResposeDetailsVO ruleOfPanStatus(RuleRequestVo requVoObjParam, Factset factSetObj) {
 		RuleResposeDetailsVO ruleResposeDetailsVO = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesRiskComplianceService@ruleOfPanStatus (PAN_STATUS) Called::::::::::", requVoObjParam.getReqId());
 		try {
@@ -92,7 +93,7 @@ public class RulesRiskComplianceService implements RulesRiskComplianceIntr {
 	}
 
 	@Override
-	public RuleResposeDetailsVO ruleOfAccountStatus(RuleRequestVo requVoObjParam) {
+	public RuleResposeDetailsVO ruleOfAccountStatus(RuleRequestVo requVoObjParam, Factset factSetObj) {
 		RuleResposeDetailsVO ruleResposeDetailsVO = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesRiskComplianceService@ruleOfAccountStatus (ACCOUNT_STATUS) Called::::::::::", requVoObjParam.getReqId());
 		try {
@@ -111,7 +112,7 @@ public class RulesRiskComplianceService implements RulesRiskComplianceIntr {
 	}
 
 	@Override
-	public RuleResposeDetailsVO ruleOfBeneficiaryRelation(RuleRequestVo requVoObjParam) {
+	public RuleResposeDetailsVO ruleOfBeneficiaryRelation(RuleRequestVo requVoObjParam, Factset factSetObj) {
 		RuleResposeDetailsVO ruleResposeDetailsVO = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesRiskComplianceService@ruleOfBeneficiaryRelation (BENEFICIARY_RELATION) Called::::::::::", requVoObjParam.getReqId());
 		try {

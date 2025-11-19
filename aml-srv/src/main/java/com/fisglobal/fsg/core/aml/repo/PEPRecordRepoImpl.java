@@ -3,6 +3,7 @@ package com.fisglobal.fsg.core.aml.repo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.fisglobal.fsg.core.aml.entity.PEPRecordEntity;
@@ -17,6 +18,7 @@ import jakarta.persistence.criteria.Root;
 @Repository
 public class PEPRecordRepoImpl {
 	
+	@Autowired
 	EntityManager em;
 
 	public List<PEPRecordEntity> getCustomerDetailsbyCriteria(String custId) {
