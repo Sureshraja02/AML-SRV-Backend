@@ -31,11 +31,49 @@ public interface RuleExecutorIntr {
 	
 	public ComputedFactsVO ruleOfLargerDeposite(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-	public ComputedFactsVO ruleOfImmediateWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfImmediateWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj, ComputedFactsVO computedFactsVODeopObj);
 	
 	public ComputedFactsVO ruleOfAvgCreditDebit(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-	public ComputedFactsVO ruleOfSumCreditAmount(RuleRequestVo requVoObjParam, Factset factSetObj);
+	public ComputedFactsVO ruleOfSumCreditDebitAmount(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfCountCreditDebitAmount(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfAvgCreditDebitAmount(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfMinProcess(RuleRequestVo requVoObjParam, Factset factSetObj);	
+	
+	public ComputedFactsVO ruleOfCountCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfSumCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfAvgCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfCountCashWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfSumCashWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfAvgCashWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfSumNonCashWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfSumNonDeposit(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfCountAccountTransfer(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfSumAccountTransfer(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfSumCashTxn(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfSumNonCashTxn(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfSumAccountToAccountTxn(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfSumNonCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	
+	
+	
 	
 	
 	//filed:Tablename.column

@@ -27,6 +27,9 @@ public class Factset implements Serializable {
 
 	@JsonProperty("field")
 	private String field;
+	
+	@JsonProperty("condition")
+	private String condition;
 
 	@JsonProperty("days")
 	public Integer getDays() {
@@ -77,4 +80,16 @@ public class Factset implements Serializable {
 	public void setHours(Integer hours) {
 		this.hours = hours;
 	}
+
+	@JsonProperty("condition")
+	public String getCondition() {
+		return condition;
+	}
+
+	@JsonProperty("condition")
+	public void setCondition(String condition) {
+		this.condition = condition;
+	}
+	
+	
 }

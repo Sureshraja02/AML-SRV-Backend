@@ -24,6 +24,7 @@ public class AMLConstants {
 	public static final String MAX = "MAX";
 	public static final String AVG = "AVG";
 	public static final String TOTAL = "TOTAL";
+	public static final String MIN = "MIN";
 	public static final String PREVIOUS_FOREX_TURNOVER = "PREVIOUS_FOREX_TURNOVER";
 
 	public static final String FD_CONVERSION = "FD_CONVERSION";
@@ -38,4 +39,50 @@ public class AMLConstants {
 	public static final String BENEFICIARY_RELATION = "BENEFICIARY_RELATION";
 	public static final String AVG_DEBIT_CREDIT = "AVG_DEBIT_CREDIT";
 	public static final String SUM_DEBIT_CREDIT = "SUM_DEBIT_CREDIT";
+	public static final String COUNT_DEBIT_CREDIT = "COUNT_DEBIT_CREDIT";
+	public static final String COUNT_CASH_DEPOSITS = "COUNT_CASH_DEPOSITS";
+	public static final String SUM_CASH_DEPOSITS = "SUM_CASH_DEPOSITS";
+	public static final String AVG_CASH_DEPOSITS = "AVG_CASH_DEPOSITS";
+	
+	public static final String WITHDRAWAL_PERCENTAGE = "WITHDRAWAL_PERCENTAGE";
+	public static final String COUNT_CASH_WITHDRAWALS="COUNT_CASH_WITHDRAWALS";
+	public static final String SUM_NONCASH_TXNS="SUM_NONCASH_TXNS";
+	public static final String SUM_ACCOUNT_TRANSFERS="SUM_ACCOUNT_TRANSFERS";
+	public static final String SUM_NONCASH_WITHDRAWAL = "SUM_NONCASH_WITHDRAWAL";
+	public static final String SUM_CASH_WITHDRAWALS="SUM_CASH_WITHDRAWALS";	
+	public static final String SUM_NONCASH_DEPOSITS = "SUM_NONCASH_DEPOSITS";
+	public static final String COUNT_ACCOUNT_TRANSFERS = "COUNT_ACCOUNT_TRANSFERS";
+	public static final String SUM_CASH_TXNS="SUM_CASH_TXNS";
+	public static final String COUNT_ACC_TO_ACC_TRANSFERS="COUNT_ACC_TO_ACC_TRANSFERS";
+	public static final String AVG_CASH_WITHDRAWALS="AVG_CASH_WITHDRAWALS";
+	
+	
+	public static final String IMMEDIATE_WITHDRAWAL_DIFFERENT_LOCATIONS = "IMMEDIATE_WITHDRAWAL_DIFFERENT_LOCATIONS";
+	public static final String IMMEDIATE_WITHDRAWAL_ATM_OR_OTHER = "IMMEDIATE_WITHDRAWAL_ATM_OR_OTHER";
+	public static final String NEW = "NEW";
+	public static final String HIGH_RISK = "HIGH_RISK";
+	public static final String TERROR_HIGH_RISK = "TERROR_HIGH_RISK";
+	public static final String FOREIGN_CURRENCY = "FOREIGN_CURRENCY";
+	public static final String CLOSED = "CLOSED";
+	public static final String AFGHANISTAN_OR_PAKISTAN = "AFGHANISTAN_OR_PAKISTAN";
+	public static final String MCC5944 = "MCC5944";
+	public static final String INDO_NEPAL_BORDER = "INDO-NEPAL-BORDER";
+	public static final String MALDA = "MALDA";
+	public static final String UNSCR = "UNSCR";
+	public static final String UAPA = "UAPA";
+	public static final String TF_SUSPECT = "TF_SUSPECT";
+	public static final String CRIMINAL_LIST = "CRIMINAL_LIST";
+	public static final String FIU_IND_ALERT = "FIU_IND_ALERT";
+	public static final String TERROR_LOCATIONS = "TERROR_LOCATIONS";
+	public static final String NON_ACCOUNT_HOLDER = "NON_ACCOUNT_HOLDER";
+	public static final String MULTIPLE_LOCATIONS = "MULTIPLE_LOCATIONS";
+	public static final String OUTSIDE_MAOIST = "OUTSIDE_MAOIST";
+	public static final String MAOIST_AREA = "MAOIST_AREA";
+	public static final String MULTIPLE = "MULTIPLE";
+	public static final String CONSULTANCY = "CONSULTANCY";
+	public static final String VIOLATION = "VIOLATION";
+	public static final String NOT_SHIPPED = "NOT_SHIPPED";
+	public static final String TERROR_INCIDENT = "TERROR_INCIDENT";
+	public static final String UNRELATED = "UNRELATED";
+	
 }

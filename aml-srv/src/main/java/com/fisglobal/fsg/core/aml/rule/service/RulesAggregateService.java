@@ -35,13 +35,37 @@ public class RulesAggregateService implements RuleExecutorIntr {
 
 	@Autowired
 	CustomerDetailsRepoImpl customerDetailsRepoImpl;
+	
+	@Autowired
+	RulesUtils rulesUtils;
 
 	@Override
 	public ComputedFactsVO ruleOfCountProcess(RuleRequestVo requVoObjParam, Factset factSetObj) {
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
 		try {
 			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getCountValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
 
 		} catch (Exception e) {
 			LOGGER.error("Exception found in RulesExecutorService@ruleOfCountProcess : {}", e);
@@ -92,7 +116,33 @@ public class RulesAggregateService implements RuleExecutorIntr {
 	public ComputedFactsVO ruleOfMaxProcess(RuleRequestVo requVoObjParam, Factset factSetObj) {
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfMaxProcess (MAX) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		
 		try {
+
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getMaxValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		
 
 		} catch (Exception e) {
 			LOGGER.error("Exception found in RulesExecutorService@ruleOfMaxProcess : {}", e);
@@ -106,7 +156,29 @@ public class RulesAggregateService implements RuleExecutorIntr {
 	public ComputedFactsVO ruleOfAVGProcess(RuleRequestVo requVoObjParam, Factset factSetObj) {
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfAVGProcess (AVG) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
 		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl.getSumValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
 
 		} catch (Exception e) {
 			LOGGER.error("Exception found in RulesExecutorService@ruleOfAVGProcess : {}", e);
@@ -178,7 +250,7 @@ public class RulesAggregateService implements RuleExecutorIntr {
 				String tableName = fieldName.split("\\.")[0];
 				String columnName = fieldName.split("\\.")[1];
 				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
-					finalValue = transactionDetailsRepositryImpl2.ruleOfLargerDeposite(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName, columnName);
+					finalValue = transactionDetailsRepositryImpl2.getLargerDeposite(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName, columnName);
 					computedFactsVOObj.setValue((finalValue));
 					computedFactsVOObj.setFact(factName);
 				}
@@ -194,7 +266,7 @@ public class RulesAggregateService implements RuleExecutorIntr {
 	}
 
 	@Override
-	public ComputedFactsVO ruleOfImmediateWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO ruleOfImmediateWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj, ComputedFactsVO computedFactsVODeopObj) {
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfImmediateWithdraw (IMMEDIATE_WITHDRAWAL) Called::::::::::", requVoObjParam.getReqId());
 		try {
@@ -210,7 +282,7 @@ public class RulesAggregateService implements RuleExecutorIntr {
 				String tableName = fieldName.split("\\.")[0];
 				String columnName = fieldName.split("\\.")[1];
 				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
-					finalValue = transactionDetailsRepositryImpl2.ruleOfLargerDeposite(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName, columnName);
+					//finalValue = rulesUtils.toGetWithdaralFacts(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName, columnName);
 					
 				}
 			}
@@ -237,13 +309,14 @@ public class RulesAggregateService implements RuleExecutorIntr {
 			transType = requVoObjParam.getTxnType();
 			fieldName = factSetObj.getField();
 			factName = factSetObj.getFact();
+			Integer months = factSetObj.getMonths();
 			Integer days = factSetObj.getDays();
 			Integer finalValue = null;
 			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
 				String tableName = fieldName.split("\\.")[0];
 				String columnName = fieldName.split("\\.")[1];
 				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
-					finalValue = transactionDetailsRepositryImpl2.ruleOfAvgCreditDebit(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName, columnName);
+					finalValue = transactionDetailsRepositryImpl2.getAvgCreditDebit(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName,months, columnName);
 					if (finalValue > 0) {
 						computedFactsVOObj.setValue(new BigDecimal(finalValue));
 						computedFactsVOObj.setFact(factName);
@@ -261,7 +334,7 @@ public class RulesAggregateService implements RuleExecutorIntr {
 	}
 
 	@Override
-	public ComputedFactsVO ruleOfSumCreditAmount(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO ruleOfSumCreditDebitAmount(RuleRequestVo requVoObjParam, Factset factSetObj) {
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfSumCreditAmount (SUM) Called::::::::::", requVoObjParam.getReqId());
 		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null;
@@ -274,12 +347,13 @@ public class RulesAggregateService implements RuleExecutorIntr {
 			fieldName = factSetObj.getField();
 			factName = factSetObj.getFact();
 			Integer days = factSetObj.getDays();
+			Integer months = factSetObj.getMonths();
 			Integer finalValue = null;
 			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
 				String tableName = fieldName.split("\\.")[0];
 				String columnName = fieldName.split("\\.")[1];
 				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
-					finalValue = transactionDetailsRepositryImpl2.ruleOfSumCreditAmount(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName, columnName);
+					finalValue = transactionDetailsRepositryImpl2.getSumCreditDebitAmount(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName,months, columnName);
 					if (finalValue > 0) {
 						computedFactsVOObj.setValue(new BigDecimal(finalValue));
 						computedFactsVOObj.setFact(factName);
@@ -294,6 +368,656 @@ public class RulesAggregateService implements RuleExecutorIntr {
 			LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfSumCreditAmount (SUM) End::::::::::\n\n", requVoObjParam.getReqId());
 		}
 		return computedFactsVOObj;
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfMinProcess(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfMinProcess (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getMinValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfMinProcess : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfMinProcess (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfCountCreditDebitAmount(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountCreditDebitAmount (SUM) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer months = factSetObj.getMonths();
+			Integer finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getCountCreditDebit(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName,months, columnName);
+					if (finalValue > 0) {
+						computedFactsVOObj.setValue(new BigDecimal(finalValue));
+						computedFactsVOObj.setFact(factName);
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfCountCreditDebitAmount : {}", e);
+		} finally {
+
+			LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountCreditDebitAmount (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfAvgCreditDebitAmount(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfAvgCreditDebitAmount (AVG) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer months = factSetObj.getMonths();
+			Integer finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getAvgCreditDebit(requVoObjParam.getReqId(), accNo, custId, transMode, transType, days, fieldName,months, columnName);
+					if (finalValue > 0) {
+						computedFactsVOObj.setValue(new BigDecimal(finalValue));
+						computedFactsVOObj.setFact(factName);
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfAvgCreditDebitAmount : {}", e);
+		} finally {
+
+			LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfAvgCreditDebitAmount (AVG) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfCountCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getCountCashDepositValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfCountProcess : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfSumCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getSumCashDepositValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfCountProcess : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+	
+	@Override
+	public ComputedFactsVO ruleOfSumNonCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfSumNonCashDeposit (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getSumNonCashDepositValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfSumNonCashDeposit : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfSumNonCashDeposit (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfAvgCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getAvgCashDepositValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfCountProcess : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfCountCashWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getCountCashWithdrawValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfCountProcess : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfSumCashWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getSumCashWithdrawValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfCountProcess : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfAvgCashWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getAugCashWithdrawValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfCountProcess : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfSumNonCashWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getSumNonCashWithdrawValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfCountProcess : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfSumNonDeposit(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfSumNonDeposit (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getSumNonCashWithdrawValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfSumNonDeposit : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfSumNonDeposit (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfCountAccountTransfer(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getCountAccountTransferValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfCountProcess : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfCountProcess (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfSumCashTxn(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfSumCashTxn (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getSumCashTxnValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfSumCashTxn : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfSumCashTxn (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+	
+	@Override
+	public ComputedFactsVO ruleOfSumNonCashTxn(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfSumNonCashTxn (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getSumNonCashTxnValue(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfSumNonCashTxn : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfSumNonCashTxn (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+	
+	@Override
+	public ComputedFactsVO ruleOfSumAccountToAccountTxn(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfSumAccountToAccountTxn (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getSumAccountToAccountTxn(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfSumCashTxn : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfSumAccountToAccountTxn (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
+	}
+
+	@Override
+	public ComputedFactsVO ruleOfSumAccountTransfer(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfSumAccountToAccountTxn (COUNT) Called::::::::::", requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, fieldName = null, txnTime = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();
+			fieldName = factSetObj.getField();
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			BigDecimal finalValue = null;
+			if (StringUtils.isNotBlank(fieldName) && fieldName.contains(".")) {
+				String tableName = fieldName.split("\\.")[0];
+				String columnName = fieldName.split("\\.")[1];
+				if (StringUtils.isNotBlank(tableName) && tableName.equalsIgnoreCase("TRANSACTION")) {
+					finalValue = transactionDetailsRepositryImpl2.getSumAccountTxn(requVoObjParam.getReqId(), accNo, custId, transMode, transType, hours, days, months, fieldName, columnName);
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(finalValue);
+				}
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RulesExecutorService@ruleOfSumCashTxn : {}", e);
+		} finally {
+			LOGGER.info("REQ ID : [{}]::::::::::::RulesExecutorService@ruleOfSumAccountToAccountTxn (COUNT) End::::::::::\n\n", requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+	
 	}
 
 }

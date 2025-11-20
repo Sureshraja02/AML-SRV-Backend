@@ -25,6 +25,9 @@ public class ComputedFactsVO implements Serializable {
 
 	@JsonProperty("value")
 	private BigDecimal value;
+	
+	@JsonProperty("ruleType")
+	private String ruleType;
 
 	@JsonProperty("fact")
 	public String getFact() {
@@ -45,5 +48,17 @@ public class ComputedFactsVO implements Serializable {
 	public void setValue(BigDecimal value) {
 		this.value = value;
 	}
+
+	@JsonProperty("ruleType")
+	public String getRuleType() {
+		return ruleType;
+	}
+
+	@JsonProperty("ruleType")
+	public void setRuleType(String ruleType) {
+		this.ruleType = ruleType;
+	}
+	
+	
 
 }

@@ -39,7 +39,7 @@ public class TransactionDetailsEntity {
 	    private String channelId;
 
 	    @Column(name = "TRANSACTIONDATE")
-	    private Timestamp transactionDate;
+	    private String transactionDate;
 
 	    @Column(name = "TRANSACTIONTIME")
 	    private String transactionTime;
@@ -199,11 +199,11 @@ public class TransactionDetailsEntity {
 			this.channelId = channelId;
 		}
 
-		public Timestamp getTransactionDate() {
+		public String getTransactionDate() {
 			return transactionDate;
 		}
 
-		public void setTransactionDate(Timestamp transactionDate) {
+		public void setTransactionDate(String transactionDate) {
 			this.transactionDate = transactionDate;
 		}
 

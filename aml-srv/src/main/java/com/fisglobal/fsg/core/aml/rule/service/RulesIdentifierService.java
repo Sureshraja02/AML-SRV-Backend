@@ -42,6 +42,9 @@ public class RulesIdentifierService {
 	
 	@Autowired
 	AccountStatusRepositryImpl accountStatusRepositryImpl;
+	
+	@Autowired
+	RulesUtils rulesUtils;
 
 	public RuleResponseVo toComputeAMLData(RuleRequestVo ruleRequestVoObParam) {
 		LOGGER.info("RulesIdentifierService toComputeAMLData method called......");
@@ -90,7 +93,8 @@ public class RulesIdentifierService {
 							computedFactsVO = rulesExecutorService.ruleOfLargerDeposite(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.IMMEDIATE_WITHDRAWAL:
-							computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact);
+							
+						//	computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact);
 							break;
 
 						case AMLConstants.COUNTRY_RISK:
@@ -112,12 +116,63 @@ public class RulesIdentifierService {
 							computedFactsVO = rulesRsikComplianceService.ruleOfBeneficiaryRelation(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.AVG_DEBIT_CREDIT:
-							computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact);	
+							computedFactsVO = rulesExecutorService.ruleOfAvgCreditDebit(ruleRequestVoObParam, fact);	
 							break;
 						case AMLConstants.SUM_DEBIT_CREDIT:
-							computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact);
+							computedFactsVO = rulesExecutorService.ruleOfSumCreditDebitAmount(ruleRequestVoObParam, fact);
 							break;	
-
+						case AMLConstants.MIN:
+							computedFactsVO = rulesExecutorService.ruleOfMinProcess(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.COUNT_DEBIT_CREDIT:
+							computedFactsVO = rulesExecutorService.ruleOfCountCreditDebitAmount(ruleRequestVoObParam, fact);
+							break;	
+						case AMLConstants.COUNT_CASH_DEPOSITS:
+							computedFactsVO = rulesExecutorService.ruleOfCountCashDeposit(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.SUM_CASH_DEPOSITS:
+							computedFactsVO = rulesExecutorService.ruleOfSumCashDeposit(ruleRequestVoObParam, fact);
+							break;	
+						case AMLConstants.AVG_CASH_DEPOSITS:
+							computedFactsVO = rulesExecutorService.ruleOfAvgCashDeposit(ruleRequestVoObParam, fact);
+							break;								
+						case AMLConstants.WITHDRAWAL_PERCENTAGE:
+							computedFactsVO = rulesExecutorService.ruleOfMinProcess(ruleRequestVoObParam, fact);
+							break;
+						//New	
+						case AMLConstants.COUNT_CASH_WITHDRAWALS:
+							computedFactsVO = rulesExecutorService.ruleOfCountCashWithdraw(ruleRequestVoObParam, fact);
+							break;	
+						case AMLConstants.SUM_NONCASH_TXNS:
+							computedFactsVO = rulesExecutorService.ruleOfSumNonCashTxn(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.SUM_ACCOUNT_TRANSFERS:
+							computedFactsVO = rulesExecutorService.ruleOfSumAccountTransfer(ruleRequestVoObParam, fact);
+							break;	
+						case AMLConstants.SUM_CASH_WITHDRAWALS:
+							computedFactsVO = rulesExecutorService.ruleOfSumCashWithdraw(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.SUM_NONCASH_DEPOSITS:
+							computedFactsVO = rulesExecutorService.ruleOfSumNonCashDeposit(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.SUM_NONCASH_WITHDRAWAL:
+							computedFactsVO = rulesExecutorService.ruleOfSumNonCashWithdraw(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.COUNT_ACCOUNT_TRANSFERS:
+							computedFactsVO = rulesExecutorService.ruleOfCountAccountTransfer(ruleRequestVoObParam, fact);
+							break;	
+						case AMLConstants.SUM_CASH_TXNS:
+							computedFactsVO = rulesExecutorService.ruleOfSumCashTxn(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.COUNT_ACC_TO_ACC_TRANSFERS:
+							computedFactsVO = rulesExecutorService.ruleOfSumAccountToAccountTxn(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.AVG_CASH_WITHDRAWALS:
+							computedFactsVO = rulesExecutorService.ruleOfAvgCashWithdraw(ruleRequestVoObParam, fact);
+							break;
+							
+							
+							
 						default:
 							LOGGER.info("NO MATCH FOUND");
 						}
