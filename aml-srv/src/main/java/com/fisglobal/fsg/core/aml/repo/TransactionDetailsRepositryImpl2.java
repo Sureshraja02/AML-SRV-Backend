@@ -1,5 +1,6 @@
 package com.fisglobal.fsg.core.aml.repo;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,9 +46,9 @@ public class TransactionDetailsRepositryImpl2 {
 	 * @param fieldName
 	 * @return getSumValue Integer
 	 */
-	public Integer ruleOfLargerDeposite(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName) {
+	public BigDecimal ruleOfLargerDeposite(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method called...........", reqId);
-		Integer retnVal = 0;
+		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
 		List<Predicate> predicates = null;
 		CriteriaQuery<Object[]> cq = null;
@@ -87,14 +88,16 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.max(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					retnVal = (Integer) result[1];
+					//BigDecimal value=  
+					retnVal=(BigDecimal) result[1];;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
+					retnVal = new BigDecimal(0);
 					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
 				}
 			}
 		} catch (Exception e) {
-			retnVal = 0;
+			retnVal = new BigDecimal(0);
 			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getSumValue :{}", reqId, e);
 		} finally {
 			cb = null;
@@ -107,9 +110,9 @@ public class TransactionDetailsRepositryImpl2 {
 	}
 	
 	
-	public Integer ruleOfImmediateWithdraw(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName) {
+	public BigDecimal ruleOfImmediateWithdraw(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........", reqId);
-		Integer retnVal = 0;
+		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
 		List<Predicate> predicates = null;
 		CriteriaQuery<Object[]> cq = null;
@@ -125,9 +128,6 @@ public class TransactionDetailsRepositryImpl2 {
 			if (StringUtils.isNotBlank(custId)) {
 				predicates.add(cb.equal(rootBk.get("customerId"), custId));
 			}			
-			
-			
-			
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			if (days != null) {
@@ -149,14 +149,16 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.max(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					retnVal = (Integer) result[1];
+					retnVal = (BigDecimal) result[1];
+					//retnVal = new BigDecimal(0);
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
+					retnVal = new BigDecimal(0);
 					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
 				}
 			}
 		} catch (Exception e) {
-			retnVal = 0;
+			retnVal = new BigDecimal(0);
 			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw :{}", reqId, e);
 		} finally {
 			cb = null;

@@ -82,18 +82,14 @@ public class TransactionDetailsRepositryImpl {
 				// Convert LocalDate to String in same format as DB
 				 String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
 				String startDateStr = stDate.toString();
-				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, stDate);
-				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(stDate));
-				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(currentDateTdy));
-				LOGGER.info("REQID : [{}] - columnName is : [{}]  [{}]", reqId, todayStr,startDateStr);
+				//LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, stDate);
+//				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(stDate));
+//				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(currentDateTdy));
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,startDateStr);
 				Expression<java.sql.Date> txnDateAsDate =
 					    cb.function("to_Date", java.sql.Date.class,
 					        rootBk.get("transactionDate"),
-					        cb.literal("YYYY-MM-DD"));
-
-				// Calculate date range in Java
-				
-				
+					        cb.literal("YYYY-MM-DD"));	
 				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr), java.sql.Date.valueOf(todayStr));
 				predicates.add(betweenDates);
 			}

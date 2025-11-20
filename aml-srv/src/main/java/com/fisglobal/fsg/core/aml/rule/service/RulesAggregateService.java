@@ -82,12 +82,7 @@ public class RulesAggregateService implements RuleExecutorIntr {
 		} catch (Exception e) {
 			LOGGER.error("Exception found in RulesExecutorService@ruleOfSUMProcess : {}", e);
 		} finally {
-			factName = null;
-			accNo = null;
-			custId = null;
-			transMode = null;
-			transType = null;
-			fieldName = null;
+			factName = null; accNo = null; custId = null; transMode = null; transType = null; fieldName = null;
 			LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfSUMProcess (SUM) End::::::::::\n\n", requVoObjParam.getReqId());
 		}
 		return computedFactsVOObj;
