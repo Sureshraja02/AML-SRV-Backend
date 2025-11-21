@@ -1,5 +1,7 @@
 package com.fisglobal.fsg.core.aml.rule.intr;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
@@ -31,7 +33,7 @@ public interface RuleExecutorIntr {
 	
 	public ComputedFactsVO ruleOfLargerDeposite(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-	public ComputedFactsVO ruleOfImmediateWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj, ComputedFactsVO computedFactsVODeopObj);
+	public ComputedFactsVO ruleOfImmediateWithdraw(RuleRequestVo requVoObjParam, Factset factSetObj, List<ComputedFactsVO> computedFacts);
 	
 	public ComputedFactsVO ruleOfAvgCreditDebit(RuleRequestVo requVoObjParam, Factset factSetObj);
 	

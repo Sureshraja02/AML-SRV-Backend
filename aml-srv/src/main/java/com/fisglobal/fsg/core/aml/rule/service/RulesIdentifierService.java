@@ -54,6 +54,7 @@ public class RulesIdentifierService {
 		RuleResposeDetailsVO ruleResposeDetailsVO = null;
 		List<ComputedFactsVO> computedFacts = null;
 		ComputedFactsVO computedFactsVO = null;
+		boolean IMMEDIATE_WITHDRAWAL = false;
 		try {
 			LOGGER.info("RulesIdentifierService toComputeAMLData - ruleRequestVoObParam [{}]......", ruleRequestVoObParam);
 			if (ruleRequestVoObParam != null) {
@@ -90,13 +91,10 @@ public class RulesIdentifierService {
 							computedFactsVO = rulesExecutorService.ruleOfFDConversion(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.LARGE_DEPOSIT:
+							IMMEDIATE_WITHDRAWAL = true;
 							computedFactsVO = rulesExecutorService.ruleOfLargerDeposite(ruleRequestVoObParam, fact);
 							break;
-						case AMLConstants.IMMEDIATE_WITHDRAWAL:
-							
-						//	computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact);
-							break;
-
+						
 						case AMLConstants.COUNTRY_RISK:
 							computedFactsVO = rulesRsikComplianceService.ruleOfCountryRisk(ruleRequestVoObParam, fact);
 							break;
@@ -136,9 +134,7 @@ public class RulesIdentifierService {
 						case AMLConstants.AVG_CASH_DEPOSITS:
 							computedFactsVO = rulesExecutorService.ruleOfAvgCashDeposit(ruleRequestVoObParam, fact);
 							break;								
-						case AMLConstants.WITHDRAWAL_PERCENTAGE:
-							computedFactsVO = rulesExecutorService.ruleOfMinProcess(ruleRequestVoObParam, fact);
-							break;
+						
 						//New	
 						case AMLConstants.COUNT_CASH_WITHDRAWALS:
 							computedFactsVO = rulesExecutorService.ruleOfCountCashWithdraw(ruleRequestVoObParam, fact);
@@ -170,8 +166,37 @@ public class RulesIdentifierService {
 						case AMLConstants.AVG_CASH_WITHDRAWALS:
 							computedFactsVO = rulesExecutorService.ruleOfAvgCashWithdraw(ruleRequestVoObParam, fact);
 							break;
-							
-							
+						case AMLConstants.MAX_DEPOSIT:
+							computedFactsVO = rulesExecutorService.ruleOfLargerDeposite(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.IMMEDIATE_WITHDRAWAL:
+							if (IMMEDIATE_WITHDRAWAL && computedFacts != null && computedFacts.size() >= 1) {
+								computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact, computedFacts);
+							} else {
+								// Rare
+							}
+							break;
+						case AMLConstants.WITHDRAWAL_PERCENTAGE://79,39,27,26,25
+							if (fact != null && fact.getCondition() != null && fact.getCondition().equalsIgnoreCase(AMLConstants.IMMEDIATE_WITHDRAWAL_DIFFERENT_LOCATIONS)) {
+								//25
+								
+							} else if (fact != null && fact.getCondition() != null && fact.getCondition().equalsIgnoreCase(AMLConstants.IMMEDIATE_WITHDRAWAL)) {
+								//26
+							} else if (fact != null && fact.getCondition() != null && fact.getCondition().equalsIgnoreCase(AMLConstants.IMMEDIATE_WITHDRAWAL_ATM_OR_OTHER)) {
+								//27
+							} else { // No condition
+								// 39, 79
+							}
+							break;
+						case AMLConstants.WITHDRAWAL_PERCENTAGE_OUTSIDE_INDIA:
+							// 42 Rule
+							break;
+						case AMLConstants.SPECIFIED_EXPENDITURE:
+							//28 Rule
+							break;
+						case AMLConstants.WITHDRAWAL_LOCATION:
+							//64, 65 Rule
+							break;	
 							
 						default:
 							LOGGER.info("NO MATCH FOUND");

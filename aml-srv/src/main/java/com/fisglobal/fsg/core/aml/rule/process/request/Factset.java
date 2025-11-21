@@ -30,6 +30,14 @@ public class Factset implements Serializable {
 	
 	@JsonProperty("condition")
 	private String condition;
+	
+	@JsonProperty("category")
+	private String category;
+	
+	@JsonProperty("range")
+	private Range range;
+	
+	
 
 	@JsonProperty("days")
 	public Integer getDays() {
@@ -90,6 +98,23 @@ public class Factset implements Serializable {
 	public void setCondition(String condition) {
 		this.condition = condition;
 	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public Range getRange() {
+		return range;
+	}
+
+	public void setRange(Range range) {
+		this.range = range;
+	}
+	
 	
 	
 }

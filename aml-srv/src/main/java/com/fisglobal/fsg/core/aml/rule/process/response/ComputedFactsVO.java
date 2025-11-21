@@ -28,6 +28,9 @@ public class ComputedFactsVO implements Serializable {
 	
 	@JsonProperty("ruleType")
 	private String ruleType;
+	
+	@JsonProperty("transDate")
+	private String transDate;
 
 	@JsonProperty("fact")
 	public String getFact() {
@@ -57,6 +60,16 @@ public class ComputedFactsVO implements Serializable {
 	@JsonProperty("ruleType")
 	public void setRuleType(String ruleType) {
 		this.ruleType = ruleType;
+	}
+
+	@JsonProperty("transDate")
+	public String getTransDate() {
+		return transDate;
+	}
+
+	@JsonProperty("transDate")
+	public void setTransDate(String transDate) {
+		this.transDate = transDate;
 	}
 	
 	

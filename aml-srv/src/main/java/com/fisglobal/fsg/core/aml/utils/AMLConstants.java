@@ -25,6 +25,7 @@ public class AMLConstants {
 	public static final String AVG = "AVG";
 	public static final String TOTAL = "TOTAL";
 	public static final String MIN = "MIN";
+	public static final String MAX_DEPOSIT = "MAX_DEPOSIT";	
 	public static final String PREVIOUS_FOREX_TURNOVER = "PREVIOUS_FOREX_TURNOVER";
 
 	public static final String FD_CONVERSION = "FD_CONVERSION";
@@ -84,5 +85,9 @@ public class AMLConstants {
 	public static final String NOT_SHIPPED = "NOT_SHIPPED";
 	public static final String TERROR_INCIDENT = "TERROR_INCIDENT";
 	public static final String UNRELATED = "UNRELATED";
+	public static final String SPECIFIED_EXPENDITURE="SPECIFIED_EXPENDITURE";
+	public static final String WITHDRAWAL_PERCENTAGE_OUTSIDE_INDIA = "WITHDRAWAL_PERCENTAGE_OUTSIDE_INDIA";
+	public static final String WITHDRAWAL_LOCATION = "WITHDRAWAL_LOCATION";
+	public static final String COUNT_SMALL_CASH_DEPOSITS="COUNT_SMALL_CASH_DEPOSITS";
 	
 }

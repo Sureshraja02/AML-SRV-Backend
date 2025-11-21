@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.fisglobal.fsg.core.aml.entity.TransactionDetailsEntity;
+import com.fisglobal.fsg.core.aml.rule.process.request.Range;
+import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -35,79 +37,7 @@ public class TransactionDetailsRepositryImpl2 {
 	@Autowired
 	EntityManager entityManager;
 
-	/**
-	 * 
-	 * @param reqId
-	 * @param accNo
-	 * @param custId
-	 * @param transMode
-	 * @param transType
-	 * @param days
-	 * @param fieldName
-	 * @return getSumValue Integer
-	 */
-	public BigDecimal getLargerDeposite(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName) {
-		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method called...........", reqId);
-		BigDecimal retnVal = null;
-		CriteriaBuilder cb = null;
-		List<Predicate> predicates = null;
-		CriteriaQuery<Object[]> cq = null;
-		Root<TransactionDetailsEntity> rootBk = null;
-		try {
-			cb = entityManager.getCriteriaBuilder();
-			cq = cb.createQuery(Object[].class);
-			predicates = new ArrayList<Predicate>();
-			rootBk = cq.from(TransactionDetailsEntity.class);
-			if (StringUtils.isNotBlank(accNo)) {
-				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
-			}
-			if (StringUtils.isNotBlank(custId)) {
-				predicates.add(cb.equal(rootBk.get("customerId"), custId));
-			}			
-			
-			 predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), "D"));
-			
-			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
-
-			if (days != null) {
-				Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string
-				);
-
-				// Calculate date range in Java
-				LocalDate currentDateTdy = LocalDate.now();
-				LocalDate stDate = currentDateTdy.minusDays(days);
-				// Convert LocalDate to String in same format as DB
-				// String todayStr = today.toString(); // yyyy-MM-dd//String startDateStr =
-				// startDate.toString();
-				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(stDate), java.sql.Date.valueOf(currentDateTdy));
-				predicates.add(betweenDates);
-			}
-			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
-			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("amount")) {
-				cq.where(cb.and(predicates.toArray(new Predicate[0])));
-				cq.multiselect(cb.count(rootBk), cb.max(rootBk.get("amount")));
-				Object[] result = entityManager.createQuery(cq).getSingleResult();
-				if (result != null && result.length > 1) {
-					//BigDecimal value=  
-					retnVal=(BigDecimal) result[1];;
-					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
-				} else {
-					retnVal = new BigDecimal(0);
-					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
-				}
-			}
-		} catch (Exception e) {
-			retnVal = new BigDecimal(0);
-			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getSumValue :{}", reqId, e);
-		} finally {
-			cb = null;
-			predicates = null;
-			cq = null;
-			rootBk = null;
-			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
-		}
-		return retnVal;
-	}
+	
 	
 	
 	public BigDecimal getImmediateWithdraw(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName) {
@@ -171,9 +101,9 @@ public class TransactionDetailsRepositryImpl2 {
 	}
 
 	
-	public Integer getSumCreditDebitAmount(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName) {
+	public BigDecimal getSumCreditDebitAmount(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfSumCreditAmount method called...........", reqId);
-		Integer retnVal = 0;
+		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
 		List<Predicate> predicates = null;
 		CriteriaQuery<Object[]> cq = null;
@@ -233,14 +163,15 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.sum(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					retnVal = (Integer) result[1];
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
 				}
 			}
 		} catch (Exception e) {
-			retnVal = 0;
+			retnVal = new BigDecimal(0);
 			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@ruleOfSumCreditAmount :{}", reqId, e);
 		} finally {
 			cb = null;
@@ -252,9 +183,9 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public Integer getAvgCreditDebit(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName) {
+	public BigDecimal getAvgCreditDebit(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfAvgCreditDebit method called...........", reqId);
-		Integer retnVal = 0;
+		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
 		List<Predicate> predicates = null;
 		CriteriaQuery<Object[]> cq = null;
@@ -314,14 +245,15 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.avg(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					retnVal = (Integer) result[1];
+					Double value=  (Double) result[1];
+					retnVal=BigDecimal.valueOf(value);
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
 				}
 			}
 		} catch (Exception e) {
-			retnVal = 0;
+			retnVal = new BigDecimal(0);
 			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@ruleOfAvgCreditDebit :{}", reqId, e);
 		} finally {
 			cb = null;
@@ -668,8 +600,8 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					BigDecimal value=  (BigDecimal) result[1];
-					retnVal=value;
+					Double value=  (Double) result[1];
+					retnVal=BigDecimal.valueOf(value);
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					retnVal = new BigDecimal(0);
@@ -689,9 +621,9 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public Integer getCountCreditDebit(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName) {
+	public BigDecimal getCountCreditDebit(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfAvgCreditDebit method called...........", reqId);
-		Integer retnVal = 0;
+		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
 		List<Predicate> predicates = null;
 		CriteriaQuery<Object[]> cq = null;
@@ -748,17 +680,18 @@ public class TransactionDetailsRepositryImpl2 {
 			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
 			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("amount")) {
 				cq.where(cb.and(predicates.toArray(new Predicate[0])));
-				cq.multiselect(cb.count(rootBk), cb.avg(rootBk.get("amount")));
+				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					retnVal = (Integer) result[1];
+					Long value=  (Long) result[1];
+					retnVal=BigDecimal.valueOf(value);
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
 				}
 			}
 		} catch (Exception e) {
-			retnVal = 0;
+			retnVal = new BigDecimal(0);
 			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@ruleOfAvgCreditDebit :{}", reqId, e);
 		} finally {
 			cb = null;
@@ -926,8 +859,8 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					Long value=  (Long) result[1];
-					retnVal=BigDecimal.valueOf(value);
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					retnVal = new BigDecimal(0);
@@ -1017,8 +950,8 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					Long value=  (Long) result[1];
-					retnVal=BigDecimal.valueOf(value);
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					retnVal = new BigDecimal(0);
@@ -1106,7 +1039,7 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					Long value=  (Long) result[1];
+					Double value=  (Double) result[1];
 					retnVal=BigDecimal.valueOf(value);
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
@@ -1199,8 +1132,8 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.sum(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					Long value=  (Long) result[1];
-					retnVal=BigDecimal.valueOf(value);
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					retnVal = new BigDecimal(0);
@@ -1220,7 +1153,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getCountCashWithdrawValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getCountCashWithdrawValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,String category,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -1244,7 +1177,14 @@ public class TransactionDetailsRepositryImpl2 {
 			 Predicate inClause = rootBk.get("channelType").in(type);
 			 predicates.add(inClause);
 			
-			
+				if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+
+				}
+			 
+			 
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			if (days != null) {
@@ -1475,8 +1415,8 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					Long value=  (Long) result[1];
-					retnVal=BigDecimal.valueOf(value);
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					retnVal = new BigDecimal(0);
@@ -1663,8 +1603,8 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.sum(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					Long value=  (Long) result[1];
-					retnVal=BigDecimal.valueOf(value);
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					retnVal = new BigDecimal(0);
@@ -1756,8 +1696,8 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.sum(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					Long value=  (Long) result[1];
-					retnVal=BigDecimal.valueOf(value);
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					retnVal = new BigDecimal(0);
@@ -1846,8 +1786,8 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					Long value=  (Long) result[1];
-					retnVal=BigDecimal.valueOf(value);
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					retnVal = new BigDecimal(0);
@@ -1940,8 +1880,8 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.sum(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					Long value=  (Long) result[1];
-					retnVal=BigDecimal.valueOf(value);
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
 					retnVal = new BigDecimal(0);
@@ -1959,5 +1899,73 @@ public class TransactionDetailsRepositryImpl2 {
 			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumAccountTxn method End...........\n\n", reqId);
 		}
 		return retnVal;
+	}
+	
+	public ComputedFactsVO getLargerDeposite(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName) {
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method called...........", reqId);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		ComputedFactsVO computedFactsVO = null;
+		try {
+			computedFactsVO = new ComputedFactsVO();
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(accNo)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
+			}
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			}			
+			
+			 predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), "D"));
+			
+			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+
+			if (days != null) {
+				Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string
+				);
+
+				// Calculate date range in Java
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusDays(days);
+				// Convert LocalDate to String in same format as DB
+				// String todayStr = today.toString(); // yyyy-MM-dd//String startDateStr =
+				// startDate.toString();
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(stDate), java.sql.Date.valueOf(currentDateTdy));
+				predicates.add(betweenDates);
+			}
+			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
+			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("amount")) {
+				cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				cq.multiselect(cb.count(rootBk), cb.max(rootBk.get("amount")),cb.max(rootBk.get("transactionDate")));
+				Object[] result = entityManager.createQuery(cq).getSingleResult();
+				if (result != null && result.length > 1) {
+					//BigDecimal value=  
+					retnVal = (BigDecimal) result[1];
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
+					LOGGER.info("REQID : [{}] - TransDate : [{}]", reqId,  result[2]);
+					computedFactsVO.setValue(retnVal);
+					computedFactsVO.setTransDate((String) result[2]);
+					
+				} else {
+					retnVal = new BigDecimal(0);
+					computedFactsVO.setValue(retnVal);
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			retnVal = new BigDecimal(0);
+			computedFactsVO.setValue(retnVal);
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getSumValue :{}", reqId, e);
+		} finally {
+			cb = null; predicates = null; cq = null; rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
+		}
+		return computedFactsVO;
 	}
 }
