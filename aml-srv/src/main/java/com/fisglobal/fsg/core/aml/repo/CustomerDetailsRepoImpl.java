@@ -1,19 +1,25 @@
 package com.fisglobal.fsg.core.aml.repo;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.fisglobal.fsg.core.aml.entity.CustomerDetailsEntity;
+import com.fisglobal.fsg.core.aml.entity.TransactionDetailsEntity;
+import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
@@ -63,5 +69,63 @@ public class CustomerDetailsRepoImpl {
 		} finally {
 
 		}
+	}
+	
+	public String getPanStatus(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
+		LOGGER.info("REQID : [{}] - CustomerDetailsRepoImpl@getPanStatus method called...........", reqId);
+		String retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<CustomerDetailsEntity> cq =null;
+		
+		Root<CustomerDetailsEntity> rootBk = null;
+		TypedQuery<CustomerDetailsEntity> query = null;
+		try {
+			cb = em.getCriteriaBuilder();
+			
+			cq = cb.createQuery(CustomerDetailsEntity.class);			
+			
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(CustomerDetailsEntity.class);
+			if (StringUtils.isNotBlank(accNo)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
+			}
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			}
+			LOGGER.info("REQID : [{}] - transType : [{}]", reqId, transType);
+			
+			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			
+			
+			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
+			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("status")) {
+				
+				cq.where(predicates.toArray(new Predicate[] {}));
+
+				query = em.createQuery(cq);
+				 
+				CustomerDetailsEntity customerEnityObj= query.getSingleResult();
+				
+				if (customerEnityObj != null && customerEnityObj.getPanNo()!=null) {
+					
+					retnVal="AVAILABLE";
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
+				} else {
+					retnVal = "NO_PAN";
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			retnVal = null;
+			LOGGER.info("REQID : [{}] - Exception found in CustomerDetailsRepoImpl@getPanStatus :{}", reqId, e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - CustomerDetailsRepoImpl@getPanStatus method End...........\n\n", reqId);
+		}
+		return retnVal;
 	}
 }

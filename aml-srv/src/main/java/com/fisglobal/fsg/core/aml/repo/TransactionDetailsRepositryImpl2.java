@@ -2,6 +2,8 @@ package com.fisglobal.fsg.core.aml.repo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.fisglobal.fsg.core.aml.entity.TransactionDetailsEntity;
+import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 
@@ -37,10 +40,11 @@ public class TransactionDetailsRepositryImpl2 {
 	@Autowired
 	EntityManager entityManager;
 
+	@Autowired
+	AccountDetailsRepoImpl accountDetailsRepoImpl;
 	
 	
-	
-	public BigDecimal getImmediateWithdraw(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName) {
+	public BigDecimal getImmediateWithdraw(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -61,8 +65,12 @@ public class TransactionDetailsRepositryImpl2 {
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			if (days != null) {
-				Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string
-				);
+
+				
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));	
 
 				// Calculate date range in Java
 				LocalDate currentDateTdy = LocalDate.now();
@@ -101,7 +109,7 @@ public class TransactionDetailsRepositryImpl2 {
 	}
 
 	
-	public BigDecimal getSumCreditDebitAmount(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName) {
+	public BigDecimal getSumCreditDebitAmount(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName,Range range,Factset factSetObj) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfSumCreditAmount method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -124,28 +132,130 @@ public class TransactionDetailsRepositryImpl2 {
 			 List<String> type = Arrays.asList("D","W");
 			 Predicate inClause = rootBk.get("depositorWithdrawal").in(type);
 			 predicates.add(inClause);
+			 
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 			
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
+			
+			LocalDate currentDateTdy=null;
+			LocalDate openDate =null;
+			LocalDate closeDate =null;
 			if (days != null) {
-				Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string
-				);
+			
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));	
 
+				
+				
+					if (factSetObj.getCondition()!=null && factSetObj.getCondition().equals("NEW_ACCOUNT_CLOSED")) {
+						String openingDate = accountDetailsRepoImpl.getAccountOpeningAndClosingDateByritiria(reqId,
+								accNo, custId);
+						if (openingDate != null) {
+							if (openingDate.contains("@")) {
+								String dateStr[] = openingDate.split("@");
+								DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+								openDate = LocalDate.parse(dateStr[0], formatter);
+								closeDate = LocalDate.parse(dateStr[1], formatter);
+								System.out.println(openDate); // Output: 2025-05-20
+
+								
+								long daysBetween = ChronoUnit.DAYS.between(openDate, closeDate);
+								if (daysBetween <= days) {
+									// Account Closed Immediately
+									currentDateTdy = closeDate;
+								} else {
+									return new BigDecimal(0);
+								}
+							} else {
+								
+								DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+								openDate = LocalDate.parse(openingDate, formatter);
+								System.out.println(openDate); // Output: 2025-05-20
+
+								currentDateTdy = openDate.plusDays(days);
+							}
+						} else {
+							return new BigDecimal(0);
+						}
+					}
+				
+				else
+				{
+					 currentDateTdy = LocalDate.now();
+					 openDate = currentDateTdy.minusDays(days);
+					 System.out.println(openDate); // Output: 2025-05-20
+				}
+			
+				
 				// Calculate date range in Java
-				LocalDate currentDateTdy = LocalDate.now();
-				LocalDate stDate = currentDateTdy.minusDays(days);
+				
+				
 				// Convert LocalDate to String in same format as DB
 				// String todayStr = today.toString(); // yyyy-MM-dd//String startDateStr =
 				// startDate.toString();
-				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(stDate), java.sql.Date.valueOf(currentDateTdy));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(openDate), java.sql.Date.valueOf(currentDateTdy));
 				predicates.add(betweenDates);
 			}
 			if (months != null) {			
-				LocalDate currentDateTdy = LocalDate.now();
-				LocalDate stDate = currentDateTdy.minusMonths(months);
+				
+				
+					if (factSetObj.getCondition()!=null && factSetObj.getCondition().equals("NEW_ACCOUNT_CLOSED")) {
+						String openingDate = accountDetailsRepoImpl.getAccountOpeningAndClosingDateByritiria(reqId,
+								accNo, custId);
+						if (openingDate != null) {
+							if (openingDate.contains("@")) {
+								String dateStr[] = openingDate.split("@");
+								DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+								openDate = LocalDate.parse(dateStr[0], formatter);
+								closeDate = LocalDate.parse(dateStr[1], formatter);
+								System.out.println(openDate); // Output: 2025-05-20
+
+								
+								long daysBetween = ChronoUnit.DAYS.between(openDate, closeDate);
+								int totaldays=months*30;
+								if (daysBetween <= totaldays) {
+									// Account Closed Immediately
+									currentDateTdy = closeDate;
+								} else {
+									return new BigDecimal(0);
+								}
+							} else {
+								DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+								openDate = LocalDate.parse(openingDate, formatter);
+								System.out.println(openDate); // Output: 2025-05-20
+
+								currentDateTdy = openDate.plusMonths(months);
+							}
+						} else {
+							return new BigDecimal(0);
+						}
+					}
+				
+				else
+				{
+					 currentDateTdy = LocalDate.now();
+					 openDate = currentDateTdy.minusMonths(months);
+					 System.out.println(openDate); // Output: 2025-05-20
+				}
+			
 				// Convert LocalDate to String in same format as DB
 				 String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
-				String startDateStr = stDate.toString();
+				String startDateStr = openDate.toString();
 				//LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, stDate);
 //				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(stDate));
 //				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(currentDateTdy));
@@ -183,7 +293,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getAvgCreditDebit(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName) {
+	public BigDecimal getAvgCreditDebit(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfAvgCreditDebit method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -206,12 +316,27 @@ public class TransactionDetailsRepositryImpl2 {
 			 Predicate inClause = rootBk.get("depositorWithdrawal").in(type);
 			 predicates.add(inClause);
 			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 			
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			if (days != null) {
-				Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string
-				);
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));	
 
 				// Calculate date range in Java
 				LocalDate currentDateTdy = LocalDate.now();
@@ -265,7 +390,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getCountValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getCountValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -286,6 +411,19 @@ public class TransactionDetailsRepositryImpl2 {
 			LOGGER.info("REQID : [{}] - transType : [{}]", reqId, transType);
 			if (StringUtils.isNotBlank(transType)) {
 				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), transType));
+			}
+			if (range != null) {
+				if (range.getMin() != null && range.getMax() != null) {
+					predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+				}
+				else if (range.getMin() != null) {
+				    // Only min present → greaterThanOrEqualTo
+				    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+				} else if (range.getMax() != null) {
+				    // Only max present → lessThanOrEqualTo
+				    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+				}
+
 			}
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
@@ -355,7 +493,7 @@ public class TransactionDetailsRepositryImpl2 {
 	}
 	
 	
-	public BigDecimal getMaxValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getMaxValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getMaxValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -447,7 +585,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getMinValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getMinValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getMinValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -532,7 +670,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getAvgValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getAvgValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getAvgValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -554,6 +692,19 @@ public class TransactionDetailsRepositryImpl2 {
 			if (StringUtils.isNotBlank(transType)) {
 				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), transType));
 			}
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			if (days != null) {
@@ -621,7 +772,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getCountCreditDebit(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName) {
+	public BigDecimal getCountCreditDebit(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName,Range range,Factset factSetObj) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfAvgCreditDebit method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -643,29 +794,88 @@ public class TransactionDetailsRepositryImpl2 {
 			 List<String> type = Arrays.asList("D","W");
 			 Predicate inClause = rootBk.get("depositorWithdrawal").in(type);
 			 predicates.add(inClause);
-			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 			
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
-
+			LocalDate currentDateTdy=null;
+			LocalDate openDate =null;
+			LocalDate closeDate =null;
 			if (days != null) {
-				Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string
-				);
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));	
 
-				// Calculate date range in Java
-				LocalDate currentDateTdy = LocalDate.now();
-				LocalDate stDate = currentDateTdy.minusDays(days);
+				
+				if (factSetObj.getCondition()!=null && factSetObj.getCondition().equals("NEW_ACCOUNT")) {
+					String openingDate = accountDetailsRepoImpl.getAccountOpeningDateByritiria(reqId,
+							accNo, custId);
+					if (openingDate != null) {
+
+						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						openDate = LocalDate.parse(openingDate, formatter);
+						System.out.println(openDate); // Output: 2025-05-20
+
+						currentDateTdy = openDate.plusDays(days);
+
+					} else {
+						return new BigDecimal(0);
+					}
+				}
+			
+			else
+			{
+				 currentDateTdy = LocalDate.now();
+				 openDate = currentDateTdy.minusDays(days);
+				 System.out.println(openDate); // Output: 2025-05-20
+			}
+				
+			
 				// Convert LocalDate to String in same format as DB
 				// String todayStr = today.toString(); // yyyy-MM-dd//String startDateStr =
 				// startDate.toString();
-				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(stDate), java.sql.Date.valueOf(currentDateTdy));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(openDate), java.sql.Date.valueOf(currentDateTdy));
 				predicates.add(betweenDates);
 			}
 			if (months != null) {			
-				LocalDate currentDateTdy = LocalDate.now();
-				LocalDate stDate = currentDateTdy.minusMonths(months);
+				if (factSetObj.getCondition()!=null && factSetObj.getCondition().equals("NEW_ACCOUNT")) {
+					String openingDate = accountDetailsRepoImpl.getAccountOpeningDateByritiria(reqId,
+							accNo, custId);
+					if (openingDate != null) {
+						
+							DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+							openDate = LocalDate.parse(openingDate, formatter);
+							System.out.println(openDate); // Output: 2025-05-20
+
+							currentDateTdy = openDate.plusMonths(months);
+						
+					} else {
+						return new BigDecimal(0);
+					}
+				}
+			
+			else
+			{
+				 currentDateTdy = LocalDate.now();
+				 openDate = currentDateTdy.minusMonths(months);
+				 System.out.println(openDate); // Output: 2025-05-20
+			}
+		
 				// Convert LocalDate to String in same format as DB
 				 String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
-				String startDateStr = stDate.toString();
+				String startDateStr = openDate.toString();
 				//LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, stDate);
 //				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(stDate));
 //				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(currentDateTdy));
@@ -702,7 +912,7 @@ public class TransactionDetailsRepositryImpl2 {
 		}
 		return retnVal;
 	}
-	public BigDecimal getCountCashDepositValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getCountCashDepositValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -725,7 +935,19 @@ public class TransactionDetailsRepositryImpl2 {
 				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), transType));
 			}
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			if (range != null) {
+				if (range.getMin() != null && range.getMax() != null) {
+					predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+				}
+				else if (range.getMin() != null) {
+				    // Only min present → greaterThanOrEqualTo
+				    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+				} else if (range.getMax() != null) {
+				    // Only max present → lessThanOrEqualTo
+				    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+				}
 
+			}
 			if (days != null) {
 				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);
 				
@@ -791,7 +1013,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getSumCashDepositValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getSumCashDepositValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumCashDepositValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -813,6 +1035,19 @@ public class TransactionDetailsRepositryImpl2 {
 			if (StringUtils.isNotBlank(transType)) {
 				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), transType));
 			}
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			if (days != null) {
@@ -880,7 +1115,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getSumNonCashDepositValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getSumNonCashDepositValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumNonCashDepositValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -902,9 +1137,23 @@ public class TransactionDetailsRepositryImpl2 {
 			predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), "D"));
 			
 			 List<String> channeltype = Arrays.asList("ATM","CASH");
-			 Predicate inchanneltype = (cb.not(rootBk.get("channeltype").in(channeltype)));
+			 Predicate inchanneltype = (cb.not(rootBk.get("channelType").in(channeltype)));
 			 predicates.add(inchanneltype);
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 
 			if (days != null) {
 				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);
@@ -971,7 +1220,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getAvgCashDepositValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getAvgCashDepositValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getAvgCashDepositValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -993,6 +1242,20 @@ public class TransactionDetailsRepositryImpl2 {
 			if (StringUtils.isNotBlank(transType)) {
 				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), transType));
 			}
+			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			if (days != null) {
@@ -1060,7 +1323,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getSumCashWithdrawValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getSumCashWithdrawValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -1083,8 +1346,21 @@ public class TransactionDetailsRepositryImpl2 {
 			predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), "W"));
 			
 			 List<String> channeltype = Arrays.asList("ATM","CASH");
-			 Predicate inchanneltype = (rootBk.get("channeltype").in(channeltype));
+			 Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
 			 predicates.add(inchanneltype);
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 			
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
@@ -1153,7 +1429,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getCountCashWithdrawValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,String category,Range range) {
+	public BigDecimal getCountCashWithdrawValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -1180,6 +1456,13 @@ public class TransactionDetailsRepositryImpl2 {
 				if (range != null) {
 					if (range.getMin() != null && range.getMax() != null) {
 						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
 					}
 
 				}
@@ -1252,7 +1535,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getAugCashWithdrawValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getAugCashWithdrawValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -1274,7 +1557,7 @@ public class TransactionDetailsRepositryImpl2 {
 			predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), "W"));
 			
 			 List<String> channeltype = Arrays.asList("ATM","CASH");
-			 Predicate inchanneltype = ((rootBk.get("channeltype").in(channeltype)));
+			 Predicate inchanneltype = ((rootBk.get("channelType").in(channeltype)));
 			 predicates.add(inchanneltype);
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
@@ -1322,7 +1605,7 @@ public class TransactionDetailsRepositryImpl2 {
 				cq.multiselect(cb.count(rootBk), cb.avg(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					Long value=  (Long) result[1];
+					Double value=  (Double) result[1];
 					retnVal=BigDecimal.valueOf(value);
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
@@ -1343,7 +1626,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getSumNonCashWithdrawValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getSumNonCashWithdrawValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -1367,9 +1650,23 @@ public class TransactionDetailsRepositryImpl2 {
 			 predicates.add(inClause);
 			 
 			 List<String> channeltype = Arrays.asList("ATM","CASH");
-			 Predicate inchanneltype = (cb.not(rootBk.get("channeltype").in(channeltype)));
+			 Predicate inchanneltype = (cb.not(rootBk.get("channelType").in(channeltype)));
 			 predicates.add(inchanneltype);
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 
 			if (days != null) {
 				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);
@@ -1436,7 +1733,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getCountAccountTransferValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getCountAccountTransferValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountAccountTransferValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -1460,8 +1757,22 @@ public class TransactionDetailsRepositryImpl2 {
 			 predicates.add(inClause);
 			 
 			 List<String> channeltype = Arrays.asList("ATM","CASH");
-			 Predicate inchanneltype = (cb.not(rootBk.get("channeltype").in(channeltype)));
+			 Predicate inchanneltype = (cb.not(rootBk.get("channelType").in(channeltype)));
 			 predicates.add(inchanneltype);
+			 
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			if (days != null) {
@@ -1530,7 +1841,7 @@ public class TransactionDetailsRepositryImpl2 {
 	}
 	
 	
-	public BigDecimal getSumCashTxnValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getSumCashTxnValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumCashTxnValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -1555,9 +1866,23 @@ public class TransactionDetailsRepositryImpl2 {
 			 predicates.add(inClause);
 			 
 			 List<String> channeltype = Arrays.asList("ATM","CASH");
-			 Predicate inchanneltype = (rootBk.get("channeltype").in(channeltype));
+			 Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
 			 predicates.add(inchanneltype);
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 
 			if (days != null) {
 				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);
@@ -1624,8 +1949,8 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getSumNonCashTxnValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
-		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumNonCashTxnValue method called...........", reqId);
+	public BigDecimal getSumNonCashTxnValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range)
+	{
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
 		List<Predicate> predicates = null;
@@ -1648,9 +1973,23 @@ public class TransactionDetailsRepositryImpl2 {
 			 predicates.add(inClause);
 			 
 			 List<String> channeltype = Arrays.asList("ATM","CASH");
-			 Predicate inchanneltype = cb.not(rootBk.get("channeltype").in(channeltype));
+			 Predicate inchanneltype = cb.not(rootBk.get("channelType").in(channeltype));
 			 predicates.add(inchanneltype);
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 
 			if (days != null) {
 				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);
@@ -1718,7 +2057,7 @@ public class TransactionDetailsRepositryImpl2 {
 	}
 	
 	
-	public BigDecimal getSumAccountToAccountTxn(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getSumAccountToAccountTxn(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumAccountToAccountTxn method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -1741,6 +2080,20 @@ public class TransactionDetailsRepositryImpl2 {
 				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), transType));
 			}
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 
 			if (days != null) {
 				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);
@@ -1807,7 +2160,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public BigDecimal getSumAccountTxn(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getSumAccountTxn(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumAccountTxn method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -1832,9 +2185,23 @@ public class TransactionDetailsRepositryImpl2 {
 			 predicates.add(inClause);
 			 
 			 List<String> channeltype = Arrays.asList("ATM","CASH");
-			 Predicate inchanneltype = (cb.not(rootBk.get("channeltype").in(channeltype)));
+			 Predicate inchanneltype = (cb.not(rootBk.get("channelType").in(channeltype)));
 			 predicates.add(inchanneltype);
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 
 			if (days != null) {
 				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);
@@ -1901,7 +2268,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public ComputedFactsVO getLargerDeposite(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName) {
+	public ComputedFactsVO getLargerDeposite(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -1927,7 +2294,7 @@ public class TransactionDetailsRepositryImpl2 {
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			if (days != null) {
-				Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string
+				Expression<java.sql.Date> txnDateAsDate = cb.function("TO_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string
 				);
 
 				// Calculate date range in Java
@@ -1968,4 +2335,372 @@ public class TransactionDetailsRepositryImpl2 {
 		}
 		return computedFactsVO;
 	}
+	
+	public BigDecimal getMaxNonCashTxnValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range)
+	{
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(accNo)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
+			}
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			}
+			LOGGER.info("REQID : [{}] - transType : [{}]", reqId, transType);
+			 List<String> type = Arrays.asList("D","W");
+			 Predicate inClause = rootBk.get("depositorWithdrawal").in(type);
+			 predicates.add(inClause);
+			 
+			 List<String> channeltype = Arrays.asList("ATM","CASH");
+			 Predicate inchanneltype = cb.not(rootBk.get("channelType").in(channeltype));
+			 predicates.add(inchanneltype);
+			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
+
+			if (days != null) {
+				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);
+				
+			/*	Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("TO_DATE", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));
+				*/
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusDays(days);
+				// Convert LocalDate to String in same format as DB
+				 String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,startDateStr);
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));	
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr), java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			if (months != null) {			
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusMonths(months);
+				// Convert LocalDate to String in same format as DB
+				 String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+				//LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, stDate);
+//				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(stDate));
+//				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(currentDateTdy));
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,startDateStr);
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));	
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr), java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
+			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("amount")) {
+				cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				cq.multiselect(cb.count(rootBk), cb.sum(rootBk.get("amount")));
+				Object[] result = entityManager.createQuery(cq).getSingleResult();
+				if (result != null && result.length > 1) {
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
+				} else {
+					retnVal = new BigDecimal(0);
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			retnVal = new BigDecimal(0);
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getSumNonCashTxnValue :{}", reqId, e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumNonCashTxnValue method End...........\n\n", reqId);
+		}
+		return retnVal;
+	}
+	
+	public BigDecimal getMaxCashTxnValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range)
+	{
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(accNo)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
+			}
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			}
+			LOGGER.info("REQID : [{}] - transType : [{}]", reqId, transType);
+			 List<String> type = Arrays.asList("D","W");
+			 Predicate inClause = rootBk.get("depositorWithdrawal").in(type);
+			 predicates.add(inClause);
+			 
+			 List<String> channeltype = Arrays.asList("ATM","CASH");
+			 Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+			 predicates.add(inchanneltype);
+			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
+
+			if (days != null) {
+				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);
+				
+			/*	Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("TO_DATE", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));
+				*/
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusDays(days);
+				// Convert LocalDate to String in same format as DB
+				 String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,startDateStr);
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));	
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr), java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			if (months != null) {			
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusMonths(months);
+				// Convert LocalDate to String in same format as DB
+				 String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+				//LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, stDate);
+//				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(stDate));
+//				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(currentDateTdy));
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,startDateStr);
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));	
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr), java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
+			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("amount")) {
+				cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				cq.multiselect(cb.count(rootBk), cb.sum(rootBk.get("amount")));
+				Object[] result = entityManager.createQuery(cq).getSingleResult();
+				if (result != null && result.length > 1) {
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
+				} else {
+					retnVal = new BigDecimal(0);
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			retnVal = new BigDecimal(0);
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getSumNonCashTxnValue :{}", reqId, e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumNonCashTxnValue method End...........\n\n", reqId);
+		}
+		return retnVal;
+	}
+	
+
+	/*public BigDecimal getSumCreditDebitClosedAccontAmount(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName,Integer months, String columnName,Range range) {
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumCreditDebitClosedAccontAmount method called...........", reqId);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(accNo)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
+			}
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			}	
+			String openingDate=accountDetailsRepoImpl.getAccountOpeningAndClosingDateByritiria(reqId, accNo, custId);
+			
+			 List<String> type = Arrays.asList("D","W");
+			 Predicate inClause = rootBk.get("depositorWithdrawal").in(type);
+			 predicates.add(inClause);
+			 
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
+			
+			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+
+			if (days != null) {
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));	
+
+				// Calculate date range in Java
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				LocalDate date = LocalDate.parse(openingDate, formatter);
+				System.out.println(date); // Output: 2025-05-20
+				
+				LocalDate stDate = date.plusDays(days);
+				// Convert LocalDate to String in same format as DB
+				// String todayStr = today.toString(); // yyyy-MM-dd//String startDateStr =
+				// startDate.toString();
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(date), java.sql.Date.valueOf(stDate));
+				predicates.add(betweenDates);
+			}
+			if (months != null) {	
+				
+				// Calculate date range in Java
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				LocalDate date = LocalDate.parse(openingDate, formatter);
+				System.out.println(date); // Output: 2025-05-20
+				
+				
+				
+				LocalDate stDate = date.plusMonths(months);
+				// Convert LocalDate to String in same format as DB
+				 
+				String startDateStr = stDate.toString();
+				//LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, stDate);
+//				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(stDate));
+//				LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, String.valueOf(currentDateTdy));
+				LOGGER.info("REQID : [{}] - Account Opeing Date : [{}]  afterDays : [{}]", reqId, date,startDateStr);
+				Expression<java.sql.Date> txnDateAsDate =
+					    cb.function("to_Date", java.sql.Date.class,
+					        rootBk.get("transactionDate"),
+					        cb.literal("YYYY-MM-DD"));	
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(date), java.sql.Date.valueOf(stDate));
+				predicates.add(betweenDates);
+			}
+			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
+			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("amount")) {
+				cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				cq.multiselect(cb.count(rootBk), cb.sum(rootBk.get("amount")));
+				Object[] result = entityManager.createQuery(cq).getSingleResult();
+				if (result != null && result.length > 1) {
+					BigDecimal value=  (BigDecimal) result[1];
+					retnVal=value;
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
+				} else {
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			retnVal = new BigDecimal(0);
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getSumCreditDebitClosedAccontAmount :{}", reqId, e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumCreditDebitClosedAccontAmount method End...........\n\n", reqId);
+		}
+		return retnVal;
+	}
+	*/
+	
+	public String getAccountStatus(String reqId, String accNo, String custId, String transMode, String transType, Integer hours,Integer days,Integer months, String fieldName, String columnName,Range range,Factset factSetObj) {
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getAccountStatus method called...........", reqId);
+		String retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(accNo)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
+			}
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			}	
+			String status = accountDetailsRepoImpl.getAccountStatus(reqId, accNo, custId, transMode, transType, hours,
+					days, months, fieldName, columnName, range);
+
+			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
+			if (status != null) {
+
+				retnVal = status;
+				LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
+			} else {
+				LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+
+			}
+		} catch (Exception e) {
+			retnVal = null;
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getAccountStatus :{}", reqId, e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getAccountStatus method End...........\n\n", reqId);
+		}
+		return retnVal;
+	}
+	
 }

@@ -89,5 +89,13 @@ public class AMLConstants {
 	public static final String WITHDRAWAL_PERCENTAGE_OUTSIDE_INDIA = "WITHDRAWAL_PERCENTAGE_OUTSIDE_INDIA";
 	public static final String WITHDRAWAL_LOCATION = "WITHDRAWAL_LOCATION";
 	public static final String COUNT_SMALL_CASH_DEPOSITS="COUNT_SMALL_CASH_DEPOSITS";
+	public static final String MAX_CASH_TXN="MAX_CASH_TXN";	
+	public static final String MAX_NON_CASH_TXN="MAX_NON_CASH_TXN";
+	public static final String SUM_DEBIT_CREDIT_CLOSED_ACCOUNT="SUM_DEBIT_CREDIT_CLOSED_ACCOUNT";
+	public static final String COUNT_CR_DR="COUNT_CR_DR";
+	
+	
+	
+	
 	
 }

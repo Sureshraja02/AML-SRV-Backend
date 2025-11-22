@@ -47,6 +47,8 @@ public interface RuleExecutorIntr {
 	
 	public ComputedFactsVO ruleOfCountCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
+	public ComputedFactsVO ruleOfCountSmallCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
 	public ComputedFactsVO ruleOfSumCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
 	public ComputedFactsVO ruleOfAvgCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj);
@@ -73,8 +75,13 @@ public interface RuleExecutorIntr {
 	
 	public ComputedFactsVO ruleOfSumNonCashDeposit(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
+	public ComputedFactsVO ruleOfMaxNonCashTxn(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
+	public ComputedFactsVO ruleOfMaxCashTxn(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
+	public ComputedFactsVO ruleOfSumCreditDebitClosedAccount(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+
 	
 	
 	

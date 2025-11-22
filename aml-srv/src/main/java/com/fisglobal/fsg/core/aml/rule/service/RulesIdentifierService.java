@@ -133,7 +133,10 @@ public class RulesIdentifierService {
 							break;	
 						case AMLConstants.AVG_CASH_DEPOSITS:
 							computedFactsVO = rulesExecutorService.ruleOfAvgCashDeposit(ruleRequestVoObParam, fact);
-							break;								
+							break;		
+						case AMLConstants.SUM_DEBIT_CREDIT_CLOSED_ACCOUNT:
+							computedFactsVO = rulesExecutorService.ruleOfSumCreditDebitClosedAccount(ruleRequestVoObParam, fact);
+							break;	
 						
 						//New	
 						case AMLConstants.COUNT_CASH_WITHDRAWALS:
@@ -168,6 +171,15 @@ public class RulesIdentifierService {
 							break;
 						case AMLConstants.MAX_DEPOSIT:
 							computedFactsVO = rulesExecutorService.ruleOfLargerDeposite(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.MAX_CASH_TXN:
+							computedFactsVO = rulesExecutorService.ruleOfMaxCashTxn(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.MAX_NON_CASH_TXN:
+							computedFactsVO = rulesExecutorService.ruleOfMaxNonCashTxn(ruleRequestVoObParam, fact);
+							break;
+						case AMLConstants.COUNT_SMALL_CASH_DEPOSITS:
+							computedFactsVO = rulesExecutorService.ruleOfCountCashDeposit(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.IMMEDIATE_WITHDRAWAL:
 							if (IMMEDIATE_WITHDRAWAL && computedFacts != null && computedFacts.size() >= 1) {

@@ -31,6 +31,15 @@ public class ComputedFactsVO implements Serializable {
 	
 	@JsonProperty("transDate")
 	private String transDate;
+	
+	@JsonProperty("strValue")
+	private String strValue;
+	
+	@JsonProperty("acc_open_date")
+	private String acc_open_date;
+	
+	@JsonProperty("accountStatus")
+	private String accountStatus;
 
 	@JsonProperty("fact")
 	public String getFact() {
@@ -70,6 +79,34 @@ public class ComputedFactsVO implements Serializable {
 	@JsonProperty("transDate")
 	public void setTransDate(String transDate) {
 		this.transDate = transDate;
+	}
+	@JsonProperty("strValue")
+	public String getStrValue() {
+		return strValue;
+	}
+	@JsonProperty("strValue")
+	public void setStrValue(String strValue) {
+		this.strValue = strValue;
+	}
+
+	@JsonProperty("acc_open_date")
+	public String getAcc_open_date() {
+		return acc_open_date;
+	}
+
+	@JsonProperty("acc_open_date")
+	public void setAcc_open_date(String acc_open_date) {
+		this.acc_open_date = acc_open_date;
+	}
+
+	@JsonProperty("accountStatus")
+	public String getAccountStatus() {
+		return accountStatus;
+	}
+
+	@JsonProperty("accountStatus")
+	public void setAccountStatus(String accountStatus) {
+		this.accountStatus = accountStatus;
 	}
 	
 	

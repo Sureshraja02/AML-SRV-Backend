@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.fisglobal.fsg.core.aml.entity.TransactionDetailsEntity;
+import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -45,7 +46,7 @@ public class TransactionDetailsRepositryImpl {
 	 * @param fieldName
 	 * @return getSumValue Integer
 	 */
-	public BigDecimal getSumValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName) {
+	public BigDecimal getSumValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -68,6 +69,20 @@ public class TransactionDetailsRepositryImpl {
 				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), transType));
 			}
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+
+			 if (range != null) {
+					if (range.getMin() != null && range.getMax() != null) {
+						predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+					}
+					else if (range.getMin() != null) {
+					    // Only min present → greaterThanOrEqualTo
+					    predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+					} else if (range.getMax() != null) {
+					    // Only max present → lessThanOrEqualTo
+					    predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+					}
+
+				}
 
 			if (days != null) {
 				//Expression<java.sql.Date> txnDateAsDate = cb.function("TRANS_DATE", java.sql.Date.class, rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD") // format of stored string);

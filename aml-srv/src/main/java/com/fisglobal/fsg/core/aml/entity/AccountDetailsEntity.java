@@ -34,7 +34,7 @@ public class AccountDetailsEntity {
     private String branchCode;
 
     @Column(name = "ACCOUNTOPENEDDATE")
-    private LocalDate accountOpenedDate;
+    private String accountOpenedDate;
 
     @Column(name = "MODEOFOPERATION")
     private String modeOfOperation;
@@ -55,10 +55,10 @@ public class AccountDetailsEntity {
     private String accountStatus;
 
     @Column(name = "ACCOUNTCLOSEDDATE")
-    private Timestamp accountClosedDate;
+    private String accountClosedDate;
 
     @Column(name = "MATURITYDATE")
-    private Timestamp maturityDate;
+    private String maturityDate;
 
     @Column(name = "LOANASSETSTATUS")
     private String loanAssetStatus;
@@ -106,7 +106,7 @@ public class AccountDetailsEntity {
     private String remarks;
 
     @Column(name = "UPDATETIMESTAMP")
-    private Timestamp updateTimestamp;
+    private String updateTimestamp;
 
     @Column(name = "ROI")
     private String roi;
@@ -148,7 +148,7 @@ public class AccountDetailsEntity {
     private String accountLastUpdatedDate;
 
     @Column(name = "LASTTRANSACTIONDATE")
-    private Timestamp lastTransactionDate;
+    private String lastTransactionDate;
 
     @Column(name = "DEPOSITAMOUNT")
     private BigDecimal depositAmount;
@@ -207,11 +207,11 @@ public class AccountDetailsEntity {
 		this.branchCode = branchCode;
 	}
 
-	public LocalDate getAccountOpenedDate() {
+	public String getAccountOpenedDate() {
 		return accountOpenedDate;
 	}
 
-	public void setAccountOpenedDate(LocalDate accountOpenedDate) {
+	public void setAccountOpenedDate(String accountOpenedDate) {
 		this.accountOpenedDate = accountOpenedDate;
 	}
 
@@ -263,19 +263,19 @@ public class AccountDetailsEntity {
 		this.accountStatus = accountStatus;
 	}
 
-	public Timestamp getAccountClosedDate() {
+	public String getAccountClosedDate() {
 		return accountClosedDate;
 	}
 
-	public void setAccountClosedDate(Timestamp accountClosedDate) {
+	public void setAccountClosedDate(String accountClosedDate) {
 		this.accountClosedDate = accountClosedDate;
 	}
 
-	public Timestamp getMaturityDate() {
+	public String getMaturityDate() {
 		return maturityDate;
 	}
 
-	public void setMaturityDate(Timestamp maturityDate) {
+	public void setMaturityDate(String maturityDate) {
 		this.maturityDate = maturityDate;
 	}
 
@@ -399,11 +399,11 @@ public class AccountDetailsEntity {
 		this.remarks = remarks;
 	}
 
-	public Timestamp getUpdateTimestamp() {
+	public String getUpdateTimestamp() {
 		return updateTimestamp;
 	}
 
-	public void setUpdateTimestamp(Timestamp updateTimestamp) {
+	public void setUpdateTimestamp(String updateTimestamp) {
 		this.updateTimestamp = updateTimestamp;
 	}
 
@@ -511,11 +511,11 @@ public class AccountDetailsEntity {
 		this.accountLastUpdatedDate = accountLastUpdatedDate;
 	}
 
-	public Timestamp getLastTransactionDate() {
+	public String getLastTransactionDate() {
 		return lastTransactionDate;
 	}
 
-	public void setLastTransactionDate(Timestamp lastTransactionDate) {
+	public void setLastTransactionDate(String lastTransactionDate) {
 		this.lastTransactionDate = lastTransactionDate;
 	}
 
