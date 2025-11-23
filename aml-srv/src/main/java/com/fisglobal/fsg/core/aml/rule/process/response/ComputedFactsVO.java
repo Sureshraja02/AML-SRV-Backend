@@ -40,6 +40,22 @@ public class ComputedFactsVO implements Serializable {
 	
 	@JsonProperty("accountStatus")
 	private String accountStatus;
+	
+	@JsonProperty("depositeLocation")
+	private String depositeLocation;
+	
+	@JsonProperty("perCentValue")
+	private String perCentValue;
+
+	@JsonProperty("depositeLocation")
+	public String getDepositeLocation() {
+		return depositeLocation;
+	}
+
+	@JsonProperty("depositeLocation")
+	public void setDepositeLocation(String depositeLocation) {
+		this.depositeLocation = depositeLocation;
+	}
 
 	@JsonProperty("fact")
 	public String getFact() {
@@ -107,6 +123,16 @@ public class ComputedFactsVO implements Serializable {
 	@JsonProperty("accountStatus")
 	public void setAccountStatus(String accountStatus) {
 		this.accountStatus = accountStatus;
+	}
+
+	@JsonProperty("perCentValue")
+	public String getPerCentValue() {
+		return perCentValue;
+	}
+
+	@JsonProperty("perCentValue")
+	public void setPerCentValue(String perCentValue) {
+		this.perCentValue = perCentValue;
 	}
 	
 	

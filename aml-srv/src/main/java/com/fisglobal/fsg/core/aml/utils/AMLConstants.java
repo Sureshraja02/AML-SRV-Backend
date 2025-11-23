@@ -57,8 +57,8 @@ public class AMLConstants {
 	public static final String COUNT_ACC_TO_ACC_TRANSFERS="COUNT_ACC_TO_ACC_TRANSFERS";
 	public static final String AVG_CASH_WITHDRAWALS="AVG_CASH_WITHDRAWALS";
 	
-	
-	public static final String IMMEDIATE_WITHDRAWAL_DIFFERENT_LOCATIONS = "IMMEDIATE_WITHDRAWAL_DIFFERENT_LOCATIONS";
+	public static final String IMMEDIATE_DIFFERENT_LOCATIONS = "IMMEDIATE_DIFFERENT_LOCATIONS";
+	//public static final String IMMEDIATE_WITHDRAWAL_DIFFERENT_LOCATIONS = "IMMEDIATE_WITHDRAWAL_DIFFERENT_LOCATIONS";
 	public static final String IMMEDIATE_WITHDRAWAL_ATM_OR_OTHER = "IMMEDIATE_WITHDRAWAL_ATM_OR_OTHER";
 	public static final String NEW = "NEW";
 	public static final String HIGH_RISK = "HIGH_RISK";
@@ -93,6 +93,8 @@ public class AMLConstants {
 	public static final String MAX_NON_CASH_TXN="MAX_NON_CASH_TXN";
 	public static final String SUM_DEBIT_CREDIT_CLOSED_ACCOUNT="SUM_DEBIT_CREDIT_CLOSED_ACCOUNT";
 	public static final String COUNT_CR_DR="COUNT_CR_DR";
+	public static final String ACCOUNT_TYPE="ACCOUNT_TYPE";
+	
 	
 	
 	

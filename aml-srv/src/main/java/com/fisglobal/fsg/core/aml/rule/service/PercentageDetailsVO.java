@@ -18,7 +18,7 @@ public class PercentageDetailsVO implements Serializable {
 	private String reqId;
 	
 	@JsonProperty("noOfTimes")
-	private BigDecimal noOfTimes;
+	private Long noOfTimes;
 	
 	@JsonProperty("totalValue")
 	private BigDecimal totalValue;
@@ -34,12 +34,12 @@ public class PercentageDetailsVO implements Serializable {
 	}
 
 	@JsonProperty("noOfTimes")
-	public BigDecimal getNoOfTimes() {
+	public Long getNoOfTimes() {
 		return noOfTimes;
 	}
 
 	@JsonProperty("noOfTimes")
-	public void setNoOfTimes(BigDecimal noOfTimes) {
+	public void setNoOfTimes(Long noOfTimes) {
 		this.noOfTimes = noOfTimes;
 	}
 

@@ -45,36 +45,57 @@ public class RulesUtils {
 		try {
 			computedFactsVO = new ComputedFactsVO();
 			LOGGER.info("REQ ID : [{}] - toGetWithdaralFacts conditianName : [{}]........", conditianName);
-			percentageDetailsVOObj = toGetValueByImediateWithDraw(reqId, accountNo, custmerId,transMode,transType, depositeLargerAmount, transDate, factName, columnName);
-			if (StringUtils.isNotBlank(conditianName)) {
-				switch (conditianName) {
-				case AMLConstants.IMMEDIATE_WITHDRAWAL_DIFFERENT_LOCATIONS:
-					computedFactsVO.setFact(factName);
-					computedFactsVO.setValue(toGetPercentAge(percentageDetailsVOObj));
-					break;
+			percentageDetailsVOObj = toGetValueByImediateWithDraw(reqId, accountNo, custmerId,transMode,transType, depositeLargerAmount, transDate, factName, columnName,conditianName);
+			/*if (percentageDetailsVOObj != null) {
+				switch (factName) {
 				case AMLConstants.IMMEDIATE_WITHDRAWAL:
+				case AMLConstants.WITHDRAWAL_PERCENTAGE:
 					computedFactsVO.setFact(factName);
-					computedFactsVO.setValue(toGetPercentAge(percentageDetailsVOObj));
+					computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
+					computedFactsVO.setPerCentValue(toGetPercentAge(percentageDetailsVOObj));
 					break;
-				case AMLConstants.IMMEDIATE_WITHDRAWAL_ATM_OR_OTHER:
-					computedFactsVO.setFact(factName);
-					computedFactsVO.setValue(toGetPercentAge(percentageDetailsVOObj));
-					break;
+
 				default:
 					LOGGER.info("REQ ID : [{}] - toGetWithdaralFacts default block Condition not match");
 					computedFactsVO.setFact(factName);
 					computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
+					computedFactsVO.setPerCentValue(toGetPercentAge(percentageDetailsVOObj));
 				}
-			} else {
-				LOGGER.info("REQ ID : [{}] - toGetWithdaralFacts conditation not available.");
-				computedFactsVO.setFact(factName);
-				computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
+			}*/
+			if (percentageDetailsVOObj != null) {
+				if (StringUtils.isNotBlank(conditianName)) {
+					switch (conditianName) {
+					case AMLConstants.IMMEDIATE_DIFFERENT_LOCATIONS:
+						computedFactsVO.setFact(factName);
+						
+						computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
+						computedFactsVO.setPerCentValue(String.valueOf(toGetPercentAge(percentageDetailsVOObj)));
+						break;
+					case AMLConstants.IMMEDIATE_WITHDRAWAL:
+						computedFactsVO.setFact(factName);
+						computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
+						computedFactsVO.setPerCentValue(String.valueOf(toGetPercentAge(percentageDetailsVOObj)));
+						break;
+					case AMLConstants.IMMEDIATE_WITHDRAWAL_ATM_OR_OTHER:
+						computedFactsVO.setFact(factName);
+						computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
+						computedFactsVO.setPerCentValue(String.valueOf(toGetPercentAge(percentageDetailsVOObj)));
+						break;
+					default:
+						LOGGER.info("REQ ID : [{}] - toGetWithdaralFacts default block Condition not match");
+						computedFactsVO.setFact(factName);
+						computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
+					}
+				} else {
+					LOGGER.info("REQ ID : [{}] - toGetWithdaralFacts conditation not available.");
+					computedFactsVO.setFact(factName);
+					computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
+				}
 			}
 
 		} catch (Exception e) {
 			computedFactsVO = null;
 			LOGGER.error("Exception found in toGetWithdaralFacts : {}", e);
-
 		} finally {
 			LOGGER.info("REQ ID : [{}] - toGetWithdaralFacts Method End........", reqId);
 		}
@@ -92,11 +113,11 @@ public class RulesUtils {
 	 * @param columnName
 	 * @return toGetValueByImediateWithDraw ComputedFactsVO
 	 */
-	public PercentageDetailsVO toGetValueByImediateWithDraw(String reqId, String accountNo, String custmerId, String transMode, String transType, BigDecimal depositeLargerAmount, String transDate, String factName, String columnName) {
+	public PercentageDetailsVO toGetValueByImediateWithDraw(String reqId, String accountNo, String custmerId, String transMode, String transType, BigDecimal depositeLargerAmount, String transDate, String factName, String columnName, String conditianName) {
 		LOGGER.info("REQ ID : [{}] - toGetValueByImediateWithDraw Method Called............", reqId);
 		PercentageDetailsVO percentageDetailsVOObj = null;
 		BigDecimal retnVal = null;
-		// ComputedFactsVO computedFactsVO = null;
+		
 		CriteriaBuilder cb = null;
 		List<Predicate> predicates = null;
 		CriteriaQuery<Object[]> cq = null;
@@ -108,33 +129,71 @@ public class RulesUtils {
 			cq = cb.createQuery(Object[].class);
 			predicates = new ArrayList<Predicate>();
 			rootBk = cq.from(TransactionDetailsEntity.class);
+			
+			if (StringUtils.isNotBlank(conditianName)) {
+				switch (conditianName) {
+				case AMLConstants.IMMEDIATE_DIFFERENT_LOCATIONS:
+					LOGGER.debug("REQID : [{}] - Transaction Date : [{}] - Deposite amt : [{}]", reqId, transDate, depositeLargerAmount);
+					predicates.add(cb.greaterThanOrEqualTo(rootBk.get("transactionDate"), transDate));
+					predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), depositeLargerAmount));
+					break;
+				case AMLConstants.IMMEDIATE_WITHDRAWAL:
+					LOGGER.debug("REQID : [{}] - Transaction Date : [{}] - Deposite amt : [{}]", reqId, transDate, depositeLargerAmount);
+					predicates.add(cb.greaterThanOrEqualTo(rootBk.get("transactionDate"), transDate));
+					predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), depositeLargerAmount));
+					break;
+				case AMLConstants.IMMEDIATE_WITHDRAWAL_ATM_OR_OTHER:
+					LOGGER.debug("REQID : [{}] - Transaction Date : [{}] - Deposite amt : [{}]", reqId, transDate, depositeLargerAmount);
+					predicates.add(cb.greaterThanOrEqualTo(rootBk.get("transactionDate"), transDate));
+					predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), depositeLargerAmount));
+					break;
+				default:
+					LOGGER.info("REQ ID : [{}] - toGetValueByImediateWithDraw default block Condition not match");
+					
+				}
+			}
+			
+			/**
+			 * Account Number 
+			 */
 			if (StringUtils.isNotBlank(accountNo)) {
 				predicates.add(cb.equal(rootBk.get("accountNo"), accountNo));
 			}
+			/**
+			 * Customer Id 
+			 */
 			if (StringUtils.isNotBlank(custmerId)) {
 				predicates.add(cb.equal(rootBk.get("customerId"), custmerId));
 			}
+			/**
+			 * Transaction Type 
+			 */
+			if (StringUtils.isNotBlank(transType)) {
+				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), transType));
+			} else {
+				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), "W"));
+			}
 
+			/**
+			 * Transaction Mode 
+			 */
+			if (StringUtils.isNotBlank(transMode)) {
+				predicates.add(cb.greaterThanOrEqualTo(rootBk.get("channelType"), transMode));
+			} else {
+				List<String> type = Arrays.asList("CASH", "CHEQUE");
+				Predicate inClause = rootBk.get("channelType").in(type);
+				predicates.add(inClause);
+			}
 			
-			predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), "W"));
-
-			List<String> type = Arrays.asList("CASH", "CHEQUE");
-			Predicate inClause = rootBk.get("channelType").in(type);
-			predicates.add(inClause);
 			
-			LOGGER.debug("REQID : [{}] - Transaction Date : [{}] - Deposite amt : [{}]", reqId, transDate, depositeLargerAmount);
-			
-			predicates.add(cb.greaterThanOrEqualTo(rootBk.get("transactionDate"), transDate));
-			predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), depositeLargerAmount));
 
 			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("amount")) {
 				cq.where(cb.and(predicates.toArray(new Predicate[0])));
 				cq.multiselect(cb.count(rootBk), cb.max(rootBk.get("amount")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
-					// BigDecimal value=
 					percentageDetailsVOObj.setReqId(reqId);
-					percentageDetailsVOObj.setNoOfTimes((BigDecimal) result[0]);
+					percentageDetailsVOObj.setNoOfTimes((Long) result[0]);
 					percentageDetailsVOObj.setTotalValue((BigDecimal) result[1]);
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
@@ -142,7 +201,6 @@ public class RulesUtils {
 					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
 				}
 			}
-
 		} catch (Exception e) {
 			percentageDetailsVOObj = null;
 			LOGGER.error("REQ ID : [{}] - Exception found in RulesUtils@toGetValueByImediateWithDraw : {}", reqId, e);
@@ -167,8 +225,20 @@ public class RulesUtils {
 		LOGGER.info("REQ ID : [{}] - toGetPercentAge Method Called............", percentageDetailsObj.getReqId());
 		BigDecimal perCentageValue = null;
 		try {
-			perCentageValue = percentageDetailsObj.getNoOfTimes().divide(percentageDetailsObj.getTotalValue(), 10, RoundingMode.HALF_UP) // scale 10 for precision
-					.multiply(new BigDecimal("100"));
+			
+			BigDecimal noOfTimes = new BigDecimal(percentageDetailsObj.getNoOfTimes());
+			BigDecimal totalValue = percentageDetailsObj.getTotalValue();
+
+			perCentageValue = noOfTimes
+			    .divide(totalValue, 10, RoundingMode.HALF_UP)
+			    .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
+			
+			/*
+			 * perCentageValue =
+			 * percentageDetailsObj.getNoOfTimes().divide(BigDecimal.valueOf(
+			 * percentageDetailsObj.getTotalValue().longValue()), 10, RoundingMode.HALF_UP)
+			 * // scale 10 for precision .multiply(new BigDecimal("100"));
+			 */
 
 		} catch (Exception e) {
 			LOGGER.error("REQ ID : [{}] - Exception found in RulesUtils@toGetPercentAge : {}", percentageDetailsObj.getReqId(), e);

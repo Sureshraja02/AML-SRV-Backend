@@ -181,7 +181,7 @@ public class RulesIdentifierService {
 						case AMLConstants.COUNT_SMALL_CASH_DEPOSITS:
 							computedFactsVO = rulesExecutorService.ruleOfCountCashDeposit(ruleRequestVoObParam, fact);
 							break;
-						case AMLConstants.IMMEDIATE_WITHDRAWAL:
+						case AMLConstants.IMMEDIATE_WITHDRAWAL://85
 							if (IMMEDIATE_WITHDRAWAL && computedFacts != null && computedFacts.size() >= 1) {
 								computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact, computedFacts);
 							} else {
@@ -189,7 +189,7 @@ public class RulesIdentifierService {
 							}
 							break;
 						case AMLConstants.WITHDRAWAL_PERCENTAGE://79,39,27,26,25
-							if (fact != null && fact.getCondition() != null && fact.getCondition().equalsIgnoreCase(AMLConstants.IMMEDIATE_WITHDRAWAL_DIFFERENT_LOCATIONS)) {
+							if (fact != null && fact.getCondition() != null && fact.getCondition().equalsIgnoreCase(AMLConstants.IMMEDIATE_DIFFERENT_LOCATIONS)) {
 								//25
 								
 							} else if (fact != null && fact.getCondition() != null && fact.getCondition().equalsIgnoreCase(AMLConstants.IMMEDIATE_WITHDRAWAL)) {
@@ -198,17 +198,13 @@ public class RulesIdentifierService {
 								//27
 							} else { // No condition
 								// 39, 79
+								if (computedFacts != null && computedFacts.size() >= 1) {
+									computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact, computedFacts);
+								}
+								
 							}
 							break;
-						case AMLConstants.WITHDRAWAL_PERCENTAGE_OUTSIDE_INDIA:
-							// 42 Rule
-							break;
-						case AMLConstants.SPECIFIED_EXPENDITURE:
-							//28 Rule
-							break;
-						case AMLConstants.WITHDRAWAL_LOCATION:
-							//64, 65 Rule
-							break;	
+							
 							
 						default:
 							LOGGER.info("NO MATCH FOUND");
