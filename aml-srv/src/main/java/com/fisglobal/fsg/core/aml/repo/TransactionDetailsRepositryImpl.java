@@ -11,7 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.fisglobal.fsg.core.aml.entity.AccountDetailsEntity;
+import com.fisglobal.fsg.core.aml.entity.CustomerDetailsEntity;
 import com.fisglobal.fsg.core.aml.entity.TransactionDetailsEntity;
+import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 
 import jakarta.persistence.EntityManager;
@@ -35,6 +38,12 @@ public class TransactionDetailsRepositryImpl {
 	@Autowired
 	EntityManager entityManager;
 
+	
+	@Autowired
+	CustomerDetailsRepoImpl customerDetailsRepoImpl;
+	
+	@Autowired
+	AccountDetailsRepoImpl accountDetailsRepoImpl;
 	/**
 	 * 
 	 * @param reqId
@@ -46,12 +55,13 @@ public class TransactionDetailsRepositryImpl {
 	 * @param fieldName
 	 * @return getSumValue Integer
 	 */
-	public BigDecimal getSumValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
+	public BigDecimal getSumValue(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range,Factset faceset) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
 		List<Predicate> predicates = null;
 		CriteriaQuery<Object[]> cq = null;
+		boolean condition=false;
 		Root<TransactionDetailsEntity> rootBk = null;
 		try {
 			cb = entityManager.getCriteriaBuilder();
@@ -68,6 +78,57 @@ public class TransactionDetailsRepositryImpl {
 			if (StringUtils.isNotBlank(transType)) {
 				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), transType));
 			}
+			if (StringUtils.isNotBlank(transMode)) {
+				predicates.add(cb.equal(rootBk.get("channelType"), transMode));
+			}
+			
+			if(faceset!=null && faceset.getCondition()!=null)
+			{
+			
+				if(faceset.getCondition().equals("NONINDIVIDUAL"))
+				{
+					if (StringUtils.isNotBlank(custId)) {
+						CustomerDetailsEntity custDetails=customerDetailsRepoImpl.getCustomerDetailsByCustId(custId);
+						if(custDetails!=null)
+						{
+							if(custDetails.getCustomerType()!=null)
+							{
+								if("NONINDIVIDUAL".equals(custDetails.getCustomerType()))
+								{
+									condition=true;
+								}
+							}
+						}
+						
+					}
+					else if (StringUtils.isNotBlank(accNo)) {
+						AccountDetailsEntity acctDetails=accountDetailsRepoImpl.getAccountDetailsByritiria(reqId, accNo, custId);
+						if(acctDetails!=null && acctDetails.getCustomerId()!=null)
+						{
+							CustomerDetailsEntity custDetails=customerDetailsRepoImpl.getCustomerDetailsByCustId(String.valueOf(acctDetails.getCustomerId()));	
+							if(custDetails.getCustomerType()!=null)
+							{
+								if("NONINDIVIDUAL".equals(custDetails.getCustomerType()))
+								{
+									condition=true;
+								}
+							}
+						}
+					}
+					
+					
+					if(!condition)
+					{
+						return new BigDecimal(0); 
+					}
+					
+				}
+				
+				
+				
+			}
+			
+			
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 
 			 if (range != null) {
