@@ -2268,7 +2268,7 @@ public class TransactionDetailsRepositryImpl2 {
 		return retnVal;
 	}
 	
-	public ComputedFactsVO getLargerDeposite(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName,Range range) {
+	public ComputedFactsVO getLargerDeposite(String reqId, String accNo, String custId, String transMode, String transType, Integer days, String fieldName, String columnName, Range rangeObj) {
 		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method called...........", reqId);
 		BigDecimal retnVal = null;
 		CriteriaBuilder cb = null;
@@ -2308,17 +2308,22 @@ public class TransactionDetailsRepositryImpl2 {
 			}
 			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
 			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("amount")) {
-				cq.where(cb.and(predicates.toArray(new Predicate[0])));
-				cq.multiselect(cb.count(rootBk), cb.max(rootBk.get("amount")),cb.max(rootBk.get("transactionDate")));
+				
+				Expression<Double> maxOf = cb.max(rootBk.get("amount"));
+		        Expression<Long> countOf = cb.count(rootBk);
+		        Expression<String> maxDateExp = cb.greatest(rootBk.get("transactionDate"));
+		        //Expression<String> addressExp = rootBk.get("counterCountryCode");
+				
+		        cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				cq.multiselect(countOf, maxOf, maxDateExp);
+				
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
-				if (result != null && result.length > 1) {
-					//BigDecimal value=  
+				if (result != null && result.length > 1) { 
 					retnVal = (BigDecimal) result[1];
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 					LOGGER.info("REQID : [{}] - TransDate : [{}]", reqId,  result[2]);
 					computedFactsVO.setValue(retnVal);
 					computedFactsVO.setTransDate((String) result[2]);
-					
 				} else {
 					retnVal = new BigDecimal(0);
 					computedFactsVO.setValue(retnVal);
@@ -2702,5 +2707,7 @@ public class TransactionDetailsRepositryImpl2 {
 		}
 		return retnVal;
 	}
+	
+	
 	
 }
