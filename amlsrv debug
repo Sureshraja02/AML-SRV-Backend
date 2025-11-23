@@ -1,0 +1,460 @@
+Rulewhiz
+===================
+2025-11-23 19:15:31.095  INFO 13496 --- [pool-6-thread-1] c.f.r.engine.core.service.AMLAggregate   : API Request [{"reqId":"7d7846a4-e5dc-48db-84c2-153de2c10b16","customerId":8297946607,"accountNo":3571836431,"rule_id":"CASH_DEPOSIT_FOR_IND_NON_IND","txn_time":"14:54:46.671+05:30","factSet":[{"days":1,"fact":"SUM","field":"amount"}]}]
+
+2025-11-23 19:15:31.149  INFO 13496 --- [pool-6-thread-1] c.f.r.engine.core.service.ApiService     : Response [{"reqId":"7d7846a4-e5dc-48db-84c2-153de2c10b16","accountHolderType":"010203","computedFacts":[{}]}]
+
+
+
+AML SRV
+============
+2025-11-23 19:13:57.353 14772 [http-nio-7046-exec-1] INFO 
+				c.f.f.c.a.r.s.RulesIdentifierService- RulesIdentifierService toComputeAMLData method called......
+2025-11-23 19:13:57.353 14772 [http-nio-7046-exec-1] INFO 
+				c.f.f.c.a.r.s.RulesIdentifierService- RulesIdentifierService toComputeAMLData - ruleRequestVoObParam [com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo@11120794]......
+2025-11-23 19:13:57.353 14772 [http-nio-7046-exec-1] INFO 
+				c.f.f.c.a.r.s.RulesAggregateService- REQID : [20dcb0a5-6831-4b41-a369-ba1e7a29de24]::::::::::::RulesExecutorService@ruleOfSUMProcess (SUM) Called::::::::::
+2025-11-23 19:13:57.353 14772 [http-nio-7046-exec-1] INFO 
+				c.f.f.c.a.r.s.RulesAggregateService- REQID : [20dcb0a5-6831-4b41-a369-ba1e7a29de24]::::::::::::RulesExecutorService@ruleOfSUMProcess (SUM) End::::::::::
+
+
+Hibernate: 
+    select
+        c1_0.customerid,
+        c1_0.addressline1,
+        c1_0.addressline2,
+        c1_0.addressline3,
+        c1_0.age,
+        c1_0.amlexistence,
+        c1_0.annualincome,
+        c1_0.bankcode,
+        c1_0.bankvisit,
+        c1_0.branchcode,
+        c1_0.carvalue,
+        c1_0.checked,
+        c1_0.city,
+        c1_0.comm_addressline1,
+        c1_0.comm_addressline2,
+        c1_0.comm_city,
+        c1_0.comm_country,
+        c1_0.comm_emailid,
+        c1_0.comm_faxno,
+        c1_0.comm_phoneno,
+        c1_0.comm_pincode,
+        c1_0.comm_state,
+        c1_0.curruptionscore,
+        c1_0.country,
+        c1_0.createddatetime,
+        c1_0.creditrating,
+        c1_0.customercategory,
+        c1_0.customerempcode,
+        c1_0.customername,
+        c1_0.customerstatcode,
+        c1_0.customertype,
+        c1_0.customertypecode,
+        c1_0.dateofbirth,
+        c1_0.dependents,
+        c1_0.drivinglicenseno,
+        c1_0.drugtrafficking,
+        c1_0.education,
+        c1_0.emailid,
+        c1_0.employeraddressline1,
+        c1_0.employeraddressline2,
+        c1_0.employercity,
+        c1_0.employercode,
+        c1_0.employercountry,
+        c1_0.employeremailid,
+        c1_0.employerfaxno,
+        c1_0.employerphoneno,
+        c1_0.employerpincode,
+        c1_0.employerstate,
+        c1_0.estimatedincomefrombusiness,
+        c1_0.fatfncct,
+        c1_0.fathername,
+        c1_0.faxno,
+        c1_0.firstname,
+        c1_0.grade,
+        c1_0.idcard,
+        c1_0.identificationmarks,
+        c1_0.intercountry,
+        c1_0.introducercategory,
+        c1_0.introducercustomerid,
+        c1_0.introducername,
+        c1_0.investments_val,
+        c1_0.issuingauthority,
+        c1_0.jth1_name,
+        c1_0.jth1_relation,
+        c1_0.jth2_name,
+        c1_0.jth2_relation,
+        c1_0.jth3_name,
+        c1_0.jth3_relation,
+        c1_0.jth4_name,
+        c1_0.jth4_relation,
+        c1_0.lastname,
+        c1_0.lastupdateddate,
+        c1_0.listento,
+        c1_0.loansavailed,
+        c1_0.maritalstatus,
+        c1_0.middlename,
+        c1_0.minor,
+        c1_0.mobileno,
+        c1_0.mothername,
+        c1_0.movietype,
+        c1_0.nationality,
+        c1_0.natureofbusiness,
+        c1_0.neighbourlyrelation,
+        c1_0.net_worth,
+        c1_0.occupation,
+        c1_0.ofacterrorism,
+        c1_0.otherincome,
+        c1_0.panno,
+        c1_0.partyid,
+        c1_0.passportexpirydate,
+        c1_0.passportno,
+        c1_0.phoneno,
+        c1_0.pincode,
+        c1_0.placeofbirth,
+        c1_0.placeofissue,
+        c1_0.politicalstability,
+        c1_0.reading,
+        c1_0.remarks,
+        c1_0.residentialstatus,
+        c1_0.salutation,
+        c1_0.score,
+        c1_0.securityid,
+        c1_0.sex,
+        c1_0.sourceoffunds,
+        c1_0.sourcetype,
+        c1_0.state,
+        c1_0.travelabroad,
+        c1_0.traveltimes,
+        c1_0.updatetimestamp,
+        c1_0.vehowner,
+        c1_0.visitfor,
+        c1_0.voteridentitycardno,
+        c1_0.wblist,
+        c1_0.website,
+        c1_0.yrofpur 
+    from
+        amlschema.fs_cust c1_0 
+    where
+        c1_0.customerid=?
+2025-11-23 19:13:57.518 14937 [http-nio-7046-exec-1] INFO 
+				c.f.f.c.a.r.AccountStatusRepositryImpl- REQ ID : [20dcb0a5-6831-4b41-a369-ba1e7a29de24] - AccountStatusRepositryImpl@getAccountStatusByAccNO method called.......
+Hibernate: 
+    select
+        a1_0.accountno,
+        a1_0.changedate,
+        a1_0.status,
+        a1_0.updatetimestamp 
+    from
+        amlschema.fs_account_status a1_0 
+    where
+        a1_0.accountno=?
+2025-11-23 19:13:57.535 14954 [http-nio-7046-exec-1] ERROR
+				c.f.f.c.a.r.AccountStatusRepositryImpl- REQ ID : [20dcb0a5-6831-4b41-a369-ba1e7a29de24] - Exception found in AccountStatusRepositryImpl@getAccountStatusByAccNO : {}
+jakarta.persistence.NoResultException: No result found for query [<criteria>]
+	at org.hibernate.query.spi.AbstractSelectionQuery.getSingleResult(AbstractSelectionQuery.java:476)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$DeferredQueryInvocationHandler.invoke(SharedEntityManagerCreator.java:405)
+	at jdk.proxy4/jdk.proxy4.$Proxy185.getSingleResult(Unknown Source)
+	at com.fisglobal.fsg.core.aml.repo.AccountStatusRepositryImpl.getAccountStatusByAccNO(AccountStatusRepositryImpl.java:45)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:751)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:137)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:751)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:703)
+	at com.fisglobal.fsg.core.aml.repo.AccountStatusRepositryImpl$$SpringCGLIB$$0.getAccountStatusByAccNO(<generated>)
+	at com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService.toComputeAMLData(RulesIdentifierService.java:220)
+	at com.fisglobal.fsg.core.aml.controller.RuleValidationController.ruleProcessMethod(RuleValidationController.java:34)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:150)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:884)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1081)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:974)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1011)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:109)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:340)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:391)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1744)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2025-11-23 19:13:57.536 14955 [http-nio-7046-exec-1] INFO 
+				c.f.f.c.a.r.AccountStatusRepositryImpl- REQ ID : [20dcb0a5-6831-4b41-a369-ba1e7a29de24] - AccountStatusRepositryImpl@getAccountStatusByAccNO method End.......
+2025-11-23 19:15:31.099 108518 [http-nio-7046-exec-3] INFO 
+				c.f.f.c.a.r.s.RulesIdentifierService- RulesIdentifierService toComputeAMLData method called......
+2025-11-23 19:15:31.099 108518 [http-nio-7046-exec-3] INFO 
+				c.f.f.c.a.r.s.RulesIdentifierService- RulesIdentifierService toComputeAMLData - ruleRequestVoObParam [com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo@268f2b09]......
+2025-11-23 19:15:31.099 108518 [http-nio-7046-exec-3] INFO 
+				c.f.f.c.a.r.s.RulesAggregateService- REQID : [7d7846a4-e5dc-48db-84c2-153de2c10b16]::::::::::::RulesExecutorService@ruleOfSUMProcess (SUM) Called::::::::::
+2025-11-23 19:15:31.099 108518 [http-nio-7046-exec-3] INFO 
+				c.f.f.c.a.r.s.RulesAggregateService- REQID : [7d7846a4-e5dc-48db-84c2-153de2c10b16]::::::::::::RulesExecutorService@ruleOfSUMProcess (SUM) End::::::::::
+
+
+Hibernate: 
+    select
+        c1_0.customerid,
+        c1_0.addressline1,
+        c1_0.addressline2,
+        c1_0.addressline3,
+        c1_0.age,
+        c1_0.amlexistence,
+        c1_0.annualincome,
+        c1_0.bankcode,
+        c1_0.bankvisit,
+        c1_0.branchcode,
+        c1_0.carvalue,
+        c1_0.checked,
+        c1_0.city,
+        c1_0.comm_addressline1,
+        c1_0.comm_addressline2,
+        c1_0.comm_city,
+        c1_0.comm_country,
+        c1_0.comm_emailid,
+        c1_0.comm_faxno,
+        c1_0.comm_phoneno,
+        c1_0.comm_pincode,
+        c1_0.comm_state,
+        c1_0.curruptionscore,
+        c1_0.country,
+        c1_0.createddatetime,
+        c1_0.creditrating,
+        c1_0.customercategory,
+        c1_0.customerempcode,
+        c1_0.customername,
+        c1_0.customerstatcode,
+        c1_0.customertype,
+        c1_0.customertypecode,
+        c1_0.dateofbirth,
+        c1_0.dependents,
+        c1_0.drivinglicenseno,
+        c1_0.drugtrafficking,
+        c1_0.education,
+        c1_0.emailid,
+        c1_0.employeraddressline1,
+        c1_0.employeraddressline2,
+        c1_0.employercity,
+        c1_0.employercode,
+        c1_0.employercountry,
+        c1_0.employeremailid,
+        c1_0.employerfaxno,
+        c1_0.employerphoneno,
+        c1_0.employerpincode,
+        c1_0.employerstate,
+        c1_0.estimatedincomefrombusiness,
+        c1_0.fatfncct,
+        c1_0.fathername,
+        c1_0.faxno,
+        c1_0.firstname,
+        c1_0.grade,
+        c1_0.idcard,
+        c1_0.identificationmarks,
+        c1_0.intercountry,
+        c1_0.introducercategory,
+        c1_0.introducercustomerid,
+        c1_0.introducername,
+        c1_0.investments_val,
+        c1_0.issuingauthority,
+        c1_0.jth1_name,
+        c1_0.jth1_relation,
+        c1_0.jth2_name,
+        c1_0.jth2_relation,
+        c1_0.jth3_name,
+        c1_0.jth3_relation,
+        c1_0.jth4_name,
+        c1_0.jth4_relation,
+        c1_0.lastname,
+        c1_0.lastupdateddate,
+        c1_0.listento,
+        c1_0.loansavailed,
+        c1_0.maritalstatus,
+        c1_0.middlename,
+        c1_0.minor,
+        c1_0.mobileno,
+        c1_0.mothername,
+        c1_0.movietype,
+        c1_0.nationality,
+        c1_0.natureofbusiness,
+        c1_0.neighbourlyrelation,
+        c1_0.net_worth,
+        c1_0.occupation,
+        c1_0.ofacterrorism,
+        c1_0.otherincome,
+        c1_0.panno,
+        c1_0.partyid,
+        c1_0.passportexpirydate,
+        c1_0.passportno,
+        c1_0.phoneno,
+        c1_0.pincode,
+        c1_0.placeofbirth,
+        c1_0.placeofissue,
+        c1_0.politicalstability,
+        c1_0.reading,
+        c1_0.remarks,
+        c1_0.residentialstatus,
+        c1_0.salutation,
+        c1_0.score,
+        c1_0.securityid,
+        c1_0.sex,
+        c1_0.sourceoffunds,
+        c1_0.sourcetype,
+        c1_0.state,
+        c1_0.travelabroad,
+        c1_0.traveltimes,
+        c1_0.updatetimestamp,
+        c1_0.vehowner,
+        c1_0.visitfor,
+        c1_0.voteridentitycardno,
+        c1_0.wblist,
+        c1_0.website,
+        c1_0.yrofpur 
+    from
+        amlschema.fs_cust c1_0 
+    where
+        c1_0.customerid=?
+2025-11-23 19:15:31.132 108551 [http-nio-7046-exec-3] INFO 
+				c.f.f.c.a.r.AccountStatusRepositryImpl- REQ ID : [7d7846a4-e5dc-48db-84c2-153de2c10b16] - AccountStatusRepositryImpl@getAccountStatusByAccNO method called.......
+Hibernate: 
+    select
+        a1_0.accountno,
+        a1_0.changedate,
+        a1_0.status,
+        a1_0.updatetimestamp 
+    from
+        amlschema.fs_account_status a1_0 
+    where
+        a1_0.accountno=?
+2025-11-23 19:15:31.146 108565 [http-nio-7046-exec-3] ERROR
+				c.f.f.c.a.r.AccountStatusRepositryImpl- REQ ID : [7d7846a4-e5dc-48db-84c2-153de2c10b16] - Exception found in AccountStatusRepositryImpl@getAccountStatusByAccNO : {}
+jakarta.persistence.NoResultException: No result found for query [<criteria>]
+	at org.hibernate.query.spi.AbstractSelectionQuery.getSingleResult(AbstractSelectionQuery.java:476)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$DeferredQueryInvocationHandler.invoke(SharedEntityManagerCreator.java:405)
+	at jdk.proxy4/jdk.proxy4.$Proxy185.getSingleResult(Unknown Source)
+	at com.fisglobal.fsg.core.aml.repo.AccountStatusRepositryImpl.getAccountStatusByAccNO(AccountStatusRepositryImpl.java:45)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:343)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:196)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:751)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:137)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:184)
+	at org.springframework.aop.framework.CglibAopProxy$CglibMethodInvocation.proceed(CglibAopProxy.java:751)
+	at org.springframework.aop.framework.CglibAopProxy$DynamicAdvisedInterceptor.intercept(CglibAopProxy.java:703)
+	at com.fisglobal.fsg.core.aml.repo.AccountStatusRepositryImpl$$SpringCGLIB$$0.getAccountStatusByAccNO(<generated>)
+	at com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService.toComputeAMLData(RulesIdentifierService.java:220)
+	at com.fisglobal.fsg.core.aml.controller.RuleValidationController.ruleProcessMethod(RuleValidationController.java:34)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:205)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:150)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:118)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:884)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:797)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1081)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:974)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1011)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:914)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:590)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:205)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:109)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:174)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:149)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:167)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:90)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:93)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:340)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:391)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:896)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1744)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1191)
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:659)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2025-11-23 19:15:31.147 108566 [http-nio-7046-exec-3] INFO 
+				c.f.f.c.a.r.AccountStatusRepositryImpl- REQ ID : [7d7846a4-e5dc-48db-84c2-153de2c10b16] - AccountStatusRepositryImpl@getAccountStatusByAccNO method End.......
