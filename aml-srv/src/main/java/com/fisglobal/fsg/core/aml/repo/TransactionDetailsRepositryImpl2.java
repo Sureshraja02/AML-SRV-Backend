@@ -2311,7 +2311,7 @@ public class TransactionDetailsRepositryImpl2 {
 				
 				Expression<Double> maxOf = cb.max(rootBk.get("amount"));
 		        Expression<Long> countOf = cb.count(rootBk);
-		        Expression<String> maxDateExp = cb.greatest(rootBk.get("transactionDate"));
+		        Expression<String> maxDateExp = cb.greatest(rootBk.<String>get("transactionDate"));
 		        //Expression<String> addressExp = rootBk.get("counterCountryCode");
 				
 		        cq.where(cb.and(predicates.toArray(new Predicate[0])));
