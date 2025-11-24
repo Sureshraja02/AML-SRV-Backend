@@ -43,6 +43,9 @@ public class FS_FIUIndHighRiskCountryEntity implements Serializable {
 
 	@Column(name = "FIU_COMPLIANCE_REQMET")
 	private String fiuComplianceReqmet;
+	
+	@Column(name = "country_code")
+	private String country_Code;
 
 	public Integer getId() {
 		return id;
@@ -91,5 +94,15 @@ public class FS_FIUIndHighRiskCountryEntity implements Serializable {
 	public void setFiuComplianceReqmet(String fiuComplianceReqmet) {
 		this.fiuComplianceReqmet = fiuComplianceReqmet;
 	}
+
+	public String getCountry_Code() {
+		return country_Code;
+	}
+
+	public void setCountry_Code(String country_Code) {
+		this.country_Code = country_Code;
+	}
+	
+	
 
 }

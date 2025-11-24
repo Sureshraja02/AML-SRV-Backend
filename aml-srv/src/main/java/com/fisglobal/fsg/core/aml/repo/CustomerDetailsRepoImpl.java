@@ -71,7 +71,7 @@ public class CustomerDetailsRepoImpl {
 		}
 	}
 	
-	public String getPanStatus(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName, String columnName,Range range) {
+	public String getPanStatus(String reqId, String accNo, String custId, String transMode, String transType, Integer hours, Integer days, Integer months,  String fieldName,Range range) {
 		LOGGER.info("REQID : [{}] - CustomerDetailsRepoImpl@getPanStatus method called...........", reqId);
 		String retnVal = null;
 		CriteriaBuilder cb = null;
@@ -87,19 +87,20 @@ public class CustomerDetailsRepoImpl {
 			
 			predicates = new ArrayList<Predicate>();
 			rootBk = cq.from(CustomerDetailsEntity.class);
-			if (StringUtils.isNotBlank(accNo)) {
-				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
-			}
 			if (StringUtils.isNotBlank(custId)) {
 				predicates.add(cb.equal(rootBk.get("customerId"), custId));
 			}
+			else if (StringUtils.isNotBlank(accNo)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
+			}
+			
 			LOGGER.info("REQID : [{}] - transType : [{}]", reqId, transType);
 			
 			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
 			
 			
-			LOGGER.info("REQID : [{}] - columnName is : [{}]", reqId, columnName);
-			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("status")) {
+			LOGGER.info("REQID : [{}] - columnName is : ", reqId);
+			if (predicates != null) {
 				
 				cq.where(predicates.toArray(new Predicate[] {}));
 
