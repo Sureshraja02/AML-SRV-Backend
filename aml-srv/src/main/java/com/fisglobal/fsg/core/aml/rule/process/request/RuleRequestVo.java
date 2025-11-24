@@ -30,6 +30,9 @@ public class RuleRequestVo implements Serializable {
 	@JsonProperty("transactionMode")
 	private String transactionMode;
 	
+	@JsonProperty("txnId")
+	private String txnId;
+	
 	@JsonProperty("txnType")
 	private String txnType;
 	
@@ -117,6 +120,16 @@ public class RuleRequestVo implements Serializable {
 	@JsonProperty("factSet")
 	public void setFactSet(List<Factset> factSet) {
 		this.factSet = factSet;
+	}
+
+	@JsonProperty("txnId")
+	public String getTxnId() {
+		return txnId;
+	}
+
+	@JsonProperty("txnId")
+	public void setTxnId(String txnId) {
+		this.txnId = txnId;
 	}
 	
 

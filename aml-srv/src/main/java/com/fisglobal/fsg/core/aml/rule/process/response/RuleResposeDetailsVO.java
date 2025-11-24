@@ -21,8 +21,8 @@ public class RuleResposeDetailsVO implements Serializable{
 	@JsonProperty("ruleId")
 	private String ruleId;
 	
-	@JsonProperty("accountHolderType")
-	private String accountHolderType;
+	@JsonProperty("accountType")
+	private String accountType;
 	
 	@JsonProperty("accountStatus")
 	private String accountStatus;
@@ -50,19 +50,21 @@ public class RuleResposeDetailsVO implements Serializable{
 		this.ruleId = ruleId;
 	}
 
-	@JsonProperty("accountHolderType")
-	public String getAccountHolderType() {
-		return accountHolderType;
-	}
-
-	@JsonProperty("accountHolderType")
-	public void setAccountHolderType(String accountHolderType) {
-		this.accountHolderType = accountHolderType;
-	}
+	
+	
 
 	@JsonProperty("accountStatus")
 	public String getAccountStatus() {
 		return accountStatus;
+	}
+	@JsonProperty("accountHolderType")
+	public String getAccountType() {
+		return accountType;
+	}
+
+	@JsonProperty("accountHolderType")
+	public void setAccountType(String accountType) {
+		this.accountType = accountType;
 	}
 
 	@JsonProperty("accountStatus")

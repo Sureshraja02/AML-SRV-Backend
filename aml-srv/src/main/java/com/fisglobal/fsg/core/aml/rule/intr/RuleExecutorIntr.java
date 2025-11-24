@@ -81,7 +81,9 @@ public interface RuleExecutorIntr {
 	
 	public ComputedFactsVO ruleOfSumCreditDebitClosedAccount(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
-
+	public ComputedFactsVO ruleOfMinBalance(RuleRequestVo requVoObjParam, Factset factSetObj);
+	
+	public ComputedFactsVO ruleOfMaxCrossBorderTxn(RuleRequestVo requVoObjParam, Factset factSetObj);
 	
 	
 	

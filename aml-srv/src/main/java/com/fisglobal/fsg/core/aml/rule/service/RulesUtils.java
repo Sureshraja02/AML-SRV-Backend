@@ -3,9 +3,9 @@ package com.fisglobal.fsg.core.aml.rule.service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fisglobal.fsg.core.aml.entity.TransactionDetailsEntity;
+import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
@@ -37,37 +38,21 @@ public class RulesUtils {
 	@Autowired
 	EntityManager entityManager;
 
-	public ComputedFactsVO toGetWithdaralFacts(String reqId, String accountNo, String custmerId, String transMode, String transType, BigDecimal depositeLargerAmount, String transDate, String factName, String columnName,
-			String conditianName) {
+	public ComputedFactsVO toGetWithdaralFacts(String reqId, String accountNo,
+			String custmerId, String transMode, String transType, BigDecimal depositeLargerAmount, 
+			String transDate, String factName, String conditianName, Factset factSetObj, Optional<ComputedFactsVO> computedFactsVOParam) {
 		LOGGER.info("REQ ID : [{}] - toGetWithdaralFacts Method Called........", reqId);
 		ComputedFactsVO computedFactsVO = null;
 		PercentageDetailsVO percentageDetailsVOObj = null;
 		try {
 			computedFactsVO = new ComputedFactsVO();
 			LOGGER.info("REQ ID : [{}] - toGetWithdaralFacts conditianName : [{}]........", conditianName);
-			percentageDetailsVOObj = toGetValueByImediateWithDraw(reqId, accountNo, custmerId,transMode,transType, depositeLargerAmount, transDate, factName, columnName,conditianName);
-			/*if (percentageDetailsVOObj != null) {
-				switch (factName) {
-				case AMLConstants.IMMEDIATE_WITHDRAWAL:
-				case AMLConstants.WITHDRAWAL_PERCENTAGE:
-					computedFactsVO.setFact(factName);
-					computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
-					computedFactsVO.setPerCentValue(toGetPercentAge(percentageDetailsVOObj));
-					break;
-
-				default:
-					LOGGER.info("REQ ID : [{}] - toGetWithdaralFacts default block Condition not match");
-					computedFactsVO.setFact(factName);
-					computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
-					computedFactsVO.setPerCentValue(toGetPercentAge(percentageDetailsVOObj));
-				}
-			}*/
+			percentageDetailsVOObj = toGetValueByImediateWithDraw(reqId, accountNo, custmerId,transMode,transType, depositeLargerAmount, transDate, factName,conditianName,factSetObj,computedFactsVOParam);
 			if (percentageDetailsVOObj != null) {
 				if (StringUtils.isNotBlank(conditianName)) {
 					switch (conditianName) {
 					case AMLConstants.IMMEDIATE_DIFFERENT_LOCATIONS:
 						computedFactsVO.setFact(factName);
-						
 						computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
 						computedFactsVO.setPerCentValue(String.valueOf(toGetPercentAge(percentageDetailsVOObj)));
 						break;
@@ -92,7 +77,6 @@ public class RulesUtils {
 					computedFactsVO.setValue(percentageDetailsVOObj.getTotalValue());
 				}
 			}
-
 		} catch (Exception e) {
 			computedFactsVO = null;
 			LOGGER.error("Exception found in toGetWithdaralFacts : {}", e);
@@ -113,7 +97,8 @@ public class RulesUtils {
 	 * @param columnName
 	 * @return toGetValueByImediateWithDraw ComputedFactsVO
 	 */
-	public PercentageDetailsVO toGetValueByImediateWithDraw(String reqId, String accountNo, String custmerId, String transMode, String transType, BigDecimal depositeLargerAmount, String transDate, String factName, String columnName, String conditianName) {
+	public PercentageDetailsVO toGetValueByImediateWithDraw(String reqId, String accountNo, String custmerId, String transMode, String transType, BigDecimal depositeLargerAmount, String transDate,
+			String factName, String conditianName, Factset factSetObj, Optional<ComputedFactsVO> computedFactsVOParam) {
 		LOGGER.info("REQ ID : [{}] - toGetValueByImediateWithDraw Method Called............", reqId);
 		PercentageDetailsVO percentageDetailsVOObj = null;
 		BigDecimal retnVal = null;
@@ -124,7 +109,6 @@ public class RulesUtils {
 		Root<TransactionDetailsEntity> rootBk = null;
 		try {
 			percentageDetailsVOObj = new PercentageDetailsVO();
-			
 			cb = entityManager.getCriteriaBuilder();
 			cq = cb.createQuery(Object[].class);
 			predicates = new ArrayList<Predicate>();
@@ -136,6 +120,7 @@ public class RulesUtils {
 					LOGGER.debug("REQID : [{}] - Transaction Date : [{}] - Deposite amt : [{}]", reqId, transDate, depositeLargerAmount);
 					predicates.add(cb.greaterThanOrEqualTo(rootBk.get("transactionDate"), transDate));
 					predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), depositeLargerAmount));
+					//
 					break;
 				case AMLConstants.IMMEDIATE_WITHDRAWAL:
 					LOGGER.debug("REQID : [{}] - Transaction Date : [{}] - Deposite amt : [{}]", reqId, transDate, depositeLargerAmount);
@@ -149,8 +134,12 @@ public class RulesUtils {
 					break;
 				default:
 					LOGGER.info("REQ ID : [{}] - toGetValueByImediateWithDraw default block Condition not match");
-					
 				}
+			} else {
+				if(StringUtils.isNotBlank(transDate)) {
+					predicates.add(cb.greaterThanOrEqualTo(rootBk.get("transactionDate"), transDate));
+				}
+				predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), depositeLargerAmount));
 			}
 			
 			/**
@@ -179,28 +168,39 @@ public class RulesUtils {
 			 */
 			if (StringUtils.isNotBlank(transMode)) {
 				predicates.add(cb.greaterThanOrEqualTo(rootBk.get("channelType"), transMode));
-			} else {
+			}
+			/*else {
 				List<String> type = Arrays.asList("CASH", "CHEQUE");
 				Predicate inClause = rootBk.get("channelType").in(type);
 				predicates.add(inClause);
-			}
+			}*/
 			
-			
-
-			if (predicates != null && StringUtils.isNotBlank(columnName) && columnName.equalsIgnoreCase("amount")) {
-				cq.where(cb.and(predicates.toArray(new Predicate[0])));
-				cq.multiselect(cb.count(rootBk), cb.max(rootBk.get("amount")));
-				Object[] result = entityManager.createQuery(cq).getSingleResult();
-				if (result != null && result.length > 1) {
-					percentageDetailsVOObj.setReqId(reqId);
-					percentageDetailsVOObj.setNoOfTimes((Long) result[0]);
-					percentageDetailsVOObj.setTotalValue((BigDecimal) result[1]);
-					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
-				} else {
-					percentageDetailsVOObj = null;
-					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+			if (factSetObj.getRange() != null) {
+				if (factSetObj.getRange().getMin() != null && factSetObj.getRange().getMax() != null) {
+					predicates.add(cb.between(rootBk.get("amount"), factSetObj.getRange().getMin(), factSetObj.getRange().getMax()));
+				} else if (factSetObj.getRange().getMin() != null) {
+					// Only min present → greaterThanOrEqualTo
+					predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), factSetObj.getRange().getMin()));
+				} else if (factSetObj.getRange().getMax() != null) {
+					// Only max present → lessThanOrEqualTo
+					predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), factSetObj.getRange().getMax()));
 				}
+
 			}
+
+			cq.where(cb.and(predicates.toArray(new Predicate[0])));
+			cq.multiselect(cb.count(rootBk), cb.max(rootBk.get("amount")));
+			Object[] result = entityManager.createQuery(cq).getSingleResult();
+			if (result != null && result.length > 1) {
+				percentageDetailsVOObj.setReqId(reqId);
+				percentageDetailsVOObj.setNoOfTimes((Long) result[0]);
+				percentageDetailsVOObj.setTotalValue((BigDecimal) result[1]);
+				LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
+			} else {
+				percentageDetailsVOObj = null;
+				LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+			}
+			
 		} catch (Exception e) {
 			percentageDetailsVOObj = null;
 			LOGGER.error("REQ ID : [{}] - Exception found in RulesUtils@toGetValueByImediateWithDraw : {}", reqId, e);

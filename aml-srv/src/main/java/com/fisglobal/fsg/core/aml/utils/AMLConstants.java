@@ -94,6 +94,11 @@ public class AMLConstants {
 	public static final String SUM_DEBIT_CREDIT_CLOSED_ACCOUNT="SUM_DEBIT_CREDIT_CLOSED_ACCOUNT";
 	public static final String COUNT_CR_DR="COUNT_CR_DR";
 	public static final String ACCOUNT_TYPE="ACCOUNT_TYPE";
+	public static final String MIN_BALANCE="MIN_BALANCE";
+	public static final String MAX_CROSS_BORDER_TXNS="MAX_CROSS_BORDER_TXNS";
+	
+	
+	
 	
 	
 	

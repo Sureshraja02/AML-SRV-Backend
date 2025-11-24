@@ -46,6 +46,19 @@ public class ComputedFactsVO implements Serializable {
 	
 	@JsonProperty("perCentValue")
 	private String perCentValue;
+	
+	@JsonProperty("transactionId")
+	private String transactionId;
+
+	@JsonProperty("transactionId")
+	public String getTransactionId() {
+		return transactionId;
+	}
+
+	@JsonProperty("transactionId")
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
+	}
 
 	@JsonProperty("depositeLocation")
 	public String getDepositeLocation() {

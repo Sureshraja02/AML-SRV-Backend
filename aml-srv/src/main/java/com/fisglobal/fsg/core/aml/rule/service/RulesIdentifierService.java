@@ -16,6 +16,7 @@ import com.fisglobal.fsg.core.aml.repo.CustomerDetailsRepoImpl;
 import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
+import com.fisglobal.fsg.core.aml.rule.process.response.RuleResponseVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.RuleResposeDetailsVO;
 import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
@@ -46,11 +47,11 @@ public class RulesIdentifierService {
 	RulesUtils rulesUtils;
 
 	public RuleResposeDetailsVO toComputeAMLData(RuleRequestVo ruleRequestVoObParam) {
+		
 		LOGGER.info("RulesIdentifierService toComputeAMLData method called......");
-		//RuleResponseVo ruleResponseVoObj = null;
-		//List<RuleResposeDetailsVO> ruleRespDtlObj = null;
-		//ruleResponseVoObj = new RuleResponseVo();
-		//ruleRespDtlObj = new ArrayList<RuleResposeDetailsVO>();
+
+		RuleResponseVo ruleResponseVoObj = null;
+		List<RuleResposeDetailsVO> ruleRespDtlObj = null;
 		RuleResposeDetailsVO ruleResposeDetailsVO = null;
 		List<ComputedFactsVO> computedFacts = null;
 		ComputedFactsVO computedFactsVO = null;
@@ -58,7 +59,9 @@ public class RulesIdentifierService {
 		try {
 			LOGGER.info("RulesIdentifierService toComputeAMLData - ruleRequestVoObParam [{}]......", ruleRequestVoObParam);
 			if (ruleRequestVoObParam != null) {
-				
+				ruleResponseVoObj = new RuleResponseVo();
+
+				ruleRespDtlObj = new ArrayList<RuleResposeDetailsVO>();
 				computedFacts = new ArrayList<ComputedFactsVO>();
 				ruleResposeDetailsVO = new RuleResposeDetailsVO();
 				for (Factset fact : ruleRequestVoObParam.getFactSet()) {
@@ -135,7 +138,14 @@ public class RulesIdentifierService {
 						case AMLConstants.SUM_DEBIT_CREDIT_CLOSED_ACCOUNT:
 							computedFactsVO = rulesExecutorService.ruleOfSumCreditDebitClosedAccount(ruleRequestVoObParam, fact);
 							break;	
-						
+						case AMLConstants.MIN_BALANCE:
+							computedFactsVO = rulesExecutorService.ruleOfMinBalance(ruleRequestVoObParam, fact);
+							break;	
+						case AMLConstants.MAX_CROSS_BORDER_TXNS:
+							computedFactsVO = rulesExecutorService.ruleOfMaxCrossBorderTxn(ruleRequestVoObParam, fact);
+							break;		
+							
+							
 						//New	
 						case AMLConstants.COUNT_CASH_WITHDRAWALS:
 							computedFactsVO = rulesExecutorService.ruleOfCountCashWithdraw(ruleRequestVoObParam, fact);
@@ -180,7 +190,7 @@ public class RulesIdentifierService {
 							computedFactsVO = rulesExecutorService.ruleOfCountCashDeposit(ruleRequestVoObParam, fact);
 							break;
 						case AMLConstants.IMMEDIATE_WITHDRAWAL://85
-							if (IMMEDIATE_WITHDRAWAL && computedFacts != null && computedFacts.size() >= 1) {
+							if (computedFacts != null && computedFacts.size() >= 1) {
 								computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact, computedFacts);
 							} else {
 								// Rare
@@ -188,8 +198,12 @@ public class RulesIdentifierService {
 							break;
 						case AMLConstants.WITHDRAWAL_PERCENTAGE://79,39,27,26,25
 							if (fact != null && fact.getCondition() != null && fact.getCondition().equalsIgnoreCase(AMLConstants.IMMEDIATE_DIFFERENT_LOCATIONS)) {
+								if (computedFacts != null && computedFacts.size() >= 1) {
+									computedFactsVO = rulesExecutorService.ruleOfImmediateWithdraw(ruleRequestVoObParam, fact, computedFacts);
+								} else {
+									// Rare
+								}
 								//25
-								
 							} else if (fact != null && fact.getCondition() != null && fact.getCondition().equalsIgnoreCase(AMLConstants.IMMEDIATE_WITHDRAWAL)) {
 								//26
 							} else if (fact != null && fact.getCondition() != null && fact.getCondition().equalsIgnoreCase(AMLConstants.IMMEDIATE_WITHDRAWAL_ATM_OR_OTHER)) {
@@ -202,6 +216,7 @@ public class RulesIdentifierService {
 								
 							}
 							break;
+							
 						default:
 							LOGGER.info("NO MATCH FOUND");
 						}
@@ -213,7 +228,7 @@ public class RulesIdentifierService {
 				if(StringUtils.isNotBlank(ruleRequestVoObParam.getCustomerId())) {
 					CustomerDetailsEntity customerEnityObj = customerDetailsRepoImpl.getCustomerDetailsByCustId(ruleRequestVoObParam.getCustomerId());
 					if (customerEnityObj != null) {
-						ruleResposeDetailsVO.setAccountHolderType(customerEnityObj.getCustomerType());
+						ruleResposeDetailsVO.setAccountType(customerEnityObj.getCustomerType());
 					}
 				}
 				if(StringUtils.isNotBlank(ruleRequestVoObParam.getAccountNo())) {
