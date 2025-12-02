@@ -27,14 +27,14 @@ public class RuleRequestVo implements Serializable {
 	@JsonProperty("accountNo")
 	private String accountNo;
 	
-	@JsonProperty("transactionMode")
+	@JsonProperty("transactionMode") //Cashor Non Cash
 	private String transactionMode;
 	
 	@JsonProperty("txnId")
 	private String txnId;
 	
-	@JsonProperty("txnType")
-	private String txnType;
+	@JsonProperty("txnType") //D or W 
+	private String txnType;    
 	
 	@JsonProperty("txn_time")
 	private String txn_time;

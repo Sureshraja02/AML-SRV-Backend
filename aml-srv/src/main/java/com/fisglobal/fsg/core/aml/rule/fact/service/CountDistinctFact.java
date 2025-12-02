@@ -1,0 +1,70 @@
+package com.fisglobal.fsg.core.aml.rule.fact.service;
+
+import java.math.BigDecimal;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.fisglobal.fsg.core.aml.repo.TransactionDetailsDTO;
+import com.fisglobal.fsg.core.aml.repo.TransactionService;
+import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
+import com.fisglobal.fsg.core.aml.rule.process.request.Range;
+import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
+import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
+import com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService;
+
+
+@Service("COUNT_DISTINCTService")
+public class CountDistinctFact implements FactInterface{
+
+
+	private Logger LOGGER = LoggerFactory.getLogger(CountDistinctFact.class);
+	
+	@Autowired
+	TransactionService transactionService;
+	
+	@Override
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::CountFact@getFactExecutor (ENTRY) Called::::::::::",
+				requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, 
+				txnTime = null, txnId = null, reqId = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			txnId = requVoObjParam.getTxnId();
+			reqId = requVoObjParam.getReqId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();			
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			Range range = factSetObj.getRange();
+
+			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
+					transMode, days, months, factSetObj, range);
+			if (dto != null && dto.getCountAmount() != null) {
+
+				computedFactsVOObj.setFact(factName);
+				computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("Exception found in CountFact@getFactExecutor : {}", e);
+		} finally {
+
+			LOGGER.info("REQID : [{}]::::::::::::CountFact@getFactExecutor (EXIT) End::::::::::\n\n",
+					requVoObjParam.getReqId());
+		}
+		return computedFactsVOObj;
+
+	}
+
+}

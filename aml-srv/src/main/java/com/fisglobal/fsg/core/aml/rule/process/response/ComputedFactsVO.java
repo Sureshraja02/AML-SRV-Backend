@@ -38,6 +38,10 @@ public class ComputedFactsVO implements Serializable {
 	@JsonProperty("acc_open_date")
 	private String acc_open_date;
 	
+	@JsonProperty("acc_Re_date")
+	private String acc_Re_date;
+	
+	
 	@JsonProperty("accountStatus")
 	private String accountStatus;
 	
@@ -146,6 +150,16 @@ public class ComputedFactsVO implements Serializable {
 	@JsonProperty("perCentValue")
 	public void setPerCentValue(String perCentValue) {
 		this.perCentValue = perCentValue;
+	}
+
+	@JsonProperty("acc_Re_date")
+	public String getAcc_Re_date() {
+		return acc_Re_date;
+	}
+
+	@JsonProperty("acc_Re_date")
+	public void setAcc_Re_date(String acc_Re_date) {
+		this.acc_Re_date = acc_Re_date;
 	}
 	
 	
