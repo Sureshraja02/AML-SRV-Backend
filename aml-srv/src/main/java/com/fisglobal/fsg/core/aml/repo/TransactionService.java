@@ -1,0 +1,802 @@
+package com.fisglobal.fsg.core.aml.repo;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.fisglobal.fsg.core.aml.entity.AccountDetailsEntity;
+import com.fisglobal.fsg.core.aml.entity.TransactionDetailsEntity;
+import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
+import com.fisglobal.fsg.core.aml.rule.process.request.Range;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+
+@Service
+public class TransactionService {
+
+	private Logger LOGGER = LoggerFactory.getLogger(TransactionService.class);
+
+	@Autowired
+	EntityManager entityManager;
+
+	public TransactionDetailsDTO getTransactionDetails(String reqId, String custId) {
+
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+
+		TransactionDetailsDTO dto = new TransactionDetailsDTO();
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
+		LOGGER.info("REQID : [{}] - custId [{}]  ", reqId, custId);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+
+				LOGGER.info("REQID : [{}] - columnName is :", reqId);
+				if (predicates != null) {
+					cq.where(cb.and(predicates.toArray(new Predicate[0])));
+					cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")), cb.sum(rootBk.get("amount")),
+							cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")));
+					Object[] result = entityManager.createQuery(cq).getSingleResult();
+					if (result != null && result.length > 1) {
+						Long count = (Long) result[1];
+						BigDecimal sum = (BigDecimal) result[2];
+						BigDecimal min = (BigDecimal) result[3];
+						BigDecimal max = (BigDecimal) result[4];
+						Double avg = (Double) result[5];
+						dto.setCountAmount(count);
+						dto.setMaxAmount(max);
+						dto.setMinAmount(min);
+						dto.setSumAmount(sum);
+						dto.setAvgAmount(avg);
+
+						LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
+					} else {
+						dto = null;
+						LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+					}
+				}
+			}
+		} catch (Exception e) {
+			dto = null;
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getCountValue :{}", reqId,
+					e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
+		}
+		return dto;
+
+	}
+
+	public TransactionDetailsDTO getTransactionDetails(String reqId, String custId, String account) {
+
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+
+		TransactionDetailsDTO dto = new TransactionDetailsDTO();
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
+		LOGGER.info("REQID : [{}] - custId [{}] accNo : [{}]  ", reqId, custId, account);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+				if (StringUtils.isNotBlank(account)) {
+					predicates.add(cb.equal(rootBk.get("accountNo"), account));
+				}
+
+				LOGGER.info("REQID : [{}] - columnName is :", reqId);
+				if (predicates != null) {
+					cq.where(cb.and(predicates.toArray(new Predicate[0])));
+					cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")), cb.sum(rootBk.get("amount")),
+							cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")));
+					Object[] result = entityManager.createQuery(cq).getSingleResult();
+					if (result != null && result.length > 1) {
+						Long count = (Long) result[1];
+						BigDecimal sum = (BigDecimal) result[2];
+						BigDecimal min = (BigDecimal) result[3];
+						BigDecimal max = (BigDecimal) result[4];
+						Double avg = (Double) result[5];
+						dto.setCountAmount(count);
+						dto.setMaxAmount(max);
+						dto.setMinAmount(min);
+						dto.setSumAmount(sum);
+						dto.setAvgAmount(avg);
+
+						LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
+					} else {
+						dto = null;
+						LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+					}
+				}
+			}
+		} catch (Exception e) {
+			dto = null;
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getCountValue :{}", reqId,
+					e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
+		}
+		return dto;
+
+	}
+
+	public TransactionDetailsDTO getTransactionDetails(String reqId, String custId, String account, String txnId) {
+
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+
+		TransactionDetailsDTO dto = new TransactionDetailsDTO();
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
+		LOGGER.info("REQID : [{}] - custId [{}] accNo : [{}] txnId [{}] ", reqId, custId, account, txnId);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+				if (StringUtils.isNotBlank(account)) {
+					predicates.add(cb.equal(rootBk.get("accountNo"), account));
+				}
+				if (StringUtils.isNotBlank(txnId)) {
+					predicates.add(cb.equal(rootBk.get("transactionId"), txnId));
+				}
+
+				LOGGER.info("REQID : [{}] - columnName is :", reqId);
+				if (predicates != null) {
+					cq.where(cb.and(predicates.toArray(new Predicate[0])));
+					cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")), cb.sum(rootBk.get("amount")),
+							cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")));
+					Object[] result = entityManager.createQuery(cq).getSingleResult();
+					if (result != null && result.length > 1) {
+						Long count = (Long) result[1];
+						BigDecimal sum = (BigDecimal) result[2];
+						BigDecimal min = (BigDecimal) result[3];
+						BigDecimal max = (BigDecimal) result[4];
+						Double avg = (Double) result[5];
+						dto.setCountAmount(count);
+						dto.setMaxAmount(max);
+						dto.setMinAmount(min);
+						dto.setSumAmount(sum);
+						dto.setAvgAmount(avg);
+
+						LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
+					} else {
+						dto = null;
+						LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+					}
+				}
+			}
+		} catch (Exception e) {
+			dto = null;
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getCountValue :{}", reqId,
+					e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
+		}
+		return dto;
+
+	}
+
+	public TransactionDetailsDTO getTransactionDetails(String reqId, String custId, String account, String txnId,
+			String txnType, String transactionMode, Integer days, Integer months, Factset factSetObj) {
+
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+
+		TransactionDetailsDTO dto = new TransactionDetailsDTO();
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
+		LOGGER.info(
+				"REQID : [{}] - custId [{}] accNo : [{}] txnId [{}] transType : [{}] transactionMode [{}]  days : [{}] months [{}]",
+				reqId, custId, account, txnId, txnType, transactionMode, days, months);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			} else if (StringUtils.isNotBlank(account)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), account));
+			}
+
+			if (StringUtils.isNotBlank(txnType)) {
+				predicates.add(cb.equal(rootBk.get("transactionType"), txnType));
+			}
+
+			if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("CASH")) {
+				List<String> channeltype = Arrays.asList("ATM", "CASH");
+				Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+				predicates.add(inchanneltype);
+			} else if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("NON-CASH")) {
+				List<String> channeltype = Arrays.asList("ATM", "CASH");
+				Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+				Predicate notInClause = cb.not(inchanneltype);
+				predicates.add(notInClause);
+
+			}
+
+			if (days != null) {
+
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusDays(days);
+				// Convert LocalDate to String in same format as DB
+				String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,
+						startDateStr);
+				Expression<java.sql.Date> txnDateAsDate = cb.function("to_Date", java.sql.Date.class,
+						rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD"));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr),
+						java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			if (months != null) {
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusMonths(months);
+				// Convert LocalDate to String in same format as DB
+				String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,
+						startDateStr);
+				Expression<java.sql.Date> txnDateAsDate = cb.function("to_Date", java.sql.Date.class,
+						rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD"));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr),
+						java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			LOGGER.info("REQID : [{}] - columnName is :", reqId);
+			if (predicates != null) {
+				cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")), cb.sum(rootBk.get("amount")),
+						cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")));
+				Object[] result = entityManager.createQuery(cq).getSingleResult();
+				if (result != null && result.length > 1) {
+					Long count = (Long) result[1];
+					BigDecimal sum = (BigDecimal) result[2];
+					BigDecimal min = (BigDecimal) result[3];
+					BigDecimal max = (BigDecimal) result[4];
+					Double avg = (Double) result[5];
+					dto.setCountAmount(count);
+					dto.setMaxAmount(max);
+					dto.setMinAmount(min);
+					dto.setSumAmount(sum);
+					dto.setAvgAmount(avg);
+
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
+				} else {
+					dto = null;
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			dto = null;
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getCountValue :{}", reqId,
+					e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
+		}
+		return dto;
+
+	}
+
+	public TransactionDetailsDTO getTransactionDetails(String reqId, String custId, String accNo, String txnType,
+			String transactionMode, Integer days, Integer months, Factset factSetObj, Range range) {
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+
+		TransactionDetailsDTO dto = new TransactionDetailsDTO();
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
+		LOGGER.info(
+				"REQID : [{}] - custId [{}] accNo : [{}] txnId [{}] transType : [{}] transactionMode [{}]  days : [{}] months [{}]",
+				reqId, custId, accNo, txnType, transactionMode, days, months);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			} else if (StringUtils.isNotBlank(accNo)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
+			}
+
+			if (StringUtils.isNotBlank(txnType)) {
+				predicates.add(cb.equal(rootBk.get("transactionType"), txnType));
+			}
+
+			if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("CASH")) {
+				List<String> channeltype = Arrays.asList("ATM", "CASH");
+				Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+				predicates.add(inchanneltype);
+			} else if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("NON-CASH")) {
+				List<String> channeltype = Arrays.asList("ATM", "CASH");
+				Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+				Predicate notInClause = cb.not(inchanneltype);
+				predicates.add(notInClause);
+
+			}
+			if (range != null) {
+				if (range.getMin() != null && range.getMax() != null) {
+					predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+				} else if (range.getMin() != null) {
+					// Only min present → greaterThanOrEqualTo
+					predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+				} else if (range.getMax() != null) {
+					// Only max present → lessThanOrEqualTo
+					predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+				}
+
+			}
+
+			if (days != null) {
+
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusDays(days);
+				// Convert LocalDate to String in same format as DB
+				String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,
+						startDateStr);
+				Expression<java.sql.Date> txnDateAsDate = cb.function("to_Date", java.sql.Date.class,
+						rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD"));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr),
+						java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			if (months != null) {
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusMonths(months);
+				// Convert LocalDate to String in same format as DB
+				String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,
+						startDateStr);
+				Expression<java.sql.Date> txnDateAsDate = cb.function("to_Date", java.sql.Date.class,
+						rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD"));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr),
+						java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			LOGGER.info("REQID : [{}] - columnName is :", reqId);
+			if (predicates != null) {
+				cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")), cb.sum(rootBk.get("amount")),
+						cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")));
+				Object[] result = entityManager.createQuery(cq).getSingleResult();
+				if (result != null && result.length > 1) {
+					Long count = (Long) result[1];
+					BigDecimal sum = (BigDecimal) result[2];
+					BigDecimal min = (BigDecimal) result[3];
+					BigDecimal max = (BigDecimal) result[4];
+					Double avg = (Double) result[5];
+					dto.setCountAmount(count);
+					dto.setMaxAmount(max);
+					dto.setMinAmount(min);
+					dto.setSumAmount(sum);
+					dto.setAvgAmount(avg);
+
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
+				} else {
+					dto = null;
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			dto = null;
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getCountValue :{}", reqId,
+					e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
+		}
+		return dto;
+
+	}
+
+	public TransactionDetailsDTO getTransactionDetails(String reqId, String custId, String account, String txnId,
+			String txnType, String transactionMode, Integer days, Integer months, Factset factSetObj, Range range) {
+
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+
+		TransactionDetailsDTO dto = new TransactionDetailsDTO();
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
+		LOGGER.info(
+				"REQID : [{}] - custId [{}] accNo : [{}] txnId [{}] transType : [{}] transactionMode [{}]  days : [{}] months [{}]",
+				reqId, custId, account, txnId, txnType, transactionMode, days, months);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			} else if (StringUtils.isNotBlank(account)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), account));
+			}
+			if (StringUtils.isNotBlank(txnId)) {
+				predicates.add(cb.equal(rootBk.get("transactionId"), txnId));
+			}
+
+			if (StringUtils.isNotBlank(txnType)) {
+				predicates.add(cb.equal(rootBk.get("transactionType"), txnType));
+			}
+
+			if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("CASH")) {
+				List<String> channeltype = Arrays.asList("ATM", "CASH");
+				Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+				predicates.add(inchanneltype);
+			} else if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("NON-CASH")) {
+				List<String> channeltype = Arrays.asList("ATM", "CASH");
+				Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+				Predicate notInClause = cb.not(inchanneltype);
+				predicates.add(notInClause);
+
+			}
+			else if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("BOTH")) {
+				
+			}
+			
+			if (range != null) {
+				if (range.getMin() != null && range.getMax() != null) {
+					predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+				} else if (range.getMin() != null) {
+					// Only min present → greaterThanOrEqualTo
+					predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+				} else if (range.getMax() != null) {
+					// Only max present → lessThanOrEqualTo
+					predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+				}
+
+			}
+
+			if (days != null) {
+
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusDays(days);
+				// Convert LocalDate to String in same format as DB
+				String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,
+						startDateStr);
+				Expression<java.sql.Date> txnDateAsDate = cb.function("to_Date", java.sql.Date.class,
+						rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD"));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr),
+						java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			if (months != null) {
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusMonths(months);
+				// Convert LocalDate to String in same format as DB
+				String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,
+						startDateStr);
+				Expression<java.sql.Date> txnDateAsDate = cb.function("to_Date", java.sql.Date.class,
+						rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD"));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr),
+						java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			LOGGER.info("REQID : [{}] - columnName is :", reqId);
+			if (predicates != null) {
+				cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")), cb.sum(rootBk.get("amount")),
+						cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")));
+				Object[] result = entityManager.createQuery(cq).getSingleResult();
+				if (result != null && result.length > 1) {
+					Long count = (Long) result[1];
+					BigDecimal sum = (BigDecimal) result[2];
+					BigDecimal min = (BigDecimal) result[3];
+					BigDecimal max = (BigDecimal) result[4];
+					Double avg = (Double) result[5];
+					dto.setCountAmount(count);
+					dto.setMaxAmount(max);
+					dto.setMinAmount(min);
+					dto.setSumAmount(sum);
+					dto.setAvgAmount(avg);
+
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
+				} else {
+					dto = null;
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			dto = null;
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getCountValue :{}", reqId,
+					e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
+		}
+		return dto;
+
+	}
+	
+	public TransactionDetailsDTO getTransactionDetails(String reqId, String custId, String account, String txnId,
+			String txnType,String deposiwithdrawal, String transactionMode, Integer days, Integer months, Factset factSetObj, Range range) {
+
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+
+		TransactionDetailsDTO dto = new TransactionDetailsDTO();
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
+		LOGGER.info(
+				"REQID : [{}] - custId [{}] accNo : [{}] txnId [{}] transType : [{}] transactionMode [{}]  days : [{}] months [{}]",
+				reqId, custId, account, txnId, txnType, transactionMode, days, months);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			} else if (StringUtils.isNotBlank(account)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), account));
+			}
+			if (StringUtils.isNotBlank(txnId)) {
+				predicates.add(cb.equal(rootBk.get("transactionId"), txnId));
+			}
+
+			if (StringUtils.isNotBlank(txnType)) {
+				predicates.add(cb.equal(rootBk.get("transactionType"), txnType));
+			}
+			
+			if (StringUtils.isNotBlank(deposiwithdrawal)) {
+				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), deposiwithdrawal));
+			}
+			
+			
+
+			if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("CASH")) {
+				List<String> channeltype = Arrays.asList("ATM", "CASH");
+				Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+				predicates.add(inchanneltype);
+			} else if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("NON-CASH")) {
+				List<String> channeltype = Arrays.asList("ATM", "CASH");
+				Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+				Predicate notInClause = cb.not(inchanneltype);
+				predicates.add(notInClause);
+
+			}
+			else if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("BOTH")) {
+				
+			}
+			
+			if (range != null) {
+				if (range.getMin() != null && range.getMax() != null) {
+					predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+				} else if (range.getMin() != null) {
+					// Only min present → greaterThanOrEqualTo
+					predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+				} else if (range.getMax() != null) {
+					// Only max present → lessThanOrEqualTo
+					predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+				}
+
+			}
+
+			if (days != null) {
+
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusDays(days);
+				// Convert LocalDate to String in same format as DB
+				String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,
+						startDateStr);
+				Expression<java.sql.Date> txnDateAsDate = cb.function("to_Date", java.sql.Date.class,
+						rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD"));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr),
+						java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			if (months != null) {
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusMonths(months);
+				// Convert LocalDate to String in same format as DB
+				String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,
+						startDateStr);
+				Expression<java.sql.Date> txnDateAsDate = cb.function("to_Date", java.sql.Date.class,
+						rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD"));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr),
+						java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			LOGGER.info("REQID : [{}] - columnName is :", reqId);
+			if (predicates != null) {
+				cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")), cb.sum(rootBk.get("amount")),
+						cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")));
+				Object[] result = entityManager.createQuery(cq).getSingleResult();
+				if (result != null && result.length > 1) {
+					Long count = (Long) result[1];
+					BigDecimal sum = (BigDecimal) result[2];
+					BigDecimal min = (BigDecimal) result[3];
+					BigDecimal max = (BigDecimal) result[4];
+					Double avg = (Double) result[5];
+					dto.setCountAmount(count);
+					dto.setMaxAmount(max);
+					dto.setMinAmount(min);
+					dto.setSumAmount(sum);
+					dto.setAvgAmount(avg);
+
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
+				} else {
+					dto = null;
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			dto = null;
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getCountValue :{}", reqId,
+					e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
+		}
+		return dto;
+
+	}
+
+	public TransactionDetailsDTO getTransactionDetails(String reqId, String custId, String account, String txnId, String txnType) {
+
+
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+
+		TransactionDetailsDTO dto = new TransactionDetailsDTO();
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
+		LOGGER.info(
+				"REQID : [{}] - custId [{}] accNo : [{}] txnId [{}] transType : [{}] ",
+				reqId, custId, account, txnId, txnType);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<TransactionDetailsEntity> cq = null;
+		TypedQuery<TransactionDetailsEntity> query = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(TransactionDetailsEntity.class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			} else if (StringUtils.isNotBlank(account)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), account));
+			}
+			if (StringUtils.isNotBlank(txnId)) {
+				predicates.add(cb.equal(rootBk.get("transactionId"), txnId));
+			}
+
+			if (StringUtils.isNotBlank(txnType)) {
+				predicates.add(cb.equal(rootBk.get("transactionType"), txnType));
+			}
+			
+			
+			
+
+			
+			
+
+			
+			if (predicates != null) {
+				cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				query = entityManager.createQuery(cq);
+				TransactionDetailsEntity txnDetails = query.getSingleResult();
+			
+				if (txnDetails != null) {
+					dto.setCounterContryCode(txnDetails.getCounterCountryCode());
+
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
+				} else {
+					dto = null;
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			dto = null;
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getCountValue :{}", reqId,
+					e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
+		}
+		return dto;
+
+	
+	}
+}

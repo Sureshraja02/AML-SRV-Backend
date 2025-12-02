@@ -7,9 +7,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import com.fisglobal.fsg.core.aml.entity.CustomerDetailsEntity;
+import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 
 import jakarta.persistence.EntityManager;
@@ -19,32 +19,18 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-@Repository
-public class CustomerDetailsRepoImpl {
+public class CustomerDetailsService {
 
-	private Logger LOGGER = LoggerFactory.getLogger(CustomerDetailsRepoImpl.class);
+	private Logger LOGGER = LoggerFactory.getLogger(CustomerDetailsService.class);
 
 	@Autowired
-	EntityManager em;
+	EntityManager entityManager;
 
-	public List<CustomerDetailsEntity> getCustomerDetailsbyCriteria(String custId) {
-		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<CustomerDetailsEntity> cq = cb.createQuery(CustomerDetailsEntity.class);
+	
 
-		Root<CustomerDetailsEntity> book = cq.from(CustomerDetailsEntity.class);
-		List<Predicate> predicates = new ArrayList<Predicate>();
-		predicates.add(cb.equal(book.get("customerId"), custId));
-		// Predicate authorNamePredicate = cb.equal(book.get("acknowledgementNo"),
-		// ackNo);
-		// Predicate titlePredicate = cb.like(book.get("title"), "%" + title + "%");
-		cq.where(predicates.toArray(new Predicate[] {}));
-
-		TypedQuery<CustomerDetailsEntity> query = em.createQuery(cq);
-		return query.getResultList();
-
-	}
-
-	public CustomerDetailsEntity getCustomerDetailsByCustId(String custId) {
+	public CustomerDetailsEntity getCustomerDetails(String reqId,String custId) {
+		LOGGER.info("REQID : [{}] - CustomerDetailsService@getCustomerDetails method called...........",
+				reqId);
 		CriteriaBuilder cb = null;
 		CriteriaQuery<CustomerDetailsEntity> cq = null;
 		Root<CustomerDetailsEntity> book = null;
@@ -52,14 +38,14 @@ public class CustomerDetailsRepoImpl {
 		CustomerDetailsEntity entity = null;
 		TypedQuery<CustomerDetailsEntity> query = null;
 		try {
-			cb = em.getCriteriaBuilder();
+			cb = entityManager.getCriteriaBuilder();
 			cq = cb.createQuery(CustomerDetailsEntity.class);
 			book = cq.from(CustomerDetailsEntity.class);
 			predicates = new ArrayList<Predicate>();
 			predicates.add(cb.equal(book.get("customerId"), custId));
 			cq.where(predicates.toArray(new Predicate[] {}));
 
-			query = em.createQuery(cq);
+			query = entityManager.createQuery(cq);
 			CustomerDetailsEntity custDtls = query.getSingleResult();
 			if (custDtls != null) {
 				entity = custDtls;
@@ -77,8 +63,37 @@ public class CustomerDetailsRepoImpl {
 		}
 	}
 
-	public String getPanStatus(String reqId, String accNo, String custId, String transMode, String transType,
-			Integer hours, Integer days, Integer months, String fieldName, Range range) {
+	public String getCustomerDetails(String reqId,String custId, String custType) {
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+		return null;
+	}
+	public String getCustomerDetails(String reqId,String custId, String custType,String custCategory) {
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+		return null;
+	}
+	public String getCustomerDetails(String reqId,String custId, String custType,String custCategory,String nationality) {
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+		return null;
+	}
+	public String getCustomerDetails(String reqId,String custId, String custType,String custCategory,String nationality,String occupation) {
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+		return null;
+	}
+	public String getCustomerDetails(String reqId,String custId, String custType,String custCategory,String nationality,String occupation,String city) {
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+		return null;
+	}
+	public String getCustomerDetails(String reqId,String custId, String custType,String custCategory,String nationality,String occupation,String city,String state,String country) {
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+		return null;
+	}
+	public String getPanStatus(String reqId, String accNo, String custId) {
 		LOGGER.info("REQID : [{}] - CustomerDetailsRepoImpl@getPanStatus method called...........", reqId);
 		String retnVal = null;
 		CriteriaBuilder cb = null;
@@ -88,7 +103,7 @@ public class CustomerDetailsRepoImpl {
 		Root<CustomerDetailsEntity> rootBk = null;
 		TypedQuery<CustomerDetailsEntity> query = null;
 		try {
-			cb = em.getCriteriaBuilder();
+			cb = entityManager.getCriteriaBuilder();
 
 			cq = cb.createQuery(CustomerDetailsEntity.class);
 
@@ -100,16 +115,14 @@ public class CustomerDetailsRepoImpl {
 				predicates.add(cb.equal(rootBk.get("accountNo"), accNo));
 			}
 
-			LOGGER.info("REQID : [{}] - transType : [{}]", reqId, transType);
-
-			LOGGER.info("REQID : [{}] - No of days : [{}]", reqId, days);
+			
 
 			LOGGER.info("REQID : [{}] - columnName is : ", reqId);
 			if (predicates != null) {
 
 				cq.where(predicates.toArray(new Predicate[] {}));
 
-				query = em.createQuery(cq);
+				query = entityManager.createQuery(cq);
 
 				CustomerDetailsEntity customerEnityObj = query.getSingleResult();
 
@@ -123,7 +136,7 @@ public class CustomerDetailsRepoImpl {
 				}
 			}
 		} catch (Exception e) {
-			retnVal = null;
+			retnVal = "NO_PAN";
 			LOGGER.info("REQID : [{}] - Exception found in CustomerDetailsRepoImpl@getPanStatus :{}", reqId, e);
 		} finally {
 			cb = null;
