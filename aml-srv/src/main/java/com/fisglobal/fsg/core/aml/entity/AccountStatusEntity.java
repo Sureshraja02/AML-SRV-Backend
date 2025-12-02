@@ -16,13 +16,13 @@ public class AccountStatusEntity {
 	private String accountNo; // VARCHAR → String (Primary Key)
 
 	@Column(name = "CHANGEDATE")
-	private LocalDate changeDate; // DATE → LocalDate
+	private String changeDate; // DATE → LocalDate
 
 	@Column(name = "STATUS")
 	private String status; // VARCHAR → String
 
 	@Column(name = "UPDATETIMESTAMP")
-	private LocalDate updateTimestamp; // DATE → LocalDate
+	private String updateTimestamp; // DATE → LocalDate
 
 	public String getAccountNo() {
 		return accountNo;
@@ -32,11 +32,11 @@ public class AccountStatusEntity {
 		this.accountNo = accountNo;
 	}
 
-	public LocalDate getChangeDate() {
+	public String getChangeDate() {
 		return changeDate;
 	}
 
-	public void setChangeDate(LocalDate changeDate) {
+	public void setChangeDate(String changeDate) {
 		this.changeDate = changeDate;
 	}
 
@@ -48,11 +48,11 @@ public class AccountStatusEntity {
 		this.status = status;
 	}
 
-	public LocalDate getUpdateTimestamp() {
+	public String getUpdateTimestamp() {
 		return updateTimestamp;
 	}
 
-	public void setUpdateTimestamp(LocalDate updateTimestamp) {
+	public void setUpdateTimestamp(String updateTimestamp) {
 		this.updateTimestamp = updateTimestamp;
 	}
 }
