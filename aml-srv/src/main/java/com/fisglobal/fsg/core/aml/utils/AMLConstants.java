@@ -18,6 +18,8 @@ public class AMLConstants {
 	public static final String KAFAK_RETURN_PUB_TOPIC = "TRANS-RTN-PUB";
 
 	public static final String YES = "YES";
+	public static final String DEPOSIT = "D";
+	public static final String WITHDRAW = "W";
 
 	public static final String SUM = "SUM";
 	public static final String COUNT = "COUNT";
