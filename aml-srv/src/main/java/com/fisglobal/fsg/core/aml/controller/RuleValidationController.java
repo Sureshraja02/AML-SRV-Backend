@@ -1,5 +1,7 @@
 package com.fisglobal.fsg.core.aml.controller;
 
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +12,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fisglobal.fsg.core.aml.cust.profiling.service.CustomerProfiling;
+import com.fisglobal.fsg.core.aml.db.service.CSVDirectImportPostgresqlService;
+import com.fisglobal.fsg.core.aml.duckdb.service.CSVDirectImportService;
+import com.fisglobal.fsg.core.aml.filewatcher.service.AMLDataTblDetailsFetch;
+import com.fisglobal.fsg.core.aml.filewatcher.service.FLTtoCSVConverter;
+import com.fisglobal.fsg.core.aml.kafka.PublishData2Kafka;
+import com.fisglobal.fsg.core.aml.kafka.repo.FinSecIndicatorVO;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.RuleResposeDetailsVO;
 import com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService;
+import com.fisglobal.fsg.core.aml.utils.AMLConstants;
+import com.fisglobal.fsg.core.aml.utils.CommonUtils;
 import com.google.gson.Gson;
 
 @RestController
@@ -23,6 +34,31 @@ public class RuleValidationController {
 
 	@Autowired
 	RulesIdentifierService rulesIdentifierService;
+	
+	
+	@Autowired
+	FLTtoCSVConverter converter;
+
+	@Autowired
+	CSVDirectImportService cvsDirectImportService;
+	
+	@Autowired
+	AMLDataTblDetailsFetch amlDataTblDetailsFetch;
+	
+	@Autowired
+	CustomerProfiling customerProfiling;
+	
+	@Autowired
+	PublishData2Kafka publishData2Kafka;
+	
+	@Autowired
+	CSVDirectImportPostgresqlService csvDirectImportPostgresqlService;
+	
+	@Autowired
+	CommonUtils commonUtils;
+	
+	
+	
 
 	@RequestMapping(value = { "fact/service" }, method = { RequestMethod.POST })
 	public ResponseEntity<?> ruleProcessMethod(@RequestBody RuleRequestVo requestObjParam) {
@@ -38,6 +74,38 @@ public class RuleValidationController {
 				retunRespEntity = getResponseEntity("No Response Found", HttpStatus.OK);
 			}
 
+		} catch (Exception e) {
+			LOGGER.error("Exception found in RuleValidationController@ruleProcessMethod : {}", e);
+			retunRespEntity = getResponseEntity("Exception, Will check with Admin", HttpStatus.BAD_REQUEST);
+		} finally {
+
+		}
+		return retunRespEntity;
+
+	}
+	
+	@RequestMapping(value = { "post/fileupload" }, method = { RequestMethod.POST })
+	public ResponseEntity<?> postFileUpload(@RequestBody RuleRequestVo requestObjParam) {
+
+		Long startDateMain = new Date().getTime();
+		ResponseEntity<Object> retunRespEntity = null;
+		RuleResposeDetailsVO ruleResponseVoObj = null;
+		try {
+
+			FinSecIndicatorVO finSecIndicatorVOoBj = new FinSecIndicatorVO();
+			finSecIndicatorVOoBj = amlDataTblDetailsFetch
+					.toSetFinSecIndicatorObjectForDuckDBSts(finSecIndicatorVOoBj);
+			finSecIndicatorVOoBj = amlDataTblDetailsFetch
+					.toGetRowCountEachAMLTblSetINFincSecIndicator(finSecIndicatorVOoBj);
+			finSecIndicatorVOoBj = customerProfiling
+					.addCustomerProfilingStsFinSecIndictor(finSecIndicatorVOoBj);
+			publishData2Kafka.sendtoKafka(finSecIndicatorVOoBj.getUuid(), finSecIndicatorVOoBj,
+					AMLConstants.KAFKA_PUB_TOPIC);
+			
+			Long endTime = new Date().getTime();
+			LOGGER.info("Total file processed time : {}", commonUtils.findIsHourMinSec((endTime - startDateMain)));
+			
+		
 		} catch (Exception e) {
 			LOGGER.error("Exception found in RuleValidationController@ruleProcessMethod : {}", e);
 			retunRespEntity = getResponseEntity("Exception, Will check with Admin", HttpStatus.BAD_REQUEST);
