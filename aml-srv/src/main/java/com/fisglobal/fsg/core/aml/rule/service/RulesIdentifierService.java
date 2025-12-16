@@ -20,7 +20,6 @@ import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 import com.fisglobal.fsg.core.aml.rule.process.response.RuleResponseVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.RuleResposeDetailsVO;
-import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
 /**
  * 
@@ -53,9 +52,9 @@ public class RulesIdentifierService {
 
 	public RuleResposeDetailsVO toComputeAMLData(RuleRequestVo ruleRequestVoObParam) {
 
-		String classname=RulesIdentifierService.class.getSimpleName();
-		String methodname=Thread.currentThread().getStackTrace()[1].getMethodName();
-		LOGGER.info("RulesIdentifierService toComputeAMLData method called......[{}] [{}]",classname,methodname);
+		String classname = RulesIdentifierService.class.getSimpleName();
+		String methodname = Thread.currentThread().getStackTrace()[1].getMethodName();
+		LOGGER.info("RulesIdentifierService toComputeAMLData method called......[{}] [{}]", classname, methodname);
 
 		RuleResponseVo ruleResponseVoObj = null;
 		List<RuleResposeDetailsVO> ruleRespDtlObj = null;
@@ -75,36 +74,38 @@ public class RulesIdentifierService {
 				for (Factset fact : ruleRequestVoObParam.getFactSet()) {
 					computedFactsVO = new ComputedFactsVO();
 					if (StringUtils.isNotBlank(fact.getFact())) {
-						
-						FactInterface factInterface = classLoaderUtil.getBean(fact.getFact()+"Service", FactInterface.class);
-						computedFactsVO = factInterface.getFactExecutor(ruleRequestVoObParam, fact);
-						computedFactsVO.setFact(fact.getFact());						
+
+						FactInterface factInterface = classLoaderUtil.getBean(fact.getFact() + "Service",
+								FactInterface.class);
+						computedFactsVO = factInterface.getFactExecutor(ruleRequestVoObParam, fact, computedFacts);
+						computedFactsVO.setFact(fact.getFact());
 						computedFacts.add(computedFactsVO);
 					} else {
 						LOGGER.info("RuleRequestVo object is NULL recevie");
 					}
 				}
-				if (StringUtils.isNotBlank(ruleRequestVoObParam.getCustomerId())) {
-					CustomerDetailsEntity customerEnityObj = customerDetailsRepoImpl
-							.getCustomerDetailsByCustId(ruleRequestVoObParam.getCustomerId());
-					if (customerEnityObj != null) {
-						ruleResposeDetailsVO.setAccountType(customerEnityObj.getCustomerType());
-					}
-				}
-				if (StringUtils.isNotBlank(ruleRequestVoObParam.getAccountNo())) {
-					AccountStatusEntity accountStatusEntityObj = accountStatusRepositryImpl.getAccountStatusByAccNO(
-							ruleRequestVoObParam.getAccountNo(), ruleRequestVoObParam.getReqId());
-					if (accountStatusEntityObj != null) {
-						ruleResposeDetailsVO.setAccountStatus(accountStatusEntityObj.getStatus());
-					}
-
-				}
-				ruleResposeDetailsVO.setComputedFacts(computedFacts);
-				ruleResposeDetailsVO.setReqId(ruleRequestVoObParam.getReqId());
-
-				// ruleRespDtlObj.add(ruleResposeDetailsVO);
-				// ruleResponseVoObj.setRuleResponse(ruleRespDtlObj);
 			}
+
+			if (StringUtils.isNotBlank(ruleRequestVoObParam.getCustomerId())) {
+				CustomerDetailsEntity customerEnityObj = customerDetailsRepoImpl
+						.getCustomerDetailsByCustId(ruleRequestVoObParam.getCustomerId());
+				if (customerEnityObj != null) {
+					ruleResposeDetailsVO.setAccountType(customerEnityObj.getCustomerType());
+				}
+			}
+			if (StringUtils.isNotBlank(ruleRequestVoObParam.getAccountNo())) {
+				AccountStatusEntity accountStatusEntityObj = accountStatusRepositryImpl
+						.getAccountStatusByAccNO(ruleRequestVoObParam.getAccountNo(), ruleRequestVoObParam.getReqId());
+				if (accountStatusEntityObj != null) {
+					ruleResposeDetailsVO.setAccountStatus(accountStatusEntityObj.getStatus());
+				}
+
+			}
+			ruleResposeDetailsVO.setComputedFacts(computedFacts);
+			ruleResposeDetailsVO.setReqId(ruleRequestVoObParam.getReqId());
+
+			// ruleRespDtlObj.add(ruleResposeDetailsVO);
+			// ruleResponseVoObj.setRuleResponse(ruleRespDtlObj);
 
 		} catch (Exception e) {
 			LOGGER.error("Exception found in RulesIdentifierService");
