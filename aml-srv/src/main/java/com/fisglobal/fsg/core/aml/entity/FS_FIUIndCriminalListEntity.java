@@ -30,6 +30,9 @@ public class FS_FIUIndCriminalListEntity implements Serializable {
 
 	@Column(name = "CATEGORY")
 	private String category;
+	
+	@Column(name = "NAME")
+	private String name;
 
 	@Column(name = "DOB")
 	private String dob;
@@ -102,4 +105,13 @@ public class FS_FIUIndCriminalListEntity implements Serializable {
 		this.listedOn = listedOn;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	
 }
