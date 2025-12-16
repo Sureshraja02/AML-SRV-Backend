@@ -1,5 +1,8 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +14,7 @@ import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
-import com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService;
+import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
 
 @Service("COUNT_CROSS_BORDER_TXNSService")
@@ -24,7 +27,7 @@ public class CountCrossBorderTxnFact implements FactInterface{
 	TransactionService transactionService;
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::CountCrossBorderTxnFact@getFactExecutor (ENTRY) Called::::::::::",
@@ -46,12 +49,12 @@ public class CountCrossBorderTxnFact implements FactInterface{
 			txnTime = requVoObjParam.getTxn_time();
 			Range range = factSetObj.getRange();
 
-			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
-					transMode, days, months, factSetObj, range);
-			if (dto != null && dto.getSumAmount() != null) {
+			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.DEPOSIT,
+					transMode,true, days, months, factSetObj, range);
+			if (dto != null && dto.getCountAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);
-				computedFactsVOObj.setValue(dto.getSumAmount());
+				computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
 			}
 
 		} catch (Exception e) {

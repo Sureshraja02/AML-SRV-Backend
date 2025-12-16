@@ -1,6 +1,7 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +28,10 @@ public class AvgCashDepositFact implements FactInterface{
 	TransactionService transactionService;
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
-		LOGGER.info("REQID : [{}]::::::::::::SumCashDepositFact@getFactExecutor (ENTRY) Called::::::::::",
+		LOGGER.info("REQID : [{}]::::::::::::AvgCashDepositFact@getFactExecutor (ENTRY) Called::::::::::",
 				requVoObjParam.getReqId());
 		String factName = null, accNo = null, custId = null, transMode = null, transType = null, 
 				txnTime = null, txnId = null, reqId = null;
@@ -58,10 +59,10 @@ public class AvgCashDepositFact implements FactInterface{
 			}
 
 		} catch (Exception e) {
-			LOGGER.error("Exception found in SumCashDepositFact@getFactExecutor : {}", e);
+			LOGGER.error("Exception found in AvgCashDepositFact@getFactExecutor : {}", e);
 		} finally {
 
-			LOGGER.info("REQID : [{}]::::::::::::SumCashDepositFact@getFactExecutor (EXIT) End::::::::::\n\n",
+			LOGGER.info("REQID : [{}]::::::::::::AvgCashDepositFact@getFactExecutor (EXIT) End::::::::::\n\n",
 					requVoObjParam.getReqId());
 		}
 		return computedFactsVOObj;

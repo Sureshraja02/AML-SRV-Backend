@@ -1,6 +1,7 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 import com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService;
+import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
 
 @Service("COUNT_DISTINCTService")
@@ -26,7 +28,7 @@ public class CountDistinctFact implements FactInterface{
 	TransactionService transactionService;
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::CountFact@getFactExecutor (ENTRY) Called::::::::::",
@@ -48,12 +50,12 @@ public class CountDistinctFact implements FactInterface{
 			txnTime = requVoObjParam.getTxn_time();
 			Range range = factSetObj.getRange();
 
-			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
+			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, AMLConstants.WITHDRAW,
 					transMode, days, months, factSetObj, range);
 			if (dto != null && dto.getCountAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);
-				computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
+				computedFactsVOObj.setValue(new BigDecimal(dto.getCOuntDistcounterpartyAccountNo()));
 			}
 
 		} catch (Exception e) {

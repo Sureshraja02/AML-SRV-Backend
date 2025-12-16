@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class SumDebitCreditFact implements FactInterface{
 
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::SumNonCashDepositFact@getFactExecutor (ENTRY) Called::::::::::",

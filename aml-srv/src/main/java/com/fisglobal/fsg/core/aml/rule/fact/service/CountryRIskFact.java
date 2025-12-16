@@ -1,6 +1,5 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,10 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fisglobal.fsg.core.aml.entity.CustomerDetailsEntity;
 import com.fisglobal.fsg.core.aml.entity.FS_FIUIndHighRiskCountryEntity;
-import com.fisglobal.fsg.core.aml.entity.FS_FactConditionAttributeEntity;
-import com.fisglobal.fsg.core.aml.entity.FS_FactConditionEntity;
+import com.fisglobal.fsg.core.aml.entity.FS_FIUIndTerrorLocationEntity;
 import com.fisglobal.fsg.core.aml.repo.CustomerDetailsService;
 import com.fisglobal.fsg.core.aml.repo.FS_FIUIndHighRiskCountryRepoImpl;
 import com.fisglobal.fsg.core.aml.repo.FS_FIUIndTerrorLocationRepoImpl;
@@ -23,7 +20,6 @@ import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
-import com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService;
 
 
 @Service("COUNTRY_RISKService")
@@ -52,7 +48,7 @@ public class CountryRIskFact implements FactInterface{
 	private Logger LOGGER = LoggerFactory.getLogger(SumCashTxnFact.class);
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::CountryRIskFact@getFactExecutor (ENTRY) Called::::::::::",
@@ -95,6 +91,44 @@ public class CountryRIskFact implements FactInterface{
 						computedFactsVOObj.setStrValue("NO_HIGH_RISK");	
 					}
 					
+				
+			}
+			else if(condition!=null && condition.equals("TERROR_LOCATIONS"))
+			{
+				
+				FS_FIUIndTerrorLocationEntity	terrorLocationEntity = fS_FIUIndTerrorLocationRepoImpl.getCountryByritiria(requVoObjParam.getReqId(), dto.getCounterContryCode());
+				if(terrorLocationEntity!=null)
+				{
+					if(terrorLocationEntity.getCountry_Code()!=null && "IN".equals(terrorLocationEntity.getCountry_Code()))
+					{
+						if(dto.getCounterLocation().contains(terrorLocationEntity.getLocation()))
+						{
+							computedFactsVOObj.setFact(factName);
+							computedFactsVOObj.setStrValue("HIGH_RISK");	
+						}
+						else
+						{
+							computedFactsVOObj.setFact(factName);
+							computedFactsVOObj.setStrValue("NO_HIGH_RISK");		
+						}
+						
+					}
+					
+					
+					else 
+					{
+						computedFactsVOObj.setFact(factName);
+						computedFactsVOObj.setStrValue("HIGH_RISK");	
+					}
+					
+					
+					
+				}
+				else
+				{
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setStrValue("NO_HIGH_RISK");	
+				}
 				
 			}
 			}

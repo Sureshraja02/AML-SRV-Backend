@@ -1,5 +1,7 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 	TransactionService transactionService;
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::SumCashWithdrawFact@getFactExecutor (ENTRY) Called::::::::::",
@@ -47,7 +49,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			txnTime = requVoObjParam.getTxn_time();
 			Range range = factSetObj.getRange();
 
-			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.WITHDRAW,
+			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, null,AMLConstants.WITHDRAW,
 					transMode, days, months, factSetObj, range);
 			if (dto != null && dto.getSumAmount() != null) {
 

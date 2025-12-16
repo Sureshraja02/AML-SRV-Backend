@@ -1,6 +1,6 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,6 @@ import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
-import com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService;
 
 
 @Service("SUM_NON_CASH_DEPOSITSService")
@@ -26,7 +25,7 @@ public class SumNonCashDepositFact implements FactInterface{
 	private Logger LOGGER = LoggerFactory.getLogger(SumNonCashDepositFact.class);
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::SumNonCashDepositFact@getFactExecutor (ENTRY) Called::::::::::",
@@ -50,7 +49,7 @@ public class SumNonCashDepositFact implements FactInterface{
 
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
 					transMode, days, months, factSetObj, range);
-			if (dto != null && dto.getCountAmount() != null) {
+			if (dto != null && dto.getSumAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);
 				computedFactsVOObj.setValue(dto.getSumAmount());

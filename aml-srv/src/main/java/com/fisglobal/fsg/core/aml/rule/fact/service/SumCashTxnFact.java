@@ -43,7 +43,7 @@ public class SumCashTxnFact implements FactInterface{
 	private Logger LOGGER = LoggerFactory.getLogger(SumCashTxnFact.class);
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::SumCashTxnFact@getFactExecutor (ENTRY) Called::::::::::",

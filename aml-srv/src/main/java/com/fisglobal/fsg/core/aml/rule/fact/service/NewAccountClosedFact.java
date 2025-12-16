@@ -1,5 +1,7 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -17,7 +19,7 @@ public class NewAccountClosedFact implements FactInterface{
 	private Logger LOGGER = LoggerFactory.getLogger(NewAccountClosedFact.class);
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfFDConversion (FD_CONVERSION) Called::::::::::",
 				requVoObjParam.getReqId());

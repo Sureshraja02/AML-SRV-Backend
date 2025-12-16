@@ -1,10 +1,22 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fisglobal.fsg.core.aml.entity.AccountDetailsEntity;
+import com.fisglobal.fsg.core.aml.entity.AccountStatusEntity;
+import com.fisglobal.fsg.core.aml.repo.AccountDetailsService;
+import com.fisglobal.fsg.core.aml.repo.TransactionDetailsDTO;
+import com.fisglobal.fsg.core.aml.repo.TransactionService;
 import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
+import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 
@@ -12,25 +24,93 @@ import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 @Service("ACCOUNT_STATUSService")
 public class AccountStatusFact implements FactInterface{
 
-
-	private Logger LOGGER = LoggerFactory.getLogger(AccountStatusFact.class);
+private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
+	
+	@Autowired
+	TransactionService transactionService;
+	
+	@Autowired
+	AccountDetailsService accountDetailsService;
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
-		ComputedFactsVO computedFactsVOObj = null;
-		LOGGER.info("REQID : [{}]::::::::::::RulesExecutorService@ruleOfFDConversion (FD_CONVERSION) Called::::::::::",
-				requVoObjParam.getReqId());
-		try {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
+		ComputedFactsVO computedFactsVOObj = null;
+		LOGGER.info("REQID : [{}]::::::::::::AccountStatusFact@getFactExecutor (ENTRY) Called::::::::::",
+				requVoObjParam.getReqId());
+		String factName = null, accNo = null, custId = null, transMode = null, transType = null, 
+				txnTime = null, txnId = null, reqId = null;
+		try {
+			computedFactsVOObj = new ComputedFactsVO();
+			accNo = requVoObjParam.getAccountNo();
+			custId = requVoObjParam.getCustomerId();
+			txnId = requVoObjParam.getTxnId();
+			reqId = requVoObjParam.getReqId();
+			transMode = requVoObjParam.getTransactionMode();
+			transType = requVoObjParam.getTxnType();			
+			factName = factSetObj.getFact();
+			Integer days = factSetObj.getDays();
+			Integer hours = factSetObj.getHours();
+			Integer months = factSetObj.getMonths();
+			txnTime = requVoObjParam.getTxn_time();
+			Range range = factSetObj.getRange();
+			String condition = factSetObj.getCondition();
+			TransactionDetailsDTO dto =null;
+
+			if (condition != null) {
+				if (condition.equals("NEW_ACCOUNT")) {
+					AccountDetailsEntity acctDetails = accountDetailsService
+							.getAccountDetails(requVoObjParam.getReqId(), accNo, custId);
+					if (acctDetails != null && acctDetails.getAccountOpenedDate() != null) {
+						DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+						LocalDate openDate = LocalDate.parse(acctDetails.getAccountOpenedDate(), formatter);
+						LocalDate currentDate = LocalDate.now();
+						System.out.println(openDate); // Output: 2025-05-20
+
+						long daysBetween = ChronoUnit.DAYS.between(openDate, currentDate);
+						if (days != null && days >= daysBetween) {
+							computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
+							computedFactsVOObj.setAccountStatus("NEW");
+						} else if (months != null) {
+							int totalDays = months * 30;
+							if (totalDays >= daysBetween) {
+								computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
+								computedFactsVOObj.setAccountStatus("NEW");
+							}
+						} else {
+							computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
+							computedFactsVOObj.setAccountStatus("OLD");
+						}
+					} else {
+
+						computedFactsVOObj.setAccountStatus("OLD");
+					}
+
+				}
+				
+					
+
+			}
+			else
+			{
+				
+				AccountStatusEntity acctStatus=accountDetailsService.getAccountStatusByAccNO(accNo, reqId);
+			
+			if (acctStatus != null && acctStatus.getStatus() != null) {
+
+				computedFactsVOObj.setFact(factName);
+				computedFactsVOObj.setStrValue(acctStatus.getStatus());
+			}
+			}
 		} catch (Exception e) {
-			LOGGER.error("Exception found in RulesExecutorService@ruleOfFDConversion : {}", e);
+			LOGGER.error("Exception found in AccountStatusFact@getFactExecutor : {}", e);
 		} finally {
 
-			LOGGER.info(
-					"REQID : [{}]::::::::::::RulesExecutorService@ruleOfFDConversion (FD_CONVERSION) End::::::::::\n\n",
+			LOGGER.info("REQID : [{}]::::::::::::AccountStatusFact@getFactExecutor (EXIT) End::::::::::\n\n",
 					requVoObjParam.getReqId());
 		}
 		return computedFactsVOObj;
+
 	}
 
 }

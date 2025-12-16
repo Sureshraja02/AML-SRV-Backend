@@ -1,6 +1,7 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ public class CountCashDepositFact implements FactInterface{
 	TransactionService transactionService;
 	
 	@Override
-	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj) {
+	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
 		LOGGER.info("REQID : [{}]::::::::::::CountCashDepositFact@getFactExecutor (ENTRY) Called::::::::::",
@@ -49,7 +50,7 @@ public class CountCashDepositFact implements FactInterface{
 			txnTime = requVoObjParam.getTxn_time();
 			Range range = factSetObj.getRange();
 
-			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.DEPOSIT,
+			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, null,AMLConstants.DEPOSIT,
 					transMode, days, months, factSetObj, range);
 			if (dto != null && dto.getCountAmount() != null) {
 
