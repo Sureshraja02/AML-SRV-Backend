@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.fisglobal.fsg.core.aml.entity.AccountDetailsEntity;
 import com.fisglobal.fsg.core.aml.entity.AccountStatusEntity;
@@ -21,6 +22,7 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+@Service
 public class AccountDetailsService{
 
 	private Logger LOGGER = LoggerFactory.getLogger(AccountDetailsService.class);

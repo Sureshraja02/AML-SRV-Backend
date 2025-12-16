@@ -43,8 +43,10 @@ public class FS_FIUIndTerrorLocationRepoImpl {
 			
 			if (StringUtils.isNotBlank(countryCode)) {
 				predicates.add(cb.equal(book.get("country_Code"), countryCode));
-				predicates.add(cb.equal(book.get("riskLevel"), "High"));
+				//predicates.add(cb.equal(book.get("riskLevel"), "High"));
 			}
+
+			
 			
 			
 			cq.where(predicates.toArray(new Predicate[] {}));
