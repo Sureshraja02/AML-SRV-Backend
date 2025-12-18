@@ -74,6 +74,11 @@ public class MaxFact implements FactInterface{
 							computedFactsVOObj.setFact(factName);
 							computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
 						}
+						else
+						{
+							computedFactsVOObj.setFact(factName);
+							computedFactsVOObj.setValue(new BigDecimal(0));
+						}
 
 					} else {
 						computedFactsVOObj.setFact(factName);
@@ -89,6 +94,11 @@ public class MaxFact implements FactInterface{
 
 					computedFactsVOObj.setFact(factName);
 					computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
+				}
+				else
+				{
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(new BigDecimal(0));
 				}
 			}
 

@@ -57,6 +57,11 @@ public class CountDistinctFact implements FactInterface{
 				computedFactsVOObj.setFact(factName);
 				computedFactsVOObj.setValue(new BigDecimal(dto.getCOuntDistcounterpartyAccountNo()));
 			}
+			else
+			{
+				computedFactsVOObj.setFact(factName);
+				computedFactsVOObj.setValue(new BigDecimal(0));
+			}
 
 		} catch (Exception e) {
 			LOGGER.error("Exception found in CountFact@getFactExecutor : {}", e);

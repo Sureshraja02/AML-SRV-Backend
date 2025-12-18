@@ -108,6 +108,11 @@ public class CustomerProfileFact implements FactInterface{
 								computedFactsVOObj.setValue((dto.getMaxAmount()));
 								computedFactsVOObj.setStrValue(profile);
 							}
+							else
+							{
+								computedFactsVOObj.setFact(factName);
+								computedFactsVOObj.setValue(new BigDecimal(0));
+							}
 						
 					} else {
 
@@ -149,6 +154,11 @@ public class CustomerProfileFact implements FactInterface{
 								computedFactsVOObj.setValue((dto.getMaxAmount()));
 								computedFactsVOObj.setStrValue(profile);
 							}
+							else
+							{
+								computedFactsVOObj.setFact(factName);
+								computedFactsVOObj.setValue(new BigDecimal(0));
+							}
 						
 					} else {
 
@@ -189,6 +199,11 @@ public class CustomerProfileFact implements FactInterface{
 								computedFactsVOObj.setFact(factName);
 								computedFactsVOObj.setValue((dto.getMaxAmount()));
 								computedFactsVOObj.setStrValue(profile);
+							}
+							else
+							{
+								computedFactsVOObj.setFact(factName);
+								computedFactsVOObj.setValue(new BigDecimal(0));
 							}
 						
 					} else {

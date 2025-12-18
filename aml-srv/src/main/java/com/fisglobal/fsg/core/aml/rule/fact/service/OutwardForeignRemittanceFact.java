@@ -1,5 +1,6 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -49,11 +50,16 @@ public class OutwardForeignRemittanceFact implements FactInterface{
 			Range range = factSetObj.getRange();
 			TransactionDetailsDTO dto =null;
 			 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.WITHDRAW,
-						transMode,true, days, months, factSetObj, range);
+						transMode,true, days, months, factSetObj, range,false);
 				if (dto != null && dto.getTxnAmount() != null) {
 
 					computedFactsVOObj.setFact(factName);
 					computedFactsVOObj.setValue((dto.getTxnAmount()));
+				}
+				else
+				{
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(new BigDecimal(0));
 				}
 
 		} catch (Exception e) {

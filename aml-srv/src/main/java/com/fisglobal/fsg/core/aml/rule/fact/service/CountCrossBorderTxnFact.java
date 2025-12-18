@@ -56,6 +56,11 @@ public class CountCrossBorderTxnFact implements FactInterface{
 				computedFactsVOObj.setFact(factName);
 				computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
 			}
+			else
+			{
+				computedFactsVOObj.setFact(factName);
+				computedFactsVOObj.setValue(new BigDecimal(0));
+			}
 
 		} catch (Exception e) {
 			LOGGER.error("Exception found in CountCrossBorderTxnFact@getFactExecutor : {}", e);

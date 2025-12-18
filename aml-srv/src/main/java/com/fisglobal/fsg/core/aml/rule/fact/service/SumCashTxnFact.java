@@ -102,6 +102,11 @@ public class SumCashTxnFact implements FactInterface{
 							computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
 							computedFactsVOObj.setStrValue(profile);
 						}
+						else
+						{
+							computedFactsVOObj.setFact(factName);
+							computedFactsVOObj.setValue(new BigDecimal(0));
+						}
 					
 				} else {
 
@@ -119,6 +124,11 @@ public class SumCashTxnFact implements FactInterface{
 
 						computedFactsVOObj.setFact(factName);
 						computedFactsVOObj.setValue(dto.getSumAmount());
+					}
+				 else
+					{
+						computedFactsVOObj.setFact(factName);
+						computedFactsVOObj.setValue(new BigDecimal(0));
 					}
 			}
 

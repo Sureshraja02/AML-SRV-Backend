@@ -124,6 +124,11 @@ public class SumDebitCreditFact implements FactInterface{
 						computedFactsVOObj.setFact(factName);
 						computedFactsVOObj.setValue(dto.getSumAmount());
 					}
+					else
+					{
+						computedFactsVOObj.setFact(factName);
+						computedFactsVOObj.setValue(new BigDecimal(0));
+					}
 				} else {
 					computedFactsVOObj.setFact(factName);
 					computedFactsVOObj.setValue(new BigDecimal(0));
@@ -140,6 +145,11 @@ public class SumDebitCreditFact implements FactInterface{
 
 				computedFactsVOObj.setFact(factName);
 				computedFactsVOObj.setValue(dto.getSumAmount());
+			}
+			else
+			{
+				computedFactsVOObj.setFact(factName);
+				computedFactsVOObj.setValue(new BigDecimal(0));
 			}
 			}
 

@@ -57,6 +57,11 @@ public class AvgCashDepositFact implements FactInterface{
 				computedFactsVOObj.setFact(factName);
 				computedFactsVOObj.setValue(new BigDecimal(dto.getAvgAmount()));
 			}
+			else
+			{
+				computedFactsVOObj.setFact(factName);
+				computedFactsVOObj.setValue(new BigDecimal(0));
+			}
 
 		} catch (Exception e) {
 			LOGGER.error("Exception found in AvgCashDepositFact@getFactExecutor : {}", e);

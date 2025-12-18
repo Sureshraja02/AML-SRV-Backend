@@ -1,5 +1,6 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -55,6 +56,11 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 
 				computedFactsVOObj.setFact(factName);
 				computedFactsVOObj.setValue((dto.getSumAmount()));
+			}
+			else
+			{
+				computedFactsVOObj.setFact(factName);
+				computedFactsVOObj.setValue(new BigDecimal(0));
 			}
 
 		} catch (Exception e) {

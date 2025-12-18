@@ -98,6 +98,11 @@ public class CountFact implements FactInterface{
 							computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
 							computedFactsVOObj.setStrValue(profile);
 						}
+						else
+						{
+							computedFactsVOObj.setFact(factName);
+							computedFactsVOObj.setValue(new BigDecimal(0));
+						}
 					
 				} else {
 
@@ -115,6 +120,12 @@ public class CountFact implements FactInterface{
 
 					computedFactsVOObj.setFact(factName);
 					computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
+				}
+				else {
+
+					computedFactsVOObj.setFact(factName);
+					computedFactsVOObj.setValue(new BigDecimal(0));
+
 				}
 			}
 			

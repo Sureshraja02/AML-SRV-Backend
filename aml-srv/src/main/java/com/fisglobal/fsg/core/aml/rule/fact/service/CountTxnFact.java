@@ -75,6 +75,11 @@ public class CountTxnFact implements FactInterface{
 						computedFactsVOObj.setFact(factName);
 						computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
 					}
+				 else
+					{
+						computedFactsVOObj.setFact(factName);
+						computedFactsVOObj.setValue(new BigDecimal(0));
+					}
 			
 
 			

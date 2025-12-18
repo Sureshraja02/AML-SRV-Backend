@@ -97,9 +97,14 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 							computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
 							computedFactsVOObj.setAccountStatus("NEW");
 							 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.DEPOSIT,
-										transMode,true, days, months, factSetObj, range);
+										transMode,true, days, months, factSetObj, range,false);
 								if (dto != null && dto.getTxnAmount() != null) {
 									computedFactsVOObj.setValue((dto.getTxnAmount()));
+								}
+								else
+								{
+									computedFactsVOObj.setFact(factName);
+									computedFactsVOObj.setValue(new BigDecimal(0));
 								}
 						} else if (months != null) {
 							int totalDays = months * 30;
@@ -107,7 +112,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 								computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
 								computedFactsVOObj.setAccountStatus("NEW");
 								 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.DEPOSIT,
-											transMode,true, days, months, factSetObj, range);
+											transMode,true, days, months, factSetObj, range,false);
 									if (dto != null && dto.getTxnAmount() != null) {
 										computedFactsVOObj.setValue((dto.getTxnAmount()));
 									}
@@ -148,12 +153,17 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 
 					if (profile != null) {
 						 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.DEPOSIT,
-									transMode,true, days, months, factSetObj, range);
+									transMode,true, days, months, factSetObj, range,false);
 							if (dto != null && dto.getTxnAmount() != null) {
 
 								computedFactsVOObj.setFact(factName);
 								computedFactsVOObj.setValue((dto.getTxnAmount()));
 								computedFactsVOObj.setStrValue(profile);
+							}
+							else
+							{
+								computedFactsVOObj.setFact(factName);
+								computedFactsVOObj.setValue(new BigDecimal(0));
 							}
 						
 					} else {
@@ -168,11 +178,16 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			else
 			{
 			 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.DEPOSIT,
-					transMode,true, days, months, factSetObj, range);
+					transMode,true, days, months, factSetObj, range,false);
 			if (dto != null && dto.getTxnAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);
 				computedFactsVOObj.setValue((dto.getTxnAmount()));
+			}
+			else
+			{
+				computedFactsVOObj.setFact(factName);
+				computedFactsVOObj.setValue(new BigDecimal(0));
 			}
 			}
 		} catch (Exception e) {
