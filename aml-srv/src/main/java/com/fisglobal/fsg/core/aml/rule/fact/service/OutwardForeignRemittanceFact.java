@@ -51,6 +51,7 @@ public class OutwardForeignRemittanceFact implements FactInterface{
 			TransactionDetailsDTO dto =null;
 			 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.WITHDRAW,
 						transMode,true, days, months, factSetObj, range,false);
+			 	computedFactsVOObj.setStrType("num");
 				if (dto != null && dto.getTxnAmount() != null) {
 
 					computedFactsVOObj.setFact(factName);

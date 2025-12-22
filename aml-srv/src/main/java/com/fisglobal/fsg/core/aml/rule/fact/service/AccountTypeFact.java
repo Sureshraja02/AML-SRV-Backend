@@ -74,12 +74,20 @@ public class AccountTypeFact implements FactInterface{
 				if (condition.equals("CA_NON_PUBLIC")) {
 
 					dto = accountDetailsService.getAccountDetails(reqId, custId, accNo);
+					computedFactsVOObj.setStrType("str");
 					if (dto != null && dto.getAccountType() != null) {
 
 						computedFactsVOObj.setFact(factName);
 						computedFactsVOObj.setStrValue(dto.getAccountType());
 					}
+					else
+					{
 
+							computedFactsVOObj.setFact(factName);
+							computedFactsVOObj.setStrValue("PUBLIC");
+						}
+
+					
 				}
 
 			} else {

@@ -52,6 +52,7 @@ public class CountCashDepositFact implements FactInterface{
 
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, null,AMLConstants.DEPOSIT,
 					transMode, days, months, factSetObj, range);
+			computedFactsVOObj.setStrType("num");
 			if (dto != null && dto.getCountAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);

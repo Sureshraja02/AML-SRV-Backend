@@ -51,6 +51,7 @@ public class MaxCashTxnFact implements FactInterface{
 
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.WITHDRAW,
 					transMode, days, months, factSetObj, range);
+			computedFactsVOObj.setStrType("num");
 			if (dto != null && dto.getMaxAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);

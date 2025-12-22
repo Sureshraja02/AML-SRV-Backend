@@ -89,7 +89,7 @@ public class TotalCreditFact implements FactInterface{
 
 					}
 				}
-
+				computedFactsVOObj.setStrType("num");
 				if (profile != null) {
 					 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
 								transMode, days, months, factSetObj, range);
@@ -98,6 +98,11 @@ public class TotalCreditFact implements FactInterface{
 							computedFactsVOObj.setFact(factName);
 							computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
 							computedFactsVOObj.setStrValue(profile);
+						}
+						else
+						{
+							computedFactsVOObj.setFact(factName);
+							computedFactsVOObj.setValue(new BigDecimal(0));
 						}
 					
 				} else {

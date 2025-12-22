@@ -66,7 +66,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 						LocalDate openDate = LocalDate.parse(acctDetails.getAccountOpenedDate(), formatter);
 						LocalDate currentDate = LocalDate.now();
 						System.out.println(openDate); // Output: 2025-05-20
-
+						computedFactsVOObj.setStrType("str");
 						long daysBetween = ChronoUnit.DAYS.between(openDate, currentDate);
 						if (days != null && days >= daysBetween) {
 							computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
@@ -100,6 +100,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 
 				computedFactsVOObj.setFact(factName);
 				computedFactsVOObj.setStrValue(acctStatus.getStatus());
+				computedFactsVOObj.setStrType("str");
 			}
 			}
 		} catch (Exception e) {

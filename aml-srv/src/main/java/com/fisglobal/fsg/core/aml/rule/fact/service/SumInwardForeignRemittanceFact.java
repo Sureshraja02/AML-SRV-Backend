@@ -55,6 +55,7 @@ public class SumInwardForeignRemittanceFact implements FactInterface{
 			String condition = factSetObj.getCondition();
 			TransactionDetailsDTO dto = null;
 			dto = transactionService.getTransactionDetails(reqId, custId);
+			computedFactsVOObj.setStrType("num");
 			
 			if (condition != null) {
 				if (condition.equals("NON_ACCOUNT_HOLDER")) {

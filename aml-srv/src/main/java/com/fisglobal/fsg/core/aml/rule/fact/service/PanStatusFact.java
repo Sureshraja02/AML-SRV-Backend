@@ -42,6 +42,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			factName = factSetObj.getFact();
 		
 			String panStatus = customerDetailsService.getPanStatus(reqId, accNo,custId);
+			computedFactsVOObj.setStrType("str");
 			if (panStatus != null) {
 
 				computedFactsVOObj.setFact(factName);

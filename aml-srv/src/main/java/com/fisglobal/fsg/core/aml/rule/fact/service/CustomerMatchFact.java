@@ -80,7 +80,7 @@ public class CustomerMatchFact implements FactInterface {
 			String country = null;
 			if (condition != null) {
 				if (condition.equals("UNSCR")) {
-
+					computedFactsVOObj.setStrType("str");
 					CustomerDetailsEntity custDetails = customerDetailsService.getCustomerDetails(reqId, custId);
 					if (custDetails != null) {
 						if (custDetails.getCustomerName() != null && custDetails.getCountry() != null) {
@@ -104,7 +104,7 @@ public class CustomerMatchFact implements FactInterface {
 					}
 
 				} else if (condition.equals("UNSCR")) {
-
+					computedFactsVOObj.setStrType("str");
 					CustomerDetailsEntity custDetails = customerDetailsService.getCustomerDetails(reqId, custId);
 					if (custDetails != null) {
 						if (custDetails.getCustomerName() != null && custDetails.getCountry() != null) {
@@ -128,7 +128,7 @@ public class CustomerMatchFact implements FactInterface {
 					}
 
 				} else if (condition.equals("CRIMINAL_LIST")) {
-
+					computedFactsVOObj.setStrType("str");
 					CustomerDetailsEntity custDetails = customerDetailsService.getCustomerDetails(reqId, custId);
 					if (custDetails != null) {
 						if (custDetails.getCustomerName() != null && custDetails.getCountry() != null) {
@@ -152,7 +152,7 @@ public class CustomerMatchFact implements FactInterface {
 					}
 
 				} else if (condition.equals("TF_SUSPECT")) {
-
+					computedFactsVOObj.setStrType("str");
 					CustomerDetailsEntity custDetails = customerDetailsService.getCustomerDetails(reqId, custId);
 					if (custDetails != null) {
 						if (custDetails.getCustomerName() != null && custDetails.getCountry() != null) {

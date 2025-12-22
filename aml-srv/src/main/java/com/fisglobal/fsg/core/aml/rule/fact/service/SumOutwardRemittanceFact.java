@@ -47,7 +47,7 @@ public class SumOutwardRemittanceFact implements FactInterface{
 			Integer months = factSetObj.getMonths();
 			txnTime = requVoObjParam.getTxn_time();
 			Range range = factSetObj.getRange();
-
+			computedFactsVOObj.setStrType("num");
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
 					transMode, days, months, factSetObj, range);
 			if (dto != null && dto.getCountAmount() != null) {

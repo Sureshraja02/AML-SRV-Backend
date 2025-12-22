@@ -78,6 +78,7 @@ public class CountryRIskFact implements FactInterface{
 				 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType);
 			 if(dto!=null && dto.getCounterContryCode()!=null)
 			{
+				 computedFactsVOObj.setStrType("str");
 			if(condition!=null && condition.equals("HIGH_RISK_COUNTRIES"))
 			{
 					FS_FIUIndHighRiskCountryEntity	countryEntity = fS_FIUIndHighRiskCountryRepoImpl.getCountryByritiria(requVoObjParam.getReqId(), dto.getCounterContryCode());
@@ -96,7 +97,7 @@ public class CountryRIskFact implements FactInterface{
 			}
 			else if(condition!=null && condition.equals("TERROR_LOCATIONS"))
 			{
-				
+				computedFactsVOObj.setStrType("num");
 				FS_FIUIndTerrorLocationEntity	terrorLocationEntity = fS_FIUIndTerrorLocationRepoImpl.getCountryByritiria(requVoObjParam.getReqId(), dto.getCounterContryCode());
 				if(terrorLocationEntity!=null)
 				{
@@ -138,6 +139,7 @@ public class CountryRIskFact implements FactInterface{
 			{
 				 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
 							transMode, days, months, factSetObj, range);
+				 computedFactsVOObj.setStrType("str");
 				 if (dto != null && dto.getSumAmount() != null) {
 
 						computedFactsVOObj.setFact(factName);

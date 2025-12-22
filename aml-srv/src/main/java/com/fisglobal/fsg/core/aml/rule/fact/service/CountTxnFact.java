@@ -70,6 +70,7 @@ public class CountTxnFact implements FactInterface{
 			
 				 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
 							transMode, days, months, factSetObj, range);
+				 computedFactsVOObj.setStrType("num");
 				 if (dto != null && dto.getCountAmount() != null) {
 
 						computedFactsVOObj.setFact(factName);

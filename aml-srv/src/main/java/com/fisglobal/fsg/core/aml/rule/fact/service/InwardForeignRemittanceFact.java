@@ -96,6 +96,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 						if (days != null && days >= daysBetween) {
 							computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
 							computedFactsVOObj.setAccountStatus("NEW");
+							computedFactsVOObj.setStrType("num");
 							 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.DEPOSIT,
 										transMode,true, days, months, factSetObj, range,false);
 								if (dto != null && dto.getTxnAmount() != null) {

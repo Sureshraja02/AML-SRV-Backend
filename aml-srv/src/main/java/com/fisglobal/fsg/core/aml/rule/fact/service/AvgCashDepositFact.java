@@ -52,6 +52,7 @@ public class AvgCashDepositFact implements FactInterface{
 
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.DEPOSIT,
 					transMode, days, months, factSetObj, range);
+			computedFactsVOObj.setStrType("num");
 			if (dto != null && dto.getAvgAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);

@@ -50,6 +50,7 @@ private Logger LOGGER = LoggerFactory.getLogger(CountFact.class);
 
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
 					transMode, days, months, factSetObj, range);
+			computedFactsVOObj.setStrType("num");
 			if (dto != null && dto.getSumAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);

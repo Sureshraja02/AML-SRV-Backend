@@ -54,7 +54,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			Range range = factSetObj.getRange();
 			String condition = factSetObj.getCondition();
 			
-			
+			computedFactsVOObj.setStrType("num");
 			if (condition != null) {
 				if (condition.equals("QUARTERLY_PERCENTAGE")) {
 

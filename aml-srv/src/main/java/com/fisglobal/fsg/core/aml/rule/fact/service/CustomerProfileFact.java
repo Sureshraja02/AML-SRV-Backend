@@ -98,8 +98,19 @@ public class CustomerProfileFact implements FactInterface{
 
 						}
 					}
-
 					if (profile != null) {
+						computedFactsVOObj.setFact(factName);						
+						computedFactsVOObj.setStrValue(profile);
+						computedFactsVOObj.setStrType("str");
+					}
+					else
+					{
+						computedFactsVOObj.setFact(factName);						
+						computedFactsVOObj.setValue(new BigDecimal(0));
+						computedFactsVOObj.setStrType("num");
+					}
+
+					/*if (profile != null) {
 						 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
 									transMode, days, months, factSetObj, range);
 							if (dto != null && dto.getMaxAmount() != null) {
@@ -120,6 +131,7 @@ public class CustomerProfileFact implements FactInterface{
 						computedFactsVOObj.setValue(new BigDecimal(0));
 
 					}
+					*/
 				}
 				else if (condition.equals("ISPARTYTYPEAGENTORDEALER")) {
 
@@ -136,7 +148,7 @@ public class CustomerProfileFact implements FactInterface{
 							CustomerDetailsEntity custDetails = customerDetailsService.getCustomerDetails(requVoObjParam.getReqId(),custId);
 							if (custDetails != null) {
 								for (FS_FactConditionAttributeEntity gs : conditionAttribute) {
-									if (gs.getAttributes().equals(custDetails.getCustomerCategory())) {
+									if (gs.getAttributes().equals(custDetails.getCustomerType())) {
 										profile = gs.getAttributes();
 									}
 								}
@@ -146,25 +158,15 @@ public class CustomerProfileFact implements FactInterface{
 					}
 
 					if (profile != null) {
-						 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
-									transMode, days, months, factSetObj, range);
-							if (dto != null && dto.getMaxAmount() != null) {
-
-								computedFactsVOObj.setFact(factName);
-								computedFactsVOObj.setValue((dto.getMaxAmount()));
-								computedFactsVOObj.setStrValue(profile);
-							}
-							else
-							{
-								computedFactsVOObj.setFact(factName);
-								computedFactsVOObj.setValue(new BigDecimal(0));
-							}
-						
-					} else {
-
-						computedFactsVOObj.setFact(factName);
+						computedFactsVOObj.setFact(factName);						
+						computedFactsVOObj.setStrValue(profile);
+						computedFactsVOObj.setStrType("str");
+					}
+					else
+					{
+						computedFactsVOObj.setFact(factName);						
 						computedFactsVOObj.setValue(new BigDecimal(0));
-
+						computedFactsVOObj.setStrType("num");
 					}
 				}
 				else if (condition.equals("LOW-CASH-PROFILE")) {
@@ -192,25 +194,15 @@ public class CustomerProfileFact implements FactInterface{
 					}
 
 					if (profile != null) {
-						 dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, null,
-									transMode, days, months, factSetObj, range);
-							if (dto != null && dto.getMaxAmount() != null) {
-
-								computedFactsVOObj.setFact(factName);
-								computedFactsVOObj.setValue((dto.getMaxAmount()));
-								computedFactsVOObj.setStrValue(profile);
-							}
-							else
-							{
-								computedFactsVOObj.setFact(factName);
-								computedFactsVOObj.setValue(new BigDecimal(0));
-							}
-						
-					} else {
-
-						computedFactsVOObj.setFact(factName);
+						computedFactsVOObj.setFact(factName);						
+						computedFactsVOObj.setStrValue(profile);
+						computedFactsVOObj.setStrType("str");
+					}
+					else
+					{
+						computedFactsVOObj.setFact(factName);						
 						computedFactsVOObj.setValue(new BigDecimal(0));
-
+						computedFactsVOObj.setStrType("num");
 					}
 				}
 				

@@ -50,6 +50,7 @@ private Logger LOGGER = LoggerFactory.getLogger(CountBeneficiaryFact.class);
 
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, null,AMLConstants.WITHDRAW,
 					transMode, days, months, factSetObj, range);
+			computedFactsVOObj.setStrType("num");
 			if (dto != null && dto.getCountcounterpartyAccountNo() != null) {
 
 				computedFactsVOObj.setFact(factName);

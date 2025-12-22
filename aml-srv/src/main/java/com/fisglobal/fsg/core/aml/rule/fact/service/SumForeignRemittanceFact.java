@@ -52,6 +52,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, null,AMLConstants.DEPOSIT,
 					transMode,true, days, months, factSetObj, range);
+			computedFactsVOObj.setStrType("num");
 			if (dto != null && dto.getSumAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);

@@ -65,7 +65,7 @@ public class SumDebitCreditFact implements FactInterface{
 			Range range = factSetObj.getRange();
 			String condition = factSetObj.getCondition();
 			TransactionDetailsDTO dto =null;
-			
+			computedFactsVOObj.setStrType("num");
 			if(condition!=null)
 			{
 			if (condition.equals("NEW_ACCOUNT_CLOSED")) {
@@ -118,7 +118,7 @@ public class SumDebitCreditFact implements FactInterface{
 
 					 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
 							transMode, days, months, factSetObj, range);
-					
+					 computedFactsVOObj.setStrType("num");
 					if (dto != null && dto.getSumAmount() != null) {
 
 						computedFactsVOObj.setFact(factName);
