@@ -35,11 +35,17 @@ public class ComputedFactsVO implements Serializable {
 	@JsonProperty("strValue")
 	private String strValue;
 	
+	@JsonProperty("strType")
+	private String strType;
+	
 	@JsonProperty("acc_open_date")
 	private String acc_open_date;
 	
 	@JsonProperty("acc_Re_date")
 	private String acc_Re_date;
+	
+	@JsonProperty("fieldTag")
+	private String fieldTag;
 	
 	
 	@JsonProperty("accountStatus")
@@ -160,6 +166,26 @@ public class ComputedFactsVO implements Serializable {
 	@JsonProperty("acc_Re_date")
 	public void setAcc_Re_date(String acc_Re_date) {
 		this.acc_Re_date = acc_Re_date;
+	}
+
+	@JsonProperty("strType")
+	public String getStrType() {
+		return strType;
+	}
+
+	@JsonProperty("strType")
+	public void setStrType(String strType) {
+		this.strType = strType;
+	}
+
+	@JsonProperty("fieldTag")
+	public String getFieldTag() {
+		return fieldTag;
+	}
+
+	@JsonProperty("fieldTag")
+	public void setFieldTag(String fieldTag) {
+		this.fieldTag = fieldTag;
 	}
 	
 	
