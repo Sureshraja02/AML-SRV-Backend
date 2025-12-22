@@ -130,10 +130,10 @@ public class CustomerDetailsService {
 
 				if (customerEnityObj != null && customerEnityObj.getPanNo() != null) {
 
-					retnVal = "AVAILABLE";
+					retnVal = "NON_NIL";
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, retnVal);
 				} else {
-					retnVal = "NO_PAN";
+					retnVal = "NIL";
 					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
 				}
 			}

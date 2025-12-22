@@ -557,7 +557,7 @@ public class TransactionService {
 			if (predicates != null) {
 				cq.where(cb.and(predicates.toArray(new Predicate[0])));
 				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")), cb.sum(rootBk.get("amount")),
-						cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")), cb.countDistinct(rootBk.get("counterpartyAccountNo")),rootBk.get("amount"));
+						cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")), cb.countDistinct(rootBk.get("counterpartyAccountNo")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
 					Long count = (Long) result[1];
@@ -566,14 +566,14 @@ public class TransactionService {
 					BigDecimal max = (BigDecimal) result[4];
 					Double avg = (Double) result[5];
 					Long counterpartyAccountNo = (Long) result[6];
-					BigDecimal txnAmount = (BigDecimal) result[7];
+				//	BigDecimal txnAmount = (BigDecimal) result[7];
 					dto.setCountAmount(count);
 					dto.setMaxAmount(max);
 					dto.setMinAmount(min);
 					dto.setSumAmount(sum);
 					dto.setAvgAmount(avg);
 					dto.setCOuntDistcounterpartyAccountNo(counterpartyAccountNo);
-					dto.setTxnAmount(txnAmount);
+					//dto.setTxnAmount(txnAmount);
 
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
 				} else {
@@ -707,7 +707,7 @@ public class TransactionService {
 			if (predicates != null) {
 				cq.where(cb.and(predicates.toArray(new Predicate[0])));
 				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")), cb.sum(rootBk.get("amount")),
-						cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")), cb.countDistinct(rootBk.get("counterpartyAccountNo")),rootBk.get("amount"));
+						cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")), cb.countDistinct(rootBk.get("counterpartyAccountNo")));
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
 					Long count = (Long) result[1];
@@ -716,14 +716,14 @@ public class TransactionService {
 					BigDecimal max = (BigDecimal) result[4];
 					Double avg = (Double) result[5];
 					Long counterpartyAccountNo = (Long) result[6];
-					BigDecimal txnAmount = (BigDecimal) result[7];
+					//BigDecimal txnAmount = (BigDecimal) result[7];
 					dto.setCountAmount(count);
 					dto.setMaxAmount(max);
 					dto.setMinAmount(min);
 					dto.setSumAmount(sum);
 					dto.setAvgAmount(avg);
 					dto.setCOuntDistcounterpartyAccountNo(counterpartyAccountNo);
-					dto.setTxnAmount(txnAmount);
+					//dto.setTxnAmount(txnAmount);
 
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
 				} else {
@@ -862,7 +862,7 @@ public class TransactionService {
 
 				
 				cq.multiselect(cb.count(rootBk), cb.count(rootBk.get("amount")), cb.sum(rootBk.get("amount")),
-						cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")), cb.countDistinct(rootBk.get("counterpartyAccountNo")),rootBk.get("amount"), maxDateExp);
+						cb.min(rootBk.get("amount")), cb.max(rootBk.get("amount")),cb.avg(rootBk.get("amount")), cb.countDistinct(rootBk.get("counterpartyAccountNo")), maxDateExp);
 				Object[] result = entityManager.createQuery(cq).getSingleResult();
 				if (result != null && result.length > 1) {
 					Long count = (Long) result[1];
@@ -871,15 +871,15 @@ public class TransactionService {
 					BigDecimal max = (BigDecimal) result[4];
 					Double avg = (Double) result[5];
 					Long counterpartyAccountNo = (Long) result[6];
-					BigDecimal txnAmount = (BigDecimal) result[7];
-					String txnDate=(String) result[8];
+					//BigDecimal txnAmount = (BigDecimal) result[7];
+					String txnDate=(String) result[7];
 					dto.setCountAmount(count);
 					dto.setMaxAmount(max);
 					dto.setMinAmount(min);
 					dto.setSumAmount(sum);
 					dto.setAvgAmount(avg);
 					dto.setCOuntDistcounterpartyAccountNo(counterpartyAccountNo);
-					dto.setTxnAmount(txnAmount);
+					//dto.setTxnAmount(txnAmount);
 					dto.setTransDate(txnDate);
 
 					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
@@ -1134,5 +1134,146 @@ public class TransactionService {
 		return dto;
 
 	
+	}
+	
+	public TransactionDetailsDTO getTransactionDetails(String reqId, String custId, String account, String txnId,
+			String txnType,String deposiwithdrawal, String transactionMode,boolean foreignCountryCode, Integer days, Integer months, Factset factSetObj, Range range,boolean amountOnly) {
+
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@ruleOfImmediateWithdraw method called...........",
+				reqId);
+
+		TransactionDetailsDTO dto = new TransactionDetailsDTO();
+		LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getCountValue method called...........", reqId);
+		LOGGER.info(
+				"REQID : [{}] - custId [{}] accNo : [{}] txnId [{}] transType : [{}] transactionMode [{}]  days : [{}] months [{}]",
+				reqId, custId, account, txnId, txnType, transactionMode, days, months);
+		BigDecimal retnVal = null;
+		CriteriaBuilder cb = null;
+		List<Predicate> predicates = null;
+		CriteriaQuery<Object[]> cq = null;
+		Root<TransactionDetailsEntity> rootBk = null;
+		try {
+			cb = entityManager.getCriteriaBuilder();
+			cq = cb.createQuery(Object[].class);
+			predicates = new ArrayList<Predicate>();
+			rootBk = cq.from(TransactionDetailsEntity.class);
+			if (StringUtils.isNotBlank(custId)) {
+				predicates.add(cb.equal(rootBk.get("customerId"), custId));
+			} else if (StringUtils.isNotBlank(account)) {
+				predicates.add(cb.equal(rootBk.get("accountNo"), account));
+			}
+			if (StringUtils.isNotBlank(txnId)) {
+				predicates.add(cb.equal(rootBk.get("transactionId"), txnId));
+			}
+
+			if (StringUtils.isNotBlank(txnType)) {
+				predicates.add(cb.equal(rootBk.get("transactionType"), txnType));
+			}
+			
+			if (StringUtils.isNotBlank(deposiwithdrawal)) {
+				predicates.add(cb.equal(rootBk.get("depositorWithdrawal"), deposiwithdrawal));
+			}
+			
+			
+			if (foreignCountryCode) {
+				List<String> countryCode = Arrays.asList("IN");
+				Predicate incountryCode = (rootBk.get("counterCountryCode").in(countryCode));
+				Predicate notInClause = cb.not(incountryCode);
+				predicates.add(notInClause);
+
+			}
+			
+			
+
+			if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("CASH")) {
+				List<String> channeltype = Arrays.asList("ATM", "CASH");
+				Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+				predicates.add(inchanneltype);
+			} else if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("NON-CASH")) {
+				List<String> channeltype = Arrays.asList("ATM", "CASH");
+				Predicate inchanneltype = (rootBk.get("channelType").in(channeltype));
+				Predicate notInClause = cb.not(inchanneltype);
+				predicates.add(notInClause);
+
+			}
+			else if (StringUtils.isNotBlank(transactionMode) && transactionMode.equals("BOTH")) {
+				
+			}
+			
+			if (range != null) {
+				if (range.getMin() != null && range.getMax() != null) {
+					predicates.add(cb.between(rootBk.get("amount"), range.getMin(), range.getMax()));
+				} else if (range.getMin() != null) {
+					// Only min present → greaterThanOrEqualTo
+					predicates.add(cb.greaterThanOrEqualTo(rootBk.get("amount"), range.getMin()));
+				} else if (range.getMax() != null) {
+					// Only max present → lessThanOrEqualTo
+					predicates.add(cb.lessThanOrEqualTo(rootBk.get("amount"), range.getMax()));
+				}
+
+			}
+
+			if (days != null) {
+
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusDays(days);
+				// Convert LocalDate to String in same format as DB
+				String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,
+						startDateStr);
+				Expression<java.sql.Date> txnDateAsDate = cb.function("to_Date", java.sql.Date.class,
+						rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD"));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr),
+						java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			if (months != null) {
+				LocalDate currentDateTdy = LocalDate.now();
+				LocalDate stDate = currentDateTdy.minusMonths(months);
+				// Convert LocalDate to String in same format as DB
+				String todayStr = currentDateTdy.toString(); // yyyy-MM-dd
+				String startDateStr = stDate.toString();
+
+				LOGGER.info("REQID : [{}] - Current / today Date : [{}]  startDateStr : [{}]", reqId, todayStr,
+						startDateStr);
+				Expression<java.sql.Date> txnDateAsDate = cb.function("to_Date", java.sql.Date.class,
+						rootBk.get("transactionDate"), cb.literal("YYYY-MM-DD"));
+				Predicate betweenDates = cb.between(txnDateAsDate, java.sql.Date.valueOf(startDateStr),
+						java.sql.Date.valueOf(todayStr));
+				predicates.add(betweenDates);
+			}
+			LOGGER.info("REQID : [{}] - columnName is :", reqId);
+			if (predicates != null) {
+				cq.where(cb.and(predicates.toArray(new Predicate[0])));
+				
+				
+				cq.multiselect(rootBk.get("amount"));
+				Object[] result = entityManager.createQuery(cq).getSingleResult();
+				if (result != null && result.length > 1) {
+				
+					BigDecimal txnAmount = (BigDecimal) result[1];
+					
+					dto.setTxnAmount(txnAmount);
+
+					LOGGER.info("REQID : [{}] - retnVal : [{}]", reqId, dto);
+				} else {
+					dto = null;
+					LOGGER.info("REQID : [{}] - result object is NUll, so retnVal : [{}]", reqId, retnVal);
+				}
+			}
+		} catch (Exception e) {
+			dto = null;
+			LOGGER.info("REQID : [{}] - Exception found in TransactionDetailsRepositryImpl@getCountValue :{}", reqId,
+					e);
+		} finally {
+			cb = null;
+			predicates = null;
+			cq = null;
+			rootBk = null;
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumValue method End...........\n\n", reqId);
+		}
+		return dto;
+
 	}
 }
