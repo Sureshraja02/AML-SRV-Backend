@@ -9,8 +9,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fisglobal.fsg.core.aml.entity.AccountDetailsEntity;
 import com.fisglobal.fsg.core.aml.entity.AccountStatusEntity;
 import com.fisglobal.fsg.core.aml.entity.CustomerDetailsEntity;
+import com.fisglobal.fsg.core.aml.repo.AccountDetailsService;
 import com.fisglobal.fsg.core.aml.repo.AccountStatusRepositryImpl;
 import com.fisglobal.fsg.core.aml.repo.CustomerDetailsRepoImpl;
 import com.fisglobal.fsg.core.aml.rule.fact.service.FactInterface;
@@ -42,6 +44,9 @@ public class RulesIdentifierService {
 	CustomerDetailsRepoImpl customerDetailsRepoImpl;
 	
 	@Autowired
+	AccountDetailsService accountDetailsService;
+	
+	@Autowired
 	AccountStatusRepositryImpl accountStatusRepositryImpl;
 	
 	@Autowired
@@ -65,6 +70,8 @@ public class RulesIdentifierService {
 		try {
 			LOGGER.info("RulesIdentifierService toComputeAMLData - ruleRequestVoObParam [{}]......",
 					ruleRequestVoObParam);
+			LOGGER.info("RulesIdentifierService toComputeAMLData - ruleRequestVoObParam as String[{}]......",
+					ruleRequestVoObParam.toString());
 			if (ruleRequestVoObParam != null) {
 				ruleResponseVoObj = new RuleResponseVo();
 
@@ -79,6 +86,9 @@ public class RulesIdentifierService {
 								FactInterface.class);
 						computedFactsVO = factInterface.getFactExecutor(ruleRequestVoObParam, fact, computedFacts);
 						computedFactsVO.setFact(fact.getFact());
+						computedFactsVO.setFieldTag(fact.getField());
+						
+						
 						computedFacts.add(computedFactsVO);
 					} else {
 						LOGGER.info("RuleRequestVo object is NULL recevie");
@@ -93,6 +103,16 @@ public class RulesIdentifierService {
 					ruleResposeDetailsVO.setAccountType(customerEnityObj.getCustomerType());
 				}
 			}
+			if (StringUtils.isNotBlank(ruleRequestVoObParam.getAccountNo())) {
+				AccountDetailsEntity customerEnityObj = accountDetailsService.getAccountDetails(ruleRequestVoObParam.getReqId(),null, ruleRequestVoObParam.getAccountNo());
+						
+				if (customerEnityObj != null) {
+					ruleResposeDetailsVO.setAccountType(customerEnityObj.getAccountType());
+				}
+			}
+			
+			
+			
 			if (StringUtils.isNotBlank(ruleRequestVoObParam.getAccountNo())) {
 				AccountStatusEntity accountStatusEntityObj = accountStatusRepositryImpl
 						.getAccountStatusByAccNO(ruleRequestVoObParam.getAccountNo(), ruleRequestVoObParam.getReqId());
