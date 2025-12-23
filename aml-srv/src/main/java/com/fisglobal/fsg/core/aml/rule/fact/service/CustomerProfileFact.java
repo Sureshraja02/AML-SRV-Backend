@@ -106,8 +106,8 @@ public class CustomerProfileFact implements FactInterface{
 					else
 					{
 						computedFactsVOObj.setFact(factName);						
-						computedFactsVOObj.setValue(new BigDecimal(0));
-						computedFactsVOObj.setStrType("num");
+						computedFactsVOObj.setStrValue("NIL");
+						computedFactsVOObj.setStrType("str");
 					}
 
 					/*if (profile != null) {
@@ -148,6 +148,7 @@ public class CustomerProfileFact implements FactInterface{
 							CustomerDetailsEntity custDetails = customerDetailsService.getCustomerDetails(requVoObjParam.getReqId(),custId);
 							if (custDetails != null) {
 								for (FS_FactConditionAttributeEntity gs : conditionAttribute) {
+									profile="RealEstateAgent";
 									if (gs.getAttributes().equals(custDetails.getCustomerType())) {
 										profile = gs.getAttributes();
 									}
@@ -165,8 +166,8 @@ public class CustomerProfileFact implements FactInterface{
 					else
 					{
 						computedFactsVOObj.setFact(factName);						
-						computedFactsVOObj.setValue(new BigDecimal(0));
-						computedFactsVOObj.setStrType("num");
+						computedFactsVOObj.setStrValue("NIL");
+						computedFactsVOObj.setStrType("str");
 					}
 				}
 				else if (condition.equals("LOW-CASH-PROFILE")) {
@@ -201,8 +202,8 @@ public class CustomerProfileFact implements FactInterface{
 					else
 					{
 						computedFactsVOObj.setFact(factName);						
-						computedFactsVOObj.setValue(new BigDecimal(0));
-						computedFactsVOObj.setStrType("num");
+						computedFactsVOObj.setStrValue("NIL");
+						computedFactsVOObj.setStrType("str");
 					}
 				}
 				

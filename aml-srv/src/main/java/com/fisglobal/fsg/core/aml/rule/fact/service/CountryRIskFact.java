@@ -72,14 +72,30 @@ public class CountryRIskFact implements FactInterface{
 			Range range = factSetObj.getRange();
 			String condition = factSetObj.getCondition();
 			TransactionDetailsDTO dto =null;
-			
+			 computedFactsVOObj.setStrType("str");
 			if(condition!=null)
 			{
 				 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType);
 			 if(dto!=null && dto.getCounterContryCode()!=null)
 			{
-				 computedFactsVOObj.setStrType("str");
+				
 			if(condition!=null && condition.equals("HIGH_RISK_COUNTRIES"))
+			{
+					FS_FIUIndHighRiskCountryEntity	countryEntity = fS_FIUIndHighRiskCountryRepoImpl.getCountryByritiria(requVoObjParam.getReqId(), dto.getCounterContryCode());
+					if(countryEntity!=null)
+					{
+						computedFactsVOObj.setFact(factName);
+						computedFactsVOObj.setStrValue("HIGH_RISK");	
+					}
+					else
+					{
+						computedFactsVOObj.setFact(factName);
+						computedFactsVOObj.setStrValue("NO_HIGH_RISK");	
+					}
+					
+				
+			}
+			else if(condition!=null && condition.equals("HIGH_RISK"))
 			{
 					FS_FIUIndHighRiskCountryEntity	countryEntity = fS_FIUIndHighRiskCountryRepoImpl.getCountryByritiria(requVoObjParam.getReqId(), dto.getCounterContryCode());
 					if(countryEntity!=null)
@@ -97,7 +113,7 @@ public class CountryRIskFact implements FactInterface{
 			}
 			else if(condition!=null && condition.equals("TERROR_LOCATIONS"))
 			{
-				computedFactsVOObj.setStrType("num");
+				
 				FS_FIUIndTerrorLocationEntity	terrorLocationEntity = fS_FIUIndTerrorLocationRepoImpl.getCountryByritiria(requVoObjParam.getReqId(), dto.getCounterContryCode());
 				if(terrorLocationEntity!=null)
 				{
@@ -135,22 +151,7 @@ public class CountryRIskFact implements FactInterface{
 			}
 			}
 			}
-			else
-			{
-				 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
-							transMode, days, months, factSetObj, range);
-				 computedFactsVOObj.setStrType("str");
-				 if (dto != null && dto.getSumAmount() != null) {
-
-						computedFactsVOObj.setFact(factName);
-						computedFactsVOObj.setValue(dto.getSumAmount());
-					}
-				 else
-					{
-						computedFactsVOObj.setFact(factName);
-						computedFactsVOObj.setValue(new BigDecimal(0));
-					}
-			}
+			
 
 			
 
