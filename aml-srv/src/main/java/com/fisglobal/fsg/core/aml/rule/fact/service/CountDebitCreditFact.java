@@ -67,6 +67,7 @@ public class CountDebitCreditFact implements FactInterface{
 			Range range = factSetObj.getRange();
 			String condition = factSetObj.getCondition();
 			TransactionDetailsDTO dto =null;
+			computedFactsVOObj.setStrType("num");
 			if(condition!=null)
 			{
 			if (condition.equals("LOW-CASH-PROFILE")) {
@@ -100,7 +101,7 @@ public class CountDebitCreditFact implements FactInterface{
 
 							computedFactsVOObj.setFact(factName);
 							computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
-							computedFactsVOObj.setStrValue(profile);
+							
 						}
 						else
 						{
@@ -141,7 +142,7 @@ public class CountDebitCreditFact implements FactInterface{
 
 				} else {
 					computedFactsVOObj.setFact(factName);
-					computedFactsVOObj.setStrValue("NO_DORMANT_REACTIVATION");
+					//computedFactsVOObj.setStrValue("NO_DORMANT_REACTIVATION");
 					computedFactsVOObj.setValue(new BigDecimal(0));
 				}
 

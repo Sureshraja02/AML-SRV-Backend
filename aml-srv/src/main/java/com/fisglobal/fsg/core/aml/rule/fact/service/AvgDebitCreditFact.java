@@ -55,6 +55,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 
 				computedFactsVOObj.setFact(factName);
 				computedFactsVOObj.setValue(new BigDecimal(dto.getAvgAmount()));
+				
 			}
 			else
 			{
