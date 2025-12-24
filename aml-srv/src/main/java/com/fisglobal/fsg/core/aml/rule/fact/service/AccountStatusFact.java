@@ -56,7 +56,8 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			Range range = factSetObj.getRange();
 			String condition = factSetObj.getCondition();
 			TransactionDetailsDTO dto =null;
-
+			computedFactsVOObj.setStrType("str");
+			computedFactsVOObj.setFact(factName);
 			if (condition != null) {
 				if (condition.equals("NEW_ACCOUNT")) {
 					AccountDetailsEntity acctDetails = accountDetailsService
@@ -70,20 +71,20 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 						long daysBetween = ChronoUnit.DAYS.between(openDate, currentDate);
 						if (days != null && days >= daysBetween) {
 							computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
-							computedFactsVOObj.setAccountStatus("NEW");
+							computedFactsVOObj.setStrValue("NEW");
 						} else if (months != null) {
 							int totalDays = months * 30;
 							if (totalDays >= daysBetween) {
 								computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
-								computedFactsVOObj.setAccountStatus("NEW");
+								computedFactsVOObj.setStrValue("NEW");
 							}
 						} else {
 							computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
-							computedFactsVOObj.setAccountStatus("OLD");
+							computedFactsVOObj.setStrValue("OLD");
 						}
 					} else {
 
-						computedFactsVOObj.setAccountStatus("OLD");
+						computedFactsVOObj.setStrValue("OLD");
 					}
 
 				}

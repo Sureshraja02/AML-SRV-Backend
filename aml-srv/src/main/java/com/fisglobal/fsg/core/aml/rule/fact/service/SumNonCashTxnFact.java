@@ -52,7 +52,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumNonCashTxnFact.class);
 			Range range = factSetObj.getRange();
 
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
-					"NON-CASH", days, months, factSetObj, range);
+					"NON-CASH", days, months, factSetObj, range,hours);
 			computedFactsVOObj.setStrType("num");
 			if (dto != null && dto.getSumAmount() != null) {
 

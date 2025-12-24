@@ -70,11 +70,12 @@ public class AccountTypeFact implements FactInterface{
 			Range range = factSetObj.getRange();
 			String condition = factSetObj.getCondition();
 			AccountDetailsEntity dto = null;
+			computedFactsVOObj.setStrType("str");
 			if (condition != null) {
 				if (condition.equals("CA_NON_PUBLIC")) {
 
 					dto = accountDetailsService.getAccountDetails(reqId, custId, accNo);
-					computedFactsVOObj.setStrType("str");
+					
 					if (dto != null && dto.getAccountType() != null) {
 
 						computedFactsVOObj.setFact(factName);

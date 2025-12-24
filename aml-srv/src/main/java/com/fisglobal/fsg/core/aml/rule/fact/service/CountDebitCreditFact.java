@@ -1,6 +1,9 @@
 package com.fisglobal.fsg.core.aml.rule.fact.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fisglobal.fsg.core.aml.entity.AccountDetailsEntity;
 import com.fisglobal.fsg.core.aml.entity.AccountStatusEntity;
 import com.fisglobal.fsg.core.aml.entity.CustomerDetailsEntity;
 import com.fisglobal.fsg.core.aml.entity.FS_FactConditionAttributeEntity;
@@ -22,6 +26,7 @@ import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
+import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
 @Service("COUNT_DEBIT_CREDITService")
 public class CountDebitCreditFact implements FactInterface{
@@ -96,7 +101,7 @@ public class CountDebitCreditFact implements FactInterface{
 
 				if (profile != null) {
 					 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
-								transMode, days, months, factSetObj, range);
+								transMode, days, months, factSetObj, range,hours);
 						if (dto != null && dto.getCountAmount() != null) {
 
 							computedFactsVOObj.setFact(factName);
@@ -127,7 +132,7 @@ public class CountDebitCreditFact implements FactInterface{
 					computedFactsVOObj.setAcc_Re_date(acctStatus.getChangeDate());
 					computedFactsVOObj.setStrValue("DORMANT_REACTIVATION");
 					 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
-								transMode, days, months, factSetObj, range);
+								transMode, days, months, factSetObj, range,hours);
 					 computedFactsVOObj.setStrType("num");
 					if (dto != null && dto.getCountAmount() != null) {
 
@@ -147,11 +152,57 @@ public class CountDebitCreditFact implements FactInterface{
 				}
 
 			}
+			else if (condition.equals("NEW_ACCOUNT")) {
+				AccountDetailsEntity acctDetails = accountDetailsService
+						.getAccountDetails(requVoObjParam.getReqId(), accNo, custId);
+				if (acctDetails != null && acctDetails.getAccountOpenedDate() != null) {
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+					LocalDate openDate = LocalDate.parse(acctDetails.getAccountOpenedDate(), formatter);
+					LocalDate currentDate = LocalDate.now();
+					System.out.println(openDate); // Output: 2025-05-20
+
+					long daysBetween = ChronoUnit.DAYS.between(openDate, currentDate);
+					if (days != null && days >= daysBetween) {
+						computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());						
+						computedFactsVOObj.setStrType("num");
+						 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
+									transMode, days, months, factSetObj, range,hours);
+						if (dto != null && dto.getCountAmount() != null) {
+
+							computedFactsVOObj.setFact(factName);
+							computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
+						}
+							else
+							{
+								computedFactsVOObj.setFact(factName);
+								computedFactsVOObj.setValue(new BigDecimal(0));
+							}
+					} else if (months != null) {
+						int totalDays = months * 30;
+						if (totalDays >= daysBetween) {
+							computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
+							computedFactsVOObj.setAccountStatus("NEW");
+							 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.DEPOSIT,
+										transMode,true, days, months, factSetObj, range,false);
+								if (dto != null && dto.getTxnAmount() != null) {
+									computedFactsVOObj.setValue((dto.getTxnAmount()));
+								}
+						}
+					} else {
+						computedFactsVOObj.setAcc_open_date(acctDetails.getAccountOpenedDate());
+						computedFactsVOObj.setAccountStatus("OLD");
+					}
+				} else {
+
+					computedFactsVOObj.setAccountStatus("OLD");
+				}
+
+			}
 			}
 			else
 			{
 				 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
-							transMode, days, months, factSetObj, range);
+							transMode, days, months, factSetObj, range,hours);
 				if (dto != null && dto.getCountAmount() != null) {
 
 					computedFactsVOObj.setFact(factName);

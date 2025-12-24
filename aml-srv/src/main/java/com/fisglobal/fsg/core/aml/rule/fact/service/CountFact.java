@@ -63,6 +63,7 @@ public class CountFact implements FactInterface{
 			Range range = factSetObj.getRange();
 			String condition = factSetObj.getCondition();
 			TransactionDetailsDTO dto =null;
+			computedFactsVOObj.setStrType("num");
 			if(condition!=null)
 			{                                                                                                                                    
 			if (condition.equals("LOW-CASH-PROFILE")) {
@@ -91,12 +92,12 @@ public class CountFact implements FactInterface{
 
 				if (profile != null) {
 					 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
-								transMode, days, months, factSetObj, range);
+								transMode, days, months, factSetObj, range,hours);
 						if (dto != null && dto.getCountAmount() != null) {
 
 							computedFactsVOObj.setFact(factName);
 							computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
-							computedFactsVOObj.setStrValue(profile);
+							//computedFactsVOObj.setStrValue(profile);
 						}
 						else
 						{
@@ -115,7 +116,7 @@ public class CountFact implements FactInterface{
 			else
 			{
 				 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
-						transMode, days, months, factSetObj, range);
+						transMode, days, months, factSetObj, range,hours);
 				if (dto != null && dto.getCountAmount() != null) {
 
 					computedFactsVOObj.setFact(factName);

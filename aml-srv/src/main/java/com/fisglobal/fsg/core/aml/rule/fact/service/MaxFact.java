@@ -68,7 +68,7 @@ public class MaxFact implements FactInterface{
 						computedFactsVOObj.setAcc_Re_date(acctStatus.getChangeDate());
 						computedFactsVOObj.setStrValue("DORMANT_REACTIVATION");
 						dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null, transMode,
-								days, months, factSetObj, range);
+								days, months, factSetObj, range,hours);
 						computedFactsVOObj.setStrType("num");
 						if (dto != null && dto.getCountAmount() != null) {
 
@@ -90,7 +90,7 @@ public class MaxFact implements FactInterface{
 				}
 			} else {
 				dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType, transMode, days,
-						months, factSetObj, range);
+						months, factSetObj, range,hours);
 				computedFactsVOObj.setStrType("num");
 				if (dto != null && dto.getCountAmount() != null) {
 

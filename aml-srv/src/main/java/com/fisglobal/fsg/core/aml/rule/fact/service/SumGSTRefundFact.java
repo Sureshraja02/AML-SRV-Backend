@@ -92,7 +92,7 @@ public class SumGSTRefundFact implements FactInterface{
 				computedFactsVOObj.setStrType("num");
 				if (profile != null) {
 					 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
-								transMode, days, months, factSetObj, range);
+								transMode, days, months, factSetObj, range,hours);
 						if (dto != null && dto.getCountAmount() != null) {
 
 							computedFactsVOObj.setFact(factName);
@@ -116,7 +116,7 @@ public class SumGSTRefundFact implements FactInterface{
 			else
 			{
 				 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
-							transMode, days, months, factSetObj, range);
+							transMode, days, months, factSetObj, range,hours);
 				 if (dto != null && dto.getSumAmount() != null) {
 
 						computedFactsVOObj.setFact(factName);

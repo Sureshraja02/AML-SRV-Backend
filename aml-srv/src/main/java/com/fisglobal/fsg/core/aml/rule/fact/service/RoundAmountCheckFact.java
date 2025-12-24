@@ -49,7 +49,7 @@ public class RoundAmountCheckFact implements FactInterface{
 			Range range = factSetObj.getRange();
 
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
-					transMode, days, months, factSetObj, range);
+					transMode, days, months, factSetObj, range,hours);
 			computedFactsVOObj.setStrType("num");
 			if (dto != null && dto.getCountAmount() != null) {
 

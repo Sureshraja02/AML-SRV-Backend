@@ -66,7 +66,7 @@ public class SumDepositFact implements FactInterface{
 				{
 				
 				 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, AMLConstants.DEPOSIT,
-						transMode, days, months, factSetObj, range);
+						transMode, days, months, factSetObj, range,hours);
 				if (dto != null && dto.getSumAmount() != null) {
 
 					computedFactsVOObj.setFact(factName);

@@ -49,7 +49,7 @@ public class SumOutwardRemittanceFact implements FactInterface{
 			Range range = factSetObj.getRange();
 			computedFactsVOObj.setStrType("num");
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, transType,
-					transMode, days, months, factSetObj, range);
+					transMode, days, months, factSetObj, range,hours);
 			if (dto != null && dto.getCountAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);

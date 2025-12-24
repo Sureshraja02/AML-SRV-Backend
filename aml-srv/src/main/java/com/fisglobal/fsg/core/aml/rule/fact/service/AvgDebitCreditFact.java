@@ -49,7 +49,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			Range range = factSetObj.getRange();
 
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
-					transMode, days, months, factSetObj, range);
+					transMode, days, months, factSetObj, range,hours);
 			computedFactsVOObj.setStrType("num");
 			if (dto != null && dto.getAvgAmount() != null) {
 

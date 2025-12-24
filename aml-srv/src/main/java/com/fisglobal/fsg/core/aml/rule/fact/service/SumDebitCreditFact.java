@@ -117,7 +117,7 @@ public class SumDebitCreditFact implements FactInterface{
 				if (newClosedflag) {
 
 					 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
-							transMode, days, months, factSetObj, range);
+							transMode, days, months, factSetObj, range,hours);
 					 computedFactsVOObj.setStrType("num");
 					if (dto != null && dto.getSumAmount() != null) {
 
@@ -140,7 +140,7 @@ public class SumDebitCreditFact implements FactInterface{
 			{
 			
 			 dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,
-					transMode, days, months, factSetObj, range);
+					transMode, days, months, factSetObj, range,hours);
 			if (dto != null && dto.getSumAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);
