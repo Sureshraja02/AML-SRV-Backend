@@ -18,8 +18,8 @@ import com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService;
 import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
 
-@Service("SUM_ACCOUNT_TRANSFERSService")
-public class SumAccountTransferFact implements FactInterface{
+@Service("COUNT_ACCOUNT_TRANSFERSService")
+public class CountAccountTransferFact implements FactInterface{
 
 
 
@@ -32,7 +32,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
-		LOGGER.info("REQID : [{}]::::::::::::SumAccountTransferFact@getFactExecutor (ENTRY) Called::::::::::",
+		LOGGER.info("REQID : [{}]::::::::::::CountAccountTransferFact@getFactExecutor (ENTRY) Called::::::::::",
 				requVoObjParam.getReqId());
 		String factName = null, accNo = null, custId = null, transMode = null, transType = null, 
 				txnTime = null, txnId = null, reqId = null;
@@ -54,10 +54,10 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, null,AMLConstants.WITHDRAW,
 					transMode, days, months, factSetObj, range);
 			computedFactsVOObj.setStrType("num");
-			if (dto != null && dto.getSumAmount() != null) {
+			if (dto != null && dto.getCountAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);
-				computedFactsVOObj.setValue((dto.getSumAmount()));
+				computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
 			}
 			else
 			{
@@ -66,10 +66,10 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			}
 
 		} catch (Exception e) {
-			LOGGER.error("Exception found in SumAccountTransferFact@getFactExecutor : {}", e);
+			LOGGER.error("Exception found in CountAccountTransferFact@getFactExecutor : {}", e);
 		} finally {
 
-			LOGGER.info("REQID : [{}]::::::::::::SumAccountTransferFact@getFactExecutor (EXIT) End::::::::::\n\n",
+			LOGGER.info("REQID : [{}]::::::::::::CountAccountTransferFact@getFactExecutor (EXIT) End::::::::::\n\n",
 					requVoObjParam.getReqId());
 		}
 		return computedFactsVOObj;

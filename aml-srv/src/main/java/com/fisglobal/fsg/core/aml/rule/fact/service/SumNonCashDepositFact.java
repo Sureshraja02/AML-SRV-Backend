@@ -15,7 +15,7 @@ import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 
 
-@Service("SUM_NON_CASH_DEPOSITSService")
+@Service("SUM_NONCASH_DEPOSITSService")
 public class SumNonCashDepositFact implements FactInterface{
 
 

@@ -18,12 +18,11 @@ import com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService;
 import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
 
-@Service("SUM_ACCOUNT_TRANSFERSService")
-public class SumAccountTransferFact implements FactInterface{
+@Service("WITHDRAWAL_PERCENTAGE_OUTSIDE_INDIAService")
+public class WithdrawPercentageOutsideIndiaFact implements FactInterface{
 
 
-
-private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
+	private Logger LOGGER = LoggerFactory.getLogger(AvgCashDepositFact.class);
 	
 	@Autowired
 	TransactionService transactionService;
@@ -32,7 +31,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
-		LOGGER.info("REQID : [{}]::::::::::::SumAccountTransferFact@getFactExecutor (ENTRY) Called::::::::::",
+		LOGGER.info("REQID : [{}]::::::::::::WithdrawPercentageOutsideIndiaFact@getFactExecutor (ENTRY) Called::::::::::",
 				requVoObjParam.getReqId());
 		String factName = null, accNo = null, custId = null, transMode = null, transType = null, 
 				txnTime = null, txnId = null, reqId = null;
@@ -51,13 +50,13 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			txnTime = requVoObjParam.getTxn_time();
 			Range range = factSetObj.getRange();
 
-			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, null,AMLConstants.WITHDRAW,
+			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, null,AMLConstants.DEPOSIT,
 					transMode, days, months, factSetObj, range);
 			computedFactsVOObj.setStrType("num");
-			if (dto != null && dto.getSumAmount() != null) {
+			if (dto != null && dto.getCountAmount() != null) {
 
 				computedFactsVOObj.setFact(factName);
-				computedFactsVOObj.setValue((dto.getSumAmount()));
+				computedFactsVOObj.setValue(new BigDecimal(dto.getCountAmount()));
 			}
 			else
 			{
@@ -66,10 +65,10 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			}
 
 		} catch (Exception e) {
-			LOGGER.error("Exception found in SumAccountTransferFact@getFactExecutor : {}", e);
+			LOGGER.error("Exception found in WithdrawPercentageOutsideIndiaFact@getFactExecutor : {}", e);
 		} finally {
 
-			LOGGER.info("REQID : [{}]::::::::::::SumAccountTransferFact@getFactExecutor (EXIT) End::::::::::\n\n",
+			LOGGER.info("REQID : [{}]::::::::::::WithdrawPercentageOutsideIndiaFact@getFactExecutor (EXIT) End::::::::::\n\n",
 					requVoObjParam.getReqId());
 		}
 		return computedFactsVOObj;

@@ -14,16 +14,13 @@ import com.fisglobal.fsg.core.aml.rule.process.request.Factset;
 import com.fisglobal.fsg.core.aml.rule.process.request.Range;
 import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
-import com.fisglobal.fsg.core.aml.rule.service.RulesIdentifierService;
 import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
-
-@Service("SUM_ACCOUNT_TRANSFERSService")
-public class SumAccountTransferFact implements FactInterface{
-
+@Service("COUNT_DISTINCT_BENEFICIARIESService")
+public class CountDistinctBeneficiaryFact implements FactInterface{
 
 
-private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
+private Logger LOGGER = LoggerFactory.getLogger(CountDistinctBeneficiaryFact.class);
 	
 	@Autowired
 	TransactionService transactionService;
@@ -32,7 +29,7 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 	public ComputedFactsVO getFactExecutor(RuleRequestVo requVoObjParam, Factset factSetObj,List<ComputedFactsVO> computedFacts ) {
 
 		ComputedFactsVO computedFactsVOObj = null;
-		LOGGER.info("REQID : [{}]::::::::::::SumAccountTransferFact@getFactExecutor (ENTRY) Called::::::::::",
+		LOGGER.info("REQID : [{}]::::::::::::CountDistinctBeneficiaryFact@getFactExecutor (ENTRY) Called::::::::::",
 				requVoObjParam.getReqId());
 		String factName = null, accNo = null, custId = null, transMode = null, transType = null, 
 				txnTime = null, txnId = null, reqId = null;
@@ -54,10 +51,10 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, null, null,AMLConstants.WITHDRAW,
 					transMode, days, months, factSetObj, range);
 			computedFactsVOObj.setStrType("num");
-			if (dto != null && dto.getSumAmount() != null) {
+			if (dto != null && dto.getCountcounterpartyAccountNo() != null) {
 
 				computedFactsVOObj.setFact(factName);
-				computedFactsVOObj.setValue((dto.getSumAmount()));
+				computedFactsVOObj.setValue(new BigDecimal(dto.getCountcounterpartyAccountNo()));
 			}
 			else
 			{
@@ -66,10 +63,10 @@ private Logger LOGGER = LoggerFactory.getLogger(SumDebitCreditFact.class);
 			}
 
 		} catch (Exception e) {
-			LOGGER.error("Exception found in SumAccountTransferFact@getFactExecutor : {}", e);
+			LOGGER.error("Exception found in CountDistinctBeneficiaryFact@getFactExecutor : {}", e);
 		} finally {
 
-			LOGGER.info("REQID : [{}]::::::::::::SumAccountTransferFact@getFactExecutor (EXIT) End::::::::::\n\n",
+			LOGGER.info("REQID : [{}]::::::::::::CountDistinctBeneficiaryFact@getFactExecutor (EXIT) End::::::::::\n\n",
 					requVoObjParam.getReqId());
 		}
 		return computedFactsVOObj;

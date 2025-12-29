@@ -16,7 +16,7 @@ import com.fisglobal.fsg.core.aml.rule.process.request.RuleRequestVo;
 import com.fisglobal.fsg.core.aml.rule.process.response.ComputedFactsVO;
 import com.fisglobal.fsg.core.aml.utils.AMLConstants;
 
-@Service("COUNT_BENEFICIARYService")
+@Service("BENEFICIARY_COUNTService")
 public class CountBeneficiaryFact implements FactInterface{
 
 

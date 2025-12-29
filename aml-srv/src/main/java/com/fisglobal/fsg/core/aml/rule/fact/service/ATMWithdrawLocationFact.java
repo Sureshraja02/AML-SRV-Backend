@@ -50,7 +50,7 @@ public class ATMWithdrawLocationFact implements FactInterface{
 			txnTime = requVoObjParam.getTxn_time();
 			Range range = factSetObj.getRange();
 
-			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.DEPOSIT,
+			TransactionDetailsDTO dto = transactionService.getTransactionDetails(reqId, custId, accNo, txnId, null,AMLConstants.WITHDRAW,
 					transMode, days, months, factSetObj, range);
 			computedFactsVOObj.setStrType("num");
 			if (dto != null && dto.getCountAmount() != null) {
