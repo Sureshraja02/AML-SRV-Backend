@@ -7,6 +7,6 @@ import com.aml.srv.core.efrmsrv.entity.Alerts;
 
 
 @Repository
-public interface AlertsRepo extends JpaRepository<Alerts, String> {
+public interface AlertsRepo extends JpaRepository<Alerts, Integer> {
 
 }

@@ -17,11 +17,11 @@ import com.aml.srv.core.efrmsrv.utils.AMLConstants;
 @Configuration
 public class KafkaConfig {
 	
-	@Value(value = "${kafka.backoff.interval:10000}")
-	private Long interval;
-
-	@Value(value = "${kafka.backoff.max_failure:5}")
-	private Long maxAttempts;
+	/*
+	 * @Value(value = "${kafka.backoff.interval:10000}") private Long interval;
+	 * 
+	 * @Value(value = "${kafka.backoff.max_failure:5}") private Long maxAttempts;
+	 */
 
     /**
      * 

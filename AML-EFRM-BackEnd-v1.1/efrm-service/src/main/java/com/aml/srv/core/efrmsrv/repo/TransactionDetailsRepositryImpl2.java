@@ -1066,8 +1066,7 @@ public class TransactionDetailsRepositryImpl2 {
 			predicates = null;
 			cq = null;
 			rootBk = null;
-			LOGGER.info(
-					"REQID : [{}] - TransactionDetailsRepositryImpl@getSumCashDepositValue method End...........\n\n",
+			LOGGER.info("REQID : [{}] - TransactionDetailsRepositryImpl@getSumCashDepositValue method End...........\n\n",
 					reqId);
 		}
 		return computedFactsVO;
