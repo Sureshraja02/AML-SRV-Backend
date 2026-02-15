@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -11,8 +13,13 @@ import jakarta.persistence.Table;
 @Table(name = "FS_Alerts")
 public class Alerts {
 
-	@Column(name = "ALERT_ID")
+	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "ID")
+	private Integer id;
+	
+	@Column(name = "ALERT_ID")
 	private String alertId;
 
 	@Column(name = "ALERT_NAME")
@@ -62,6 +69,14 @@ public class Alerts {
 
 	@Column(name = "THRESHOLD_VALUE")
 	private String thresholdValue;
+	
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	public String getAlertId() {
 		return alertId;
